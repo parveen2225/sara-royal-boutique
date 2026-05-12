@@ -1,0 +1,656 @@
+@use "../../assets/theme/var" as *;
+
+/* ─── Page Shell ─────────────────────────────────── */
+.collections_page {
+  background: var(--boutique-bg);
+  color: var(--boutique-text);
+}
+
+/* ─── Hero ───────────────────────────────────────── */
+.collections_hero {
+  position: relative;
+  min-height: 42vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--navy-black) url("/images/Designer_Suits5.webp") center/cover
+    no-repeat;
+  overflow: hidden;
+
+  .collections_hero_overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      170deg,
+      rgba(4, 8, 16, 0.55) 0%,
+      rgba(7, 11, 18, 0.9) 100%
+    );
+  }
+
+  .collections_hero_content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 7.5rem 1.5rem 4.5rem;
+    animation: heroFadeUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .collections_hero_label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.1rem;
+
+    &::before,
+    &::after {
+      content: "";
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+  }
+
+  .collections_hero_title {
+    font-family: $playfair;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 700;
+    color: var(--ivory-text);
+    margin-bottom: 0.85rem;
+    line-height: 1.12;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .collections_hero_sub {
+    font-size: 1.05rem;
+    color: rgba(240, 230, 204, 0.68);
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+}
+
+.collections_body {
+  padding: 5rem 0 7rem;
+  background:
+    radial-gradient(
+      circle at 8% 0%,
+      rgba(201, 168, 76, 0.07),
+      transparent 30rem
+    ),
+    radial-gradient(
+      circle at 92% 60%,
+      rgba(201, 168, 76, 0.05),
+      transparent 25rem
+    ),
+    var(--boutique-bg);
+}
+
+.collections_section_header {
+  margin-bottom: 2.5rem;
+  animation: heroFadeUp 0.7s ease both;
+}
+
+.collections_section_eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+}
+
+.collections_section_title {
+  font-family: $playfair;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--boutique-text);
+  margin: 0 0 0.65rem;
+  line-height: 1.15;
+
+  em {
+    font-style: italic;
+    color: var(--gold);
+  }
+}
+
+.collections_section_sub {
+  font-size: 0.95rem;
+  color: var(--boutique-muted);
+  margin: 0;
+  line-height: 1.7;
+  max-width: 480px;
+}
+
+/* ─── Toolbar ────────────────────────────────────── */
+.collections_toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.collections_toolbar_top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ─── Service chip / pill row ────────────────────── */
+.collections_chips_row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding: 0.15rem 0.1rem 0.5rem;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.collection_chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.35rem;
+  padding: 0 1.2rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--boutique-muted);
+  background: transparent;
+  border: 1.5px solid var(--boutique-border);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.18s ease,
+    box-shadow 0.22s ease;
+
+  &:hover:not(.active) {
+    color: var(--gold);
+    border-color: rgba(201, 168, 76, 0.45);
+    background: rgba(201, 168, 76, 0.05);
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    background: var(--boutiqueGoldGradient);
+    color: var(--navy-black);
+    border-color: transparent;
+    box-shadow: 0 4px 18px rgba(201, 168, 76, 0.28);
+    transform: translateY(-1px);
+    padding-right: 0.65rem;
+  }
+
+  &.chip_all.active {
+    padding-right: 1.2rem;
+  }
+}
+
+.chip_label {
+  line-height: 1;
+}
+
+.chip_clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: rgba(8, 12, 20, 0.2);
+  font-size: 0.58rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.18s ease;
+
+  &:hover {
+    background: rgba(8, 12, 20, 0.38);
+  }
+}
+
+/* ─── Active filter chip row ─────────────────────── */
+.collections_active_filter_row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  animation: chipFadeIn 0.22s ease;
+}
+
+@keyframes chipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.collections_active_filter_chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding: 0 0.5rem 0 1rem;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1.5px solid rgba(201, 168, 76, 0.4);
+  border-radius: 999px;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(201, 168, 76, 0.65);
+  }
+
+  &.collections_active_filter_chip--service {
+    background: rgba(201, 168, 76, 0.07);
+  }
+}
+
+.active_filter_badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(201, 168, 76, 0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: 2rem;
+}
+
+.active_filter_label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--boutique-text);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.active_filter_clear_btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.12);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  color: var(--boutique-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  line-height: 1;
+
+  &:hover {
+    background: rgba(201, 168, 76, 0.25);
+    color: var(--gold);
+    border-color: rgba(201, 168, 76, 0.5);
+  }
+}
+
+/* ─── Collection dropdown ────────────────────────── */
+.collections_select_wrap {
+  position: relative;
+  min-width: 210px;
+
+  &::after {
+    content: "▾";
+    position: absolute;
+    right: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+}
+
+.collections_select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background: color-mix(in srgb, var(--boutique-card-bg) 92%, var(--gold) 8%);
+  border: 1.5px solid var(--boutique-border);
+  color: var(--boutique-text);
+  border-radius: 999px;
+  padding: 0.62rem 2.5rem 0.62rem 1.2rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+
+  &:focus {
+    outline: none;
+    border-color: rgba(201, 168, 76, 0.6);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+  }
+
+  option {
+    background: var(--boutique-card-bg);
+    color: var(--boutique-text);
+  }
+}
+
+/* ─── Divider below toolbar ──────────────────────── */
+.collections_divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--boutique-border) 30%,
+    var(--boutique-border) 70%,
+    transparent
+  );
+  margin-bottom: 1.75rem;
+}
+
+/* ─── Count + grid header ────────────────────────── */
+.collections_grid_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.25rem;
+  gap: 1rem;
+}
+
+.collections_count {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--boutique-muted);
+  letter-spacing: 0.02em;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    font-size: 0.875rem;
+  }
+
+  strong {
+    color: var(--gold);
+    font-weight: 700;
+  }
+}
+
+.collections_grid_label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--boutique-muted);
+
+  &::after {
+    content: "";
+    display: block;
+    width: 1.5rem;
+    height: 1px;
+    background: var(--boutique-border);
+  }
+}
+
+/* ─── Empty state ────────────────────────────────── */
+.collections_empty {
+  text-align: center;
+  padding: 6rem 0;
+
+  .empty_icon {
+    display: block;
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+    opacity: 0.4;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  p {
+    color: var(--boutique-muted);
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.08);
+  }
+}
+
+/* ─── Services CTA band ──────────────────────────── */
+.collections_services_band {
+  padding: 0 0 7rem;
+  background: var(--boutique-bg);
+}
+
+.collections_services_inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5rem;
+  padding: 2.75rem 3rem;
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(201, 168, 76, 0.1) 0%,
+      rgba(201, 168, 76, 0.03) 100%
+    ),
+    var(--boutique-card-bg);
+  box-shadow:
+    0 24px 64px var(--boutique-card-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(
+      circle,
+      rgba(201, 168, 76, 0.08) 0%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  h2 {
+    max-width: 600px;
+    font-family: $playfair;
+    font-size: clamp(1.5rem, 3vw, 2.3rem);
+    font-weight: 700;
+    color: var(--boutique-text);
+    margin: 0 0 0.65rem;
+    line-height: 1.2;
+  }
+
+  p {
+    max-width: 640px;
+    color: var(--boutique-muted);
+    line-height: 1.8;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.collections_services_label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  &::before {
+    content: "✦";
+    font-size: 0.55rem;
+  }
+}
+
+.collections_services_actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.collections_services_gold,
+.collections_services_outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.82rem 1.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.collections_services_gold {
+  background: var(--boutiqueGoldGradient);
+  color: var(--navy-black);
+  box-shadow: 0 6px 24px rgba(201, 168, 76, 0.22);
+
+  &:hover {
+    color: var(--navy-black);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(201, 168, 76, 0.38);
+  }
+}
+
+.collections_services_outline {
+  color: var(--gold);
+  background: transparent;
+  border: 1.5px solid var(--boutique-border);
+
+  svg {
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: rgba(201, 168, 76, 0.07);
+    transform: translateY(-2px);
+
+    svg {
+      transform: translateX(4px);
+    }
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────── */
+@media (max-width: 991px) {
+  .collections_toolbar_top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .collections_select_wrap {
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .collections_body {
+    padding: 4rem 0 5rem;
+  }
+
+  .collections_grid_header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .collections_services_band {
+    padding-bottom: 5rem;
+  }
+
+  .collections_services_inner {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .collections_services_actions {
+    justify-content: center;
+
+    .collections_services_gold,
+    .collections_services_outline {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+/* ─── Keyframes ──────────────────────────────────── */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

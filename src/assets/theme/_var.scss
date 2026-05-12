@@ -1,0 +1,161 @@
+$inter:
+  var(--font-body),
+  "Plus Jakarta Sans",
+  system-ui,
+  -apple-system,
+  sans-serif;
+$roboto: var(--font-body), "Plus Jakarta Sans", system-ui, sans-serif;
+$playfair:
+  var(--font-display),
+  "Plus Jakarta Sans",
+  system-ui,
+  -apple-system,
+  sans-serif;
+%transition {
+  transition: 0.3s all ease-in-out;
+}
+
+:root,
+.theme-light {
+  --gold: #c9a84c;
+  --goldLight: #e8d4a0;
+  --goldDark: #8b6914;
+  --navyBlack: #080c14;
+  --navySurface: #0e1622;
+  --navyHover: #14203a;
+  --ivoryText: #f0e6cc;
+  --mutedGold: #9b8a6e;
+  --creamLight: #faf7f0;
+  --red: #ff3134;
+  --red-rgb: 255, 49, 52;
+  --greenclr: #22c55e;
+  --baseClr: #04251f;
+  --borderclr: rgba(0, 0, 0, 0.1);
+  --white: #ffffff;
+  --textdark: #04060c;
+  --black: #000000;
+  --black-rgb: 0, 0, 0;
+  --boutiqueGoldGradient: linear-gradient(135deg, #8b6914 0%, #c9a84c 50%, #e8d4a0 100%);
+  --boutiqueGoldGradientHover: linear-gradient(135deg, #e8d4a0 0%, #c9a84c 50%, #8b6914 100%);
+  --boutiqueGoldGradient: linear-gradient(135deg, #8b6914 0%, #c9a84c 50%, #e8d4a0 100%);
+  --boutiqueGoldGradientHover: linear-gradient(135deg, #e8d4a0 0%, #c9a84c 50%, #8b6914 100%);
+  --greenlightbg: #effff4;
+  --bluelightbg: #d2e1f5;
+  --blueclr: #1d4ed8;
+  --darkgreenclr: #15803d;
+  --yellowclr: #facc15;
+  --borderclr2: rgba(255, 255, 255, 0.12);
+  --checkboxborder: rgba(0, 0, 0, 0.1);
+  --whitesecondry: #f8fafc;
+  --textgray: #6c757d;
+  --dotsclr: rgba(255, 255, 255, 0.12);
+  --tabHeadBorder: rgba(255, 255, 255, 0.12);
+  --tabLink: #94a3b8;
+  --green0f3333: #0f3333;
+ 
+  --boutique-bg: #faf7f0;
+  --boutique-surface: #ffffff;
+  --boutique-surface-hover: #f5edd8;
+  --boutique-nav-bg: rgba(250, 247, 240, 0.96);
+  --boutique-card-bg: #ffffff;
+  --boutique-text: #1a1208;
+  --boutique-muted: #7a6a52;
+  --boutique-gold: #c9a84c;
+  --boutique-gold-light: #e8d4a0;
+  --boutique-gold-dark: #8b6914;
+  --boutique-border: rgba(201, 168, 76, 0.3);
+  --boutique-input-bg: #f5edd8;
+  --boutique-shadow: rgba(139, 105, 20, 0.12);
+  --boutique-hero-overlay: rgba(26, 18, 8, 0.62);
+  --boutique-card-shadow: rgba(139, 105, 20, 0.15);
+  --boutique-footer-bg: #1a1208;
+  --boutique-footer-text: #f0e6cc;
+  --boutique-modal-border: rgba(201, 168, 76, 0.4);
+  --background: var(--boutique-bg);
+  --bg-app: var(--boutique-bg);
+  --surface: var(--boutique-surface);
+  --surface-muted: #f3ead7;
+  --surface-hover: var(--boutique-surface-hover);
+  --card: var(--boutique-card-bg);
+  --cardbg: var(--boutique-card-bg);
+  --border-color: var(--boutique-border);
+  --foreground: var(--boutique-text);
+  --textclr: var(--boutique-muted);
+  --placeholderclr: #9a886a;
+  --input-bg: var(--boutique-input-bg);
+  --input-text: #fff;
+  --shadow: var(--boutique-shadow);
+  --primaryclr: var(--boutique-gold);
+  --gradient: var(--boutiqueGoldGradient);
+  --gradient-hover: var(--boutiqueGoldGradientHover);
+  --table-heading: var(--boutique-gold-dark);
+  --table-row-text: var(--boutique-text);
+  --table-row-hover: rgba(201, 168, 76, 0.08);
+  --table-placeholder: rgba(139, 105, 20, 0.14);
+  --tooltip-bg: var(--boutique-footer-bg);
+  --tooltip-text: var(--boutique-footer-text);
+  --dangerBg: rgba(255, 49, 52, 0.1);
+  --dangerText: #c62828;
+  --dangerBorder: rgba(255, 49, 52, 0.25);
+  --navy-black: var(--navyBlack);
+  --ivory-text: var(--ivoryText);
+  --gold-light: var(--goldLight);
+  --scrollbarclr: var(--boutique-gold);
+}
+
+.theme-dark {
+  --background: #121212;
+  --bg-app: #121212;
+  --surface: #1e1e1e;
+  --surface-muted: #171717;
+  --surface-hover: #242424;
+  --card: #1e1e1e;
+  --cardbg: #191919;
+  --border-color: #2c2c2c;
+  --foreground: #e4e4e4;
+  --textclr: #a4acb9;
+  --placeholderclr: #7b8493;
+  --dangerBg: rgba(209, 26, 42, 0.12);
+  --dangerText: #ff8b98;
+  --dangerBorder: rgba(255, 139, 152, 0.18);
+  --label-gradient: linear-gradient(
+    90deg,
+    #f5f5f5 0%,
+    #d1d5db 50%,
+    #9ca3af 100%
+  );
+  --boutique-bg: #080c14;
+  --boutique-surface: #0e1622;
+  --boutique-surface-hover: #14203a;
+  --boutique-nav-bg: rgba(8, 12, 20, 0.95);
+  --boutique-card-bg: #0e1622;
+  --boutique-text: #f0e6cc;
+  --boutique-muted: #9b8a6e;
+  --boutique-gold: #c9a84c;
+  --boutique-gold-light: #e8d4a0;
+  --boutique-gold-dark: #8b6914;
+  --boutique-border: rgba(201, 168, 76, 0.2);
+  --boutique-input-bg: #0a1220;
+  --boutique-shadow: rgba(0, 0, 0, 0.5);
+  --boutique-hero-overlay: rgba(4, 8, 16, 0.68);
+  --boutique-card-shadow: rgba(201, 168, 76, 0.08);
+  --boutique-footer-bg: #040810;
+  --boutique-footer-text: #f0e6cc;
+  --boutique-modal-border: rgba(201, 168, 76, 0.3);
+  --input-bg: var(--boutique-input-bg);
+  --input-text: var(--boutique-text);
+  --shadow: rgba(0, 0, 0, 0.38);
+  --primaryclr: var(--boutique-gold);
+  --gradient: var(--boutiqueGoldGradient);
+  --gradient-hover: var(--boutiqueGoldGradientHover);
+  --table-heading: var(--boutique-gold);
+  --table-row-text: var(--boutique-text);
+  --table-row-hover: rgba(201, 168, 76, 0.07);
+  --table-placeholder: rgba(201, 168, 76, 0.14);
+  --tooltip-bg: var(--boutique-surface);
+  --tooltip-text: var(--boutique-text);
+  --navy-black: var(--navyBlack);
+  --ivory-text: var(--ivoryText);
+  --gold-light: var(--goldLight);
+  --scrollbarclr: var(--boutique-gold);
+}

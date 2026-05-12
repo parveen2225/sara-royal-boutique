@@ -1,0 +1,657 @@
+@use "../../assets/theme/_var.scss" as *;
+
+.classes_page {
+  background: var(--boutique-bg);
+  color: var(--boutique-text);
+}
+
+.classes_hero {
+  position: relative;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(3, 6, 14, 0.88) 0%,
+      rgba(8, 14, 28, 0.96) 100%
+    ),
+    url("/images/Designer_Suits5.webp") center / cover no-repeat;
+  overflow: hidden;
+  padding-top: 5rem;
+
+  &::before {
+    content: "\2702";
+    position: absolute;
+    left: 40%;
+    top: 25%;
+    font-size: clamp(18rem, 40vw, 36rem);
+    color: rgba(201, 168, 76, 0.1);
+    pointer-events: none;
+    line-height: 1;
+    user-select: none;
+    animation: slowSpin 40s linear infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--boutiqueGoldGradient);
+    opacity: 0.9;
+  }
+}
+
+@keyframes slowSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.classes_hero_orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  animation: floatOrb 8s ease-in-out infinite;
+
+  &.orb1 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(
+      circle,
+      rgba(201, 168, 76, 0.3),
+      transparent 70%
+    );
+    top: -80px;
+    left: -80px;
+    animation-duration: 9s;
+  }
+
+  &.orb2 {
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(
+      circle,
+      rgba(255, 190, 9, 0.3),
+      transparent 70%
+    );
+    bottom: 60px;
+    right: 10%;
+    animation-duration: 12s;
+    animation-delay: -4s;
+  }
+}
+
+@keyframes floatOrb {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-24px) scale(1.06);
+  }
+}
+
+.classes_hero_overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(3, 6, 14, 0.3) 0%,
+    rgba(6, 10, 24, 0.5) 100%
+  );
+}
+
+.classes_hero_content {
+  position: relative;
+  z-index: 2;
+  padding: 6rem 1rem 5rem;
+  text-align: left;
+  animation: classFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @media (max-width: 767px) {
+    text-align: center;
+  }
+}
+
+@keyframes classFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.classes_hero_split {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+
+  @media (max-width: 991px) {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+}
+
+.classes_hero_left {
+  flex: 1;
+  min-width: 0;
+}
+
+.classes_hero_right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.5rem;
+  min-width: 260px;
+
+  @media (max-width: 991px) {
+    align-items: center;
+  }
+}
+
+.classes_stat_card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(201, 168, 76, 0.22);
+  border-radius: 1.25rem;
+  padding: 1.5rem 2rem;
+  backdrop-filter: blur(8px);
+  width: 100%;
+  max-width: 240px;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
+
+  &:hover {
+    border-color: rgba(201, 168, 76, 0.5);
+    background: rgba(201, 168, 76, 0.06);
+  }
+
+  .stat_num {
+    font-family: $playfair;
+    font-size: 2.25rem;
+    font-weight: 700;
+    background: var(--boutiqueGoldGradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat_text {
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(240, 230, 204, 0.6);
+  }
+}
+
+.classes_eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+  padding: 0.35rem 1rem;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 999px;
+  background: rgba(201, 168, 76, 0.06);
+  backdrop-filter: blur(4px);
+}
+
+.classes_hero_title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+  gap: 0.1rem;
+}
+
+.classes_hero_sewing {
+  font-family: $playfair;
+  font-size: clamp(4rem, 10vw, 7.5rem);
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow:
+    0 0 80px rgba(201, 168, 76, 0.15),
+    0 4px 30px rgba(0, 0, 0, 0.6);
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+
+.classes_hero_classes {
+  font-family: $playfair;
+  font-size: clamp(4rem, 10vw, 7.5rem);
+  font-weight: 700;
+  background: var(--boutiqueGoldGradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  filter: drop-shadow(0 4px 24px rgba(201, 168, 76, 0.4));
+}
+
+.classes_tagline_strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--boutiqueGoldGradient);
+  color: #080c14;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.75rem;
+  border-radius: 999px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 6px 24px rgba(201, 168, 76, 0.35);
+}
+
+.tagline_sep {
+  opacity: 0.45;
+  font-weight: 300;
+}
+
+.classes_hero_sub {
+  font-size: 1.1rem;
+  color: rgba(240, 230, 204, 0.7);
+  font-style: italic;
+  margin-bottom: 2.5rem;
+  letter-spacing: 0.04em;
+}
+
+.classes_hero_actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 767px) {
+    justify-content: center;
+  }
+}
+
+.classes_cta_primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.9rem 2rem;
+  background: var(--boutiqueGoldGradient);
+  color: #080c14 !important;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 28px rgba(201, 168, 76, 0.35);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(201, 168, 76, 0.5);
+    color: #080c14 !important;
+  }
+
+  &.fee_cta {
+    padding: 0.85rem 1.75rem;
+  }
+}
+
+.classes_cta_secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(240, 230, 204, 0.75);
+  text-decoration: none;
+  border: 1.5px solid rgba(201, 168, 76, 0.35);
+  border-radius: 999px;
+  padding: 0.85rem 1.75rem;
+  transition:
+    border-color 0.22s ease,
+    color 0.22s ease;
+
+  &:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+}
+
+/* ── Shared section helpers ─────────────────────── */
+.classes_section_label_wrap {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.classes_section_badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #080c14;
+  background: var(--boutiqueGoldGradient);
+  padding: 0.4rem 1.5rem;
+  border-radius: 999px;
+}
+
+/* ── Curriculum ─────────────────────────────────── */
+.classes_curriculum_section {
+  padding: 5rem 0;
+  background:
+    radial-gradient(
+      ellipse at 10% 0%,
+      rgba(201, 168, 76, 0.07),
+      transparent 40%
+    ),
+    var(--boutique-bg);
+}
+
+.curriculum_card {
+  text-align: center;
+  padding: 2rem 1.25rem;
+  background: var(--boutique-card-bg);
+  border: 1.5px solid var(--boutique-border);
+  border-radius: 1.25rem;
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    border-color: rgba(201, 168, 76, 0.5);
+    box-shadow: 0 16px 48px var(--boutique-card-shadow);
+  }
+}
+
+.curriculum_icon {
+  font-size: 2.25rem;
+  margin-bottom: 0.9rem;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(201, 168, 76, 0.3));
+}
+
+.curriculum_title {
+  font-family: $playfair;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--boutique-text);
+  margin: 0 0 0.35rem;
+}
+
+.curriculum_sub {
+  font-size: 0.8rem;
+  color: var(--boutique-muted);
+  margin: 0;
+}
+
+/* ── Fee Banner ─────────────────────────────────── */
+.classes_fee_section {
+  padding: 3rem 0;
+  background: var(--boutique-bg);
+}
+
+.classes_fee_card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.25rem 3rem;
+  background: var(--boutiqueGoldGradient);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 60px rgba(201, 168, 76, 0.28);
+  flex-wrap: wrap;
+
+  @media (max-width: 767px) {
+    padding: 1.75rem 1.5rem;
+    gap: 1.25rem;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
+.fee_icon_wrap {
+  width: 4rem;
+  height: 4rem;
+  background: rgba(8, 12, 20, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fee_icon {
+  font-size: 1.75rem;
+  color: #080c14;
+  font-weight: 700;
+}
+
+.fee_details {
+  flex: 1;
+}
+
+.fee_label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(8, 12, 20, 0.65);
+  margin-bottom: 0.2rem;
+}
+
+.fee_amount {
+  font-family: $playfair;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  color: #080c14;
+  line-height: 1;
+  margin-bottom: 0.1rem;
+}
+
+.fee_per_person {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(8, 12, 20, 0.6);
+}
+
+/* ── Features ───────────────────────────────────── */
+.classes_features_section {
+  padding: 5rem 0;
+  background:
+    radial-gradient(
+      ellipse at 90% 100%,
+      rgba(201, 168, 76, 0.06),
+      transparent 40%
+    ),
+    var(--boutique-bg);
+}
+
+.feature_card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.75rem 1rem;
+  background: var(--boutique-card-bg);
+  border: 1.5px solid var(--boutique-border);
+  border-radius: 1rem;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba(201, 168, 76, 0.4);
+  }
+}
+
+.feature_icon {
+  font-size: 1.75rem;
+  display: block;
+}
+
+.feature_label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--boutique-text);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ── Join Section ───────────────────────────────── */
+.classes_join_section {
+  padding: 0 0 6rem;
+  background: var(--boutique-bg);
+}
+
+.classes_join_inner {
+  background: var(--boutique-card-bg);
+  border: 1.5px solid var(--boutique-border);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 24px 64px var(--boutique-card-shadow);
+}
+
+.classes_join_cta_col {
+  background: var(--boutiqueGoldGradient);
+  padding: 3.5rem 3rem;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 767px) {
+    padding: 2.5rem 1.75rem;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.classes_join_cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+
+  @media (max-width: 767px) {
+    align-items: center;
+  }
+}
+
+.classes_join_title {
+  font-family: $playfair;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 700;
+  color: #080c14;
+  margin: 0;
+  line-height: 1;
+}
+
+.classes_join_sub {
+  font-size: 1rem;
+  color: rgba(8, 12, 20, 0.7);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.classes_contact_col {
+  padding: 3.5rem 3rem;
+
+  @media (max-width: 767px) {
+    padding: 2.5rem 1.75rem;
+  }
+}
+
+.classes_contact_info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contact_info_row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.contact_info_icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.contact_info_label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 0.3rem;
+}
+
+.contact_info_value {
+  font-size: 0.95rem;
+  color: var(--boutique-text);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.contact_info_phone {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--boutique-text);
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--gold);
+  }
+}
+
+.contact_info_wa {
+  font-size: 0.78rem;
+  color: var(--boutique-muted);
+  margin: 0.2rem 0 0;
+}
+
+.classes_footer_motto {
+  text-align: center;
+  margin-top: 2.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+}

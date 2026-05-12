@@ -1,0 +1,65 @@
+@use "../../../assets/theme/var" as *;
+
+.tooltip {
+  position: absolute !important;
+
+  * {
+    word-break: break-word;
+  }
+
+  &.show {
+    opacity: 1;
+  }
+
+  &-inner {
+    border: 1px solid var(--tooltip-border);
+    background: var(--tooltip-bg);
+    padding: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: normal;
+    width: 100%;
+    max-width: 17.125rem;
+    border-radius: .625rem;
+    z-index: 9;
+    position: relative;
+    color: var(--tooltip-text);
+    text-align: left;
+    box-shadow: 0 0 0.625rem var(--shadow);
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+
+  &-arrow {
+    &::before {
+      border-width: .4375rem !important;
+    }
+  }
+
+  &.bs-tooltip {
+    &-start .tooltip-arrow::before {
+      border-left-color: var(--tooltip-bg);
+    }
+    &-end .tooltip-arrow::before {
+      border-right-color: var(--tooltip-bg);
+    }
+    &-top .tooltip-arrow::before {
+      border-top-color: var(--tooltip-bg);
+    }
+    &-bottom .tooltip-arrow::before {
+      border-bottom-color: var(--tooltip-bg);
+    }
+  }
+}
+.boutique_page {
+  .tooltip-inner {
+    background: var(--boutique-surface, #0e1622);
+    border-color: var(--boutique-border, rgba(201, 168, 76, 0.2));
+    color: var(--boutique-text, #f0e6cc);
+    font-size: 0.82rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .tooltip.bs-tooltip-top    .tooltip-arrow::before { border-top-color:    var(--boutique-surface, #0e1622); }
+  .tooltip.bs-tooltip-bottom .tooltip-arrow::before { border-bottom-color: var(--boutique-surface, #0e1622); }
+  .tooltip.bs-tooltip-start  .tooltip-arrow::before { border-left-color:   var(--boutique-surface, #0e1622); }
+  .tooltip.bs-tooltip-end    .tooltip-arrow::before { border-right-color:  var(--boutique-surface, #0e1622); }
+}

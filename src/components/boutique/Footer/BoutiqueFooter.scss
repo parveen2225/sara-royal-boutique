@@ -1,0 +1,189 @@
+@use "../../../assets/theme/_var.scss" as *;
+
+.boutique_footer {
+  background: var(--boutique-footer-bg);
+  color: var(--boutique-footer-text);
+  padding-top: 5rem;
+  padding-bottom: 0;
+  border-top: 1px solid var(--boutique-border);
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: var(--boutiqueGoldGradient);
+  }
+  .boutique_footer_main {
+    padding-bottom: 3.5rem;
+  }
+  .footer_brand {
+    .footer_logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      margin-bottom: 1rem;
+
+      img {
+        width: 150px;
+        height: auto;
+      }
+    }
+
+    .footer_tagline {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--boutique-footer-text);
+      margin: 0;
+    }
+  }
+  .footer_heading {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+  .footer_links_list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .footer_link {
+    font-size: 0.9rem;
+    color: rgba(240, 230, 204, 0.7);
+    text-decoration: none;
+    transition:
+      color 0.25s ease,
+      padding-left 0.25s ease;
+    display: inline-block;
+
+    &:hover {
+      color: var(--gold);
+      padding-left: 4px;
+    }
+  }
+  .footer_social {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer_social_link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(240, 230, 204, 0.75);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--boutique-border);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(201, 168, 76, 0.08);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    &.instagram:hover {
+      border-color: #c13584;
+      color: #c13584;
+      background: rgba(193, 53, 132, 0.08);
+    }
+
+    &.whatsapp:hover {
+      border-color: #25d366;
+      color: #25d366;
+      background: rgba(37, 211, 102, 0.08);
+    }
+
+    &.google_review:hover {
+      border-color: #fbbc04;
+      color: #fbbc04;
+      background: rgba(251, 188, 4, 0.08);
+    }
+
+    .footer_google_star {
+      font-size: 1rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+  }
+  .footer_order_cta {
+    .footer_order_text {
+      font-size: 0.875rem;
+      color: rgba(240, 230, 204, 0.6);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .footer_order_btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1.5rem;
+      background: var(--boutiqueGoldGradient);
+      color: var(--navy-black);
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-radius: 3rem;
+      text-decoration: none;
+      transition:
+        opacity 0.3s ease,
+        transform 0.25s ease,
+        box-shadow 0.3s ease;
+      width: 100%;
+
+      &:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3);
+      }
+    }
+  }
+  .boutique_footer_bottom {
+    border-top: 1px solid var(--boutique-border);
+    padding: 1.25rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .footer_copyright,
+    .footer_made_with {
+      font-size: 0.8rem;
+      color: rgba(240, 230, 204, 0.45);
+      margin: 0;
+    }
+
+    .footer_brand_name {
+      color: var(--gold);
+      font-weight: 600;
+    }
+  }
+
+  @media (max-width: 767px) {
+    padding-top: 2.5rem;
+
+    .boutique_footer_bottom {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+}

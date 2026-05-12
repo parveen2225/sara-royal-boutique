@@ -1,0 +1,310 @@
+@use "../../../../assets/theme/var" as *;
+
+.about_section {
+  padding: 7rem 0;
+  position: relative;
+  background: linear-gradient(160deg, var(--boutique-surface) 0%, var(--boutique-bg) 100%);
+  border-top: 1px solid var(--boutique-border);
+  border-bottom: 1px solid var(--boutique-border);
+  overflow: hidden;
+
+  &::before {
+    content: "STORY";
+    position: absolute;
+    right: -3rem;
+    bottom: -1rem;
+    font-family: $playfair;
+    font-size: clamp(8rem, 18vw, 16rem);
+    font-weight: 700;
+    color: rgba(201, 168, 76, 0.04);
+    pointer-events: none;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 991px) {
+    padding: 5rem 0;
+  }
+
+  @media (max-width: 767px) {
+    padding: 4rem 0;
+  }
+
+  .about_grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 5rem;
+    align-items: center;
+
+    @media (max-width: 991px) {
+      grid-template-columns: 1fr;
+      gap: 3.5rem;
+    }
+  }
+
+  .about_visual_col {
+    position: relative;
+  }
+
+  .about_image_frame {
+    position: relative;
+    max-width: 28rem;
+    margin: 0 auto;
+
+    @media (max-width: 991px) {
+      max-width: 24rem;
+    }
+
+    @media (max-width: 575px) {
+      max-width: 20rem;
+    }
+  }
+
+  .about_image_accent {
+    position: absolute;
+    top: -1.5rem;
+    left: -1.5rem;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    border: 2px solid rgba(201, 168, 76, 0.22);
+    border-radius: 1.5rem;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .about_image_wrap {
+    position: relative;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(201, 168, 76, 0.18);
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow:
+        0 36px 80px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(201, 168, 76, 0.3);
+    }
+  }
+
+  .about_image {
+    width: 100%;
+    height: 42rem;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+
+    @media (max-width: 991px) {
+      height: 28rem;
+    }
+
+    @media (max-width: 575px) {
+      height: 22rem;
+    }
+  }
+
+  .about_image_overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(26, 18, 8, 0.45) 100%);
+    pointer-events: none;
+  }
+
+  .about_years_badge {
+    position: absolute;
+    bottom: -1.75rem;
+    right: -1.75rem;
+    z-index: 2;
+    background: var(--boutiqueGoldGradient);
+    border-radius: 50%;
+    width: 8rem;
+    height: 8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 12px 36px rgba(201, 168, 76, 0.4);
+    animation: floatBadge 4s ease-in-out infinite;
+
+    @media (max-width: 575px) {
+      width: 6.5rem;
+      height: 6.5rem;
+      right: -0.75rem;
+      bottom: -1.25rem;
+    }
+
+    .about_years_number {
+      font-family: $playfair;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--navy-black);
+      line-height: 1;
+
+      @media (max-width: 575px) {
+        font-size: 1.4rem;
+      }
+    }
+
+    .about_years_text {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(8, 12, 20, 0.7);
+      line-height: 1.3;
+      margin-top: 0.2rem;
+    }
+  }
+
+  .about_msme_badge {
+    position: absolute;
+    top: -1.25rem;
+    left: -1.25rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1rem;
+    background: var(--boutique-card-bg);
+    border: 1.5px solid rgba(201, 168, 76, 0.3);
+    border-radius: 0.875rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s ease;
+
+    &:hover {
+      border-color: rgba(201, 168, 76, 0.55);
+    }
+
+    @media (max-width: 575px) {
+      left: -0.5rem;
+      top: -0.75rem;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .about_msme_icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 6px rgba(201, 168, 76, 0.3));
+    }
+
+    .about_msme_info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+
+    .about_msme_label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+    }
+
+    .about_msme_reg {
+      font-family: $playfair;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--boutique-text);
+      display: block;
+      letter-spacing: 0.03em;
+    }
+  }
+
+  .about_content_col {
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 991px) {
+      order: -1;
+    }
+  }
+
+  .about_heading {
+    font-family: $playfair;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 700;
+    color: var(--boutique-text);
+    margin: 0.75rem 0 1.5rem;
+    line-height: 1.15;
+
+    em {
+      font-style: italic;
+      background: var(--boutiqueGoldGradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 12px rgba(201, 168, 76, 0.3));
+    }
+  }
+
+  .about_desc {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: var(--boutique-muted);
+    margin-bottom: 1rem;
+    max-width: 520px;
+  }
+
+  .about_stats_grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 2.25rem 0 2.5rem;
+
+    @media (max-width: 767px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .about_stat_card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 0.75rem;
+    background: rgba(201, 168, 76, 0.05);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 1rem;
+    gap: 0.35rem;
+    transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+
+    &:hover {
+      border-color: rgba(201, 168, 76, 0.45);
+      background: rgba(201, 168, 76, 0.1);
+      transform: translateY(-3px);
+    }
+
+    .about_stat_number {
+      font-family: $playfair;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      filter: drop-shadow(0 2px 8px rgba(201, 168, 76, 0.3));
+    }
+
+    .about_stat_label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--boutique-muted);
+    }
+  }
+}
+
+@keyframes floatBadge {
+  0%, 100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+}

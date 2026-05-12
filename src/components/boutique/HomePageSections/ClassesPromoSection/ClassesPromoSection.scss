@@ -1,0 +1,234 @@
+@use "../../../../assets/theme/var" as *;
+
+.classes_promo_section {
+  padding: 7rem 0;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #060c1a 0%, #0a1426 55%, #071020 100%);
+  border-top: 1px solid rgba(201, 168, 76, 0.15);
+  border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+
+  &::before {
+    content: "CLASSES";
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: $playfair;
+    font-size: clamp(10rem, 22vw, 20rem);
+    font-weight: 700;
+    color: rgba(201, 168, 76, 0.04);
+    pointer-events: none;
+    white-space: nowrap;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--boutiqueGoldGradient);
+  }
+
+  @media (max-width: 991px) {
+    padding: 5rem 0;
+  }
+
+  @media (max-width: 767px) {
+    padding: 4rem 0;
+  }
+
+  .classes_promo_inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 4rem;
+
+    @media (max-width: 991px) {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  .classes_promo_text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .classes_promo_eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    padding: 0.3rem 0.9rem;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    border-radius: 999px;
+    background: rgba(201, 168, 76, 0.07);
+  }
+
+  .classes_promo_title {
+    font-family: $playfair;
+    font-size: clamp(2.75rem, 6vw, 4.5rem);
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 1.25rem;
+    line-height: 1.05;
+
+    em {
+      font-style: italic;
+      background: var(--boutiqueGoldGradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 2px 16px rgba(201, 168, 76, 0.35));
+    }
+  }
+
+  .classes_promo_tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #080c14;
+    margin-bottom: 1.75rem;
+    padding: 0.5rem 1.5rem;
+    background: var(--boutiqueGoldGradient);
+    border-radius: 999px;
+    box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
+
+    .sep {
+      opacity: 0.45;
+    }
+  }
+
+  .classes_promo_list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 2rem;
+
+    li {
+      font-size: 0.92rem;
+      color: rgba(240, 230, 204, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .classes_promo_fee {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(201, 168, 76, 0.08);
+    border: 1.5px solid rgba(201, 168, 76, 0.25);
+    border-radius: 0.75rem;
+
+    .fee_text {
+      font-size: 0.82rem;
+      color: rgba(240, 230, 204, 0.55);
+      font-weight: 500;
+    }
+
+    .fee_amount {
+      font-family: $playfair;
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--gold);
+      filter: drop-shadow(0 2px 10px rgba(201, 168, 76, 0.4));
+    }
+  }
+
+  .classes_promo_badge_wrap {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+
+    @media (max-width: 767px) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+  }
+
+  .classes_promo_badge {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: var(--boutiqueGoldGradient);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 0 0 12px rgba(201, 168, 76, 0.1),
+      0 0 0 24px rgba(201, 168, 76, 0.05),
+      0 20px 60px rgba(201, 168, 76, 0.4);
+    text-align: center;
+    padding: 1.5rem;
+    animation: pulseBadge 3s ease-in-out infinite;
+
+    @media (max-width: 991px) {
+      width: 160px;
+      height: 160px;
+    }
+
+    .badge_line1 {
+      font-size: 0.65rem;
+      font-weight: 900;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #080c14;
+      display: block;
+    }
+
+    .badge_line2 {
+      font-family: $playfair;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #080c14;
+      display: block;
+      margin-top: 0.5rem;
+      line-height: 1.2;
+    }
+  }
+}
+
+@keyframes pulseBadge {
+  0%,
+  100% {
+    transform: scale(1) rotate(-3deg);
+    box-shadow:
+      0 0 0 12px rgba(201, 168, 76, 0.1),
+      0 0 0 24px rgba(201, 168, 76, 0.05),
+      0 20px 60px rgba(201, 168, 76, 0.4);
+  }
+  50% {
+    transform: scale(1.04) rotate(-3deg);
+    box-shadow:
+      0 0 0 16px rgba(201, 168, 76, 0.12),
+      0 0 0 32px rgba(201, 168, 76, 0.06),
+      0 28px 80px rgba(201, 168, 76, 0.55);
+  }
+}

@@ -1,0 +1,157 @@
+@use "../../../../assets/theme/_var.scss" as *;
+
+.common_btn {
+  min-height: 3.125rem;
+  border-radius: .625rem;
+  background: linear-gradient(90deg, var(--boutique-gold) 0%, var(--boutique-gold-dark) 50%, var(--boutique-gold-light) 100%);
+  color: var(--navy-black);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: .3125rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+  position: relative;
+  outline: none;
+  overflow: hidden;
+  min-width: 9rem;
+  @extend %transition;
+
+  &:hover {
+    background: linear-gradient(90deg, var(--boutique-gold-light) 0%, var(--boutique-gold) 50%, var(--boutique-gold-dark) 100%);
+  }
+
+  @media (max-width: 767px) {
+    min-height: 2.75rem;
+    font-size: .875rem;
+    border-radius: 0.5rem;
+  }
+
+  @media (max-width: 359px) {
+    padding: .3125rem 0.625rem;
+  }
+
+  &_icon {
+    margin-right: .5rem;
+
+    svg,
+    img {
+      max-width: 2.25rem;
+
+      @media (max-width:991px) {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+    }
+  }
+
+  &.full {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &.border-btn {
+    background: var(--pink);
+    color: var(--purple);
+    border: 2px solid var(--pink-border);
+
+    &:hover {
+      background: var(--purple);
+      color: var(--white);
+      border-color: var(--purple);
+
+      .common_btn_icon svg path {
+        fill: var(--white);
+      }
+    }
+  }
+
+  &.white-btn {
+    background: var(--surface);
+    color: var(--foreground);
+    border: 1px solid var(--border-color);
+
+    &:hover {
+      background: var(--surface-hover);
+      color: var(--white);
+      border-color: var(--border-color);
+
+      .common_btn_icon svg path {
+        fill: var(--white);
+      }
+    }
+  }
+
+  &.danger_btn {
+    background: var(--dangerBg);
+    color: var(--dangerText);
+    border: 1px solid var(--dangerBorder);
+
+    &:hover {
+      background: var(--red);
+      color: var(--white);
+      border-color: var(--red);
+    }
+  }
+  &.boutique-btn {
+    background: var(--boutiqueGoldGradient);
+    color: var(--navy-black);
+    border-radius: 3rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    &:hover {
+      background: var(--boutiqueGoldGradientHover);
+      box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+  &.boutique-outline-btn {
+    background: transparent;
+    color: var(--boutique-gold);
+    border: 1.5px solid var(--boutique-border, rgba(201, 168, 76, 0.3));
+    border-radius: 3rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    &:hover {
+      background: rgba(201, 168, 76, 0.08);
+      border-color: var(--boutique-gold);
+      color: var(--boutique-gold);
+    }
+  }
+
+  &.filter_btn {
+    background: transparent;
+  }
+
+  &.product_detail_back_btn {
+    background: transparent;
+  }
+
+  &.theme_toggle_btn,
+  &.boutique_hamburger,
+  &.drawer_close,
+  &.offcanvas_close_btn,
+  &.modal_close_btn,
+  &.login_modal_signup_link,
+  &.input_group_passbtn {
+    background: transparent;
+  }
+
+  &_icon {
+    svg path {
+      @extend %transition;
+    }
+  }
+
+  &:disabled {
+    cursor: default;
+    pointer-events: none;
+    opacity: .5;
+  }
+}

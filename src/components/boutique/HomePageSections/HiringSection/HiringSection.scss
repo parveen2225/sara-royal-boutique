@@ -1,0 +1,285 @@
+@use "../../../../assets/theme/var" as *;
+
+.hiring_section {
+  padding: 7rem 0;
+  position: relative;
+  background: var(--boutique-bg);
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 90% 50%, rgba(201, 168, 76, 0.07) 0%, transparent 55%),
+      radial-gradient(circle at 10% 80%, rgba(201, 168, 76, 0.04) 0%, transparent 40%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 991px) {
+    padding: 5rem 0;
+  }
+
+  @media (max-width: 767px) {
+    padding: 4rem 0;
+  }
+
+  .hiring_wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5rem;
+    align-items: center;
+
+    @media (max-width: 991px) {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .hiring_badge_col {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    @media (max-width: 991px) {
+      order: -1;
+    }
+  }
+
+  .hiring_pulse_ring {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    border: 2px solid rgba(201, 168, 76, 0.12);
+    animation: hiringPulse 3s ease-in-out infinite;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 168, 76, 0.08);
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 1px solid rgba(201, 168, 76, 0.06);
+    }
+
+    @media (max-width: 575px) {
+      width: 240px;
+      height: 240px;
+    }
+  }
+
+  .hiring_center_badge {
+    position: relative;
+    z-index: 1;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: var(--boutiqueGoldGradient);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1.5rem;
+    box-shadow:
+      0 0 0 2px rgba(201, 168, 76, 0.35),
+      0 24px 70px rgba(201, 168, 76, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    animation: floatBadge 4s ease-in-out infinite;
+
+    @media (max-width: 575px) {
+      width: 200px;
+      height: 200px;
+    }
+
+    .hiring_badge_eyebrow {
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(8, 12, 20, 0.6);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .hiring_badge_main {
+      font-family: $playfair;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: #080c14;
+      line-height: 1.1;
+      display: block;
+      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.12);
+
+      @media (max-width: 575px) {
+        font-size: 1.2rem;
+      }
+    }
+
+    .hiring_badge_sub {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(8, 12, 20, 0.55);
+      display: block;
+      margin-top: 0.5rem;
+    }
+  }
+
+  .hiring_content_col {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hiring_heading {
+    font-family: $playfair;
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 700;
+    color: var(--boutique-text);
+    margin: 0.75rem 0 1rem;
+    line-height: 1.2;
+  }
+
+  .hiring_intro {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--boutique-muted);
+    margin-bottom: 2rem;
+    max-width: 520px;
+  }
+
+  .hiring_roles_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.875rem;
+    margin-bottom: 2.5rem;
+
+    @media (max-width: 575px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hiring_role_card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(201, 168, 76, 0.05);
+    border: 1.5px solid rgba(201, 168, 76, 0.18);
+    border-radius: 1rem;
+    transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+
+    &:hover {
+      border-color: rgba(201, 168, 76, 0.45);
+      background: rgba(201, 168, 76, 0.1);
+      transform: translateX(4px);
+    }
+
+    .hiring_role_icon {
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 6px rgba(201, 168, 76, 0.25));
+    }
+
+    .hiring_role_info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .hiring_role_title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--boutique-text);
+      line-height: 1.2;
+    }
+
+    .hiring_role_sub {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--boutique-muted);
+      letter-spacing: 0.04em;
+    }
+  }
+
+  .hiring_contact_row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(201, 168, 76, 0.15);
+
+    @media (max-width: 575px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .hiring_contact_info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .hiring_contact_item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.88rem;
+    color: var(--boutique-muted);
+  }
+
+  .hiring_contact_icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .hiring_phone {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      color: var(--boutique-text);
+      transform: translateX(2px);
+    }
+  }
+}
+
+@keyframes floatBadge {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes hiringPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.7;
+  }
+}

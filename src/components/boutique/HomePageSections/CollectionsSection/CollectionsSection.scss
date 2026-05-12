@@ -1,0 +1,43 @@
+@use "../../../../assets/theme/var" as *;
+
+.section_collections {
+  background: var(--boutique-bg);
+
+  .section_header {
+    margin-bottom: 3.5rem;
+    animation: smoothReveal 0.8s ease both;
+  }
+
+  .section_footer_cta {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  .collections_empty {
+    padding: 5rem 0;
+
+    .empty_icon {
+      display: block;
+      font-size: 2.5rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      opacity: 0.45;
+    }
+
+    p {
+      font-size: 1rem;
+      color: var(--boutique-muted);
+    }
+  }
+}
+
+@keyframes smoothReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

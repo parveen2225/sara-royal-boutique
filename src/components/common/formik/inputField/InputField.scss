@@ -1,0 +1,20 @@
+@use "../../../../assets/theme/_var.scss" as *;
+
+.input_group {
+    width: 100%;
+    align-items: start;
+
+    .input_group_inner {
+        width: 100%;
+
+        .form-control {
+            padding-right: 5rem;
+        }
+    }
+
+    .form-control {
+        &::placeholder {
+            opacity: 1;
+        }
+    }
+}

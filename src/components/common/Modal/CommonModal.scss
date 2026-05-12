@@ -1,0 +1,186 @@
+@use "../../../assets/theme/_var.scss" as *;
+
+.commonModal {
+  &.modal {
+    &.overhideModal {
+      z-index: 9992;
+    }
+
+    .modal-dialog {
+      max-width: 37.5rem;
+    }
+
+    .modal-content {
+      background: var(--boutique-card-bg);
+      border: 1.5px solid var(--boutique-border);
+      border-radius: 1.25rem;
+      position: relative;
+      margin: 0 auto;
+      z-index: 2;
+      padding: 2.25rem;
+
+      @media (max-width: 767px) {
+        padding: 1.25rem 1rem 1.5rem;
+      }
+
+      .modal-header {
+        border: 0;
+        padding: 0;
+        max-width: 90%;
+
+        .modal-title {
+          margin-bottom: 1.875rem;
+
+          h4 {
+            font-size: 2rem;
+            font-weight: 600;
+            line-height: normal;
+            color: var(--foreground);
+            display: flex;
+            flex-wrap: wrap;
+
+            @media (max-width: 575px) {
+              font-size: 1.5rem;
+            }
+          }
+        }
+      }
+
+      .modal_close_btn,
+      .btn-close {
+        background-color: transparent;
+        border: none;
+        padding: 0;
+        position: absolute;
+        right: 1.25rem;
+        top: 1rem;
+        @extend %transition;
+
+        svg path {
+          fill: var(--textclr);
+        }
+
+        &:hover {
+          svg path {
+            fill: var(--purple);
+          }
+          .boutique_page & svg path {
+            fill: var(--boutique-gold);
+          }
+        }
+      }
+
+      .modal-body {
+        padding: 0;
+        color: var(--foreground);
+      }
+
+      .btn-style {
+        min-width: 19rem;
+
+        @media (max-width: 767px) { min-width: 15rem; }
+        @media (max-width: 575px) { min-width: 12rem; }
+      }
+    }
+
+    .backbtn {
+      font-size: 1rem;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      cursor: pointer;
+      @extend %transition;
+
+      svg {
+        display: block;
+
+        path {
+          @extend %transition;
+        }
+      }
+
+      &:hover {
+        color: var(--purple);
+        gap: 0.7rem;
+
+        svg path {
+          stroke: var(--purple);
+        }
+      }
+    }
+  }
+
+  &.modalSize110 {
+    .modal-dialog {
+      max-width: 110rem;
+    }
+  }
+  &.boutique-modal {
+    .modal-dialog {
+      max-width: 42rem;
+    }
+
+    .modal-content {
+      background: linear-gradient(
+            var(--boutique-card-bg, #0e1622),
+            var(--boutique-card-bg, #0e1622)
+          )
+          padding-box,
+        var(--boutiqueGoldGradient) border-box;
+      border: 1.5px solid transparent;
+
+      .modal-header .modal-title h4 {
+        font-family: $playfair;
+        color: var(--boutique-text, var(--ivory-text));
+      }
+    }
+  }
+}
+
+.login_modal,
+.add_note_modal,
+.edit_note_modal,
+.delete_note_modal {
+  .login_modal_subtitle,
+  .delete_note_modal_subtext {
+    color: var(--textclr);
+    line-height: 1.6;
+  }
+
+  .delete_note_modal_text {
+    color: var(--foreground);
+    line-height: 1.6;
+  }
+
+  .login_modal_signup_text {
+    color: var(--textclr);
+  }
+
+  .login_modal_signup_link {
+    color: var(--primaryclr);
+    font-weight: 600;
+  }
+}
+
+.modal-backdrop {
+  &.transaction_modal_bckdrop {
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(4px);
+    opacity: 1;
+
+    &_otp,
+    &.overhideModal {
+      background-color: rgba(15, 23, 42, 0.35);
+      z-index: 9991;
+    }
+  }
+}
+
+body .modal-backdrop {
+  &.fade {
+    background: rgba(0,0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    opacity: 1;
+  }
+}

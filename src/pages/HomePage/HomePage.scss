@@ -1,0 +1,153 @@
+@use "../../assets/theme/var" as *;
+
+.boutique_page {
+  min-height: 100vh;
+  background: var(--boutique-bg);
+  color: var(--boutique-text);
+  font-family: $inter;
+}
+
+.py-section {
+  padding-top: 7rem;
+  padding-bottom: 7rem;
+
+  @media (max-width: 991px) {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  @media (max-width: 767px) {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
+.section_label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+
+  &::before {
+    content: "✦ ";
+    font-size: 0.6rem;
+  }
+
+  &::after {
+    content: " ✦";
+    font-size: 0.6rem;
+  }
+}
+
+.section_title {
+  font-family: $playfair;
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  color: var(--boutique-text);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.section_sub {
+  font-size: 1.05rem;
+  color: var(--boutique-muted);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.boutique_gold_btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 2rem;
+  background: var(--boutiqueGoldGradient);
+  color: var(--navy-black);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0.625rem;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 18px rgba(201, 168, 76, 0.3);
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -80%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transition: left 0.45s ease;
+    pointer-events: none;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(201, 168, 76, 0.45);
+    color: var(--navy-black);
+
+    &::after {
+      left: 130%;
+    }
+  }
+}
+
+.boutique_outline_btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 2rem;
+  background: transparent;
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1.5px solid rgba(201, 168, 76, 0.45);
+  border-radius: 0.625rem;
+  text-decoration: none;
+  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+    transition: transform 0.22s ease;
+  }
+
+  &:hover {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(201, 168, 76, 0.2);
+
+    svg {
+      transform: translateX(3px);
+    }
+  }
+}
+
+@keyframes smoothReveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

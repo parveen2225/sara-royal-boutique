@@ -45,6 +45,7 @@ export default function AdminServicesPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const previewSrc = useMemo(() => form.imageUrl || "/images/Designer_Suits5.webp", [form.imageUrl]);
 
@@ -71,9 +72,14 @@ export default function AdminServicesPage() {
     const file = event.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setUploadError("");
     uploadImages([file])
       .then((urls) => {
         setForm((prev) => ({ ...prev, imageUrl: urls[0] || "", imageName: file.name }));
+      })
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : "Image upload failed";
+        setUploadError(message);
       })
       .finally(() => setUploading(false));
   };
@@ -160,6 +166,7 @@ export default function AdminServicesPage() {
                   onChange={onFileSelect}
                 />
                 {uploading && <small className="text-muted d-block mt-1">Uploading...</small>}
+                {uploadError && <small className="text-danger d-block mt-1">{uploadError}</small>}
                 {errors.imageUrl && (
                   <small className="text-danger d-block mt-1">{errors.imageUrl}</small>
                 )}

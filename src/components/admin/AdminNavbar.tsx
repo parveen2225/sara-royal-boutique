@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { apiJson } from "@/lib/api/client";
@@ -7,7 +9,11 @@ import { AUTH } from "@/lib/api/urls";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import CommonModal from "@/components/common/Modal/CommonModal";
 
-export default function AdminNavbar() {
+type AdminNavbarProps = {
+  onMenuOpen?: () => void;
+};
+
+export default function AdminNavbar({ onMenuOpen }: AdminNavbarProps) {
   const router = useRouter();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -18,9 +24,40 @@ export default function AdminNavbar() {
 
   return (
     <header className="admin_topbar">
-      <div>
-        <p className="admin_topbar_title">Admin Panel</p>
-        <p className="admin_topbar_subtitle">Manage boutique products and collections</p>
+      <div className="admin_topbar_left">
+        <CommonButton
+          className="admin_menu_toggle"
+          onClick={onMenuOpen}
+          ariaLabel="Open admin menu"
+        >
+          <span />
+          <span />
+          <span />
+        </CommonButton>
+
+        <Link href="/admin/dashboard" className="admin_topbar_brand">
+          <Image
+            src="/images/logo_3.png"
+            alt="Sara Royal"
+            width={148}
+            height={36}
+            className="admin_brand_logo admin_brand_logo_full"
+            unoptimized
+          />
+          <Image
+            src="/images/logo_icon.png"
+            alt="Sara Royal"
+            width={32}
+            height={32}
+            className="admin_brand_logo admin_brand_logo_icon"
+            unoptimized
+          />
+        </Link>
+
+        <div>
+          <p className="admin_topbar_title">Admin Panel</p>
+          <p className="admin_topbar_subtitle">Manage boutique products and collections</p>
+        </div>
       </div>
       <CommonButton className="admin_outline_btn" onClick={() => setShowLogoutConfirm(true)}>
         Logout

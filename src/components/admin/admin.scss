@@ -191,17 +191,26 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .admin_brand {
-  font-family: $playfair;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  letter-spacing: 0.02em;
+}
+
+.admin_brand_logo {
+  display: block;
+}
+
+.admin_brand_logo_icon {
+  display: none;
 }
 
 .admin_nav {
@@ -252,6 +261,42 @@
   transition:
     background-color 0.3s ease,
     border-color 0.3s ease;
+}
+
+.admin_topbar_left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.admin_topbar_brand {
+  display: none;
+  align-items: center;
+}
+
+.admin_menu_toggle {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-height: auto !important;
+  min-width: auto !important;
+  border-radius: 0.55rem !important;
+  border: 1px solid var(--border-color) !important;
+  background: transparent !important;
+  padding: 0.45rem !important;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  span {
+    width: 16px;
+    height: 2px;
+    border-radius: 4px;
+    background: var(--boutique-gold, #c9a84c);
+    display: block;
+  }
 }
 
 .admin_topbar_title {
@@ -485,39 +530,67 @@
   }
 }
 
+.admin_login_card_redesign {
+  max-width: 470px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -120px auto auto -80px;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.16), transparent 68%);
+    pointer-events: none;
+  }
+
+  .card-body {
+    position: relative;
+    z-index: 1;
+    padding: 2rem !important;
+  }
+}
+
 @media (max-width: 992px) {
-  .admin_root {
-    flex-direction: column;
-  }
-
   .admin_sidebar {
-    width: 100%;
-    padding: 1rem 1.25rem;
-  }
-
-  .admin_brand {
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.75rem;
-  }
-
-  .admin_nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .admin_nav_link {
-    padding: 0.45rem 0.75rem;
-    font-size: 0.875rem;
-
-    &:hover,
-    &.is_active {
-      transform: none;
-    }
+    display: none;
   }
 
   .admin_content {
-    padding: 1rem 1rem 2rem;
+    padding: 1rem 0.9rem 1.5rem;
+  }
+
+  .admin_topbar {
+    padding: 0.8rem 0.85rem;
+    align-items: flex-start;
+  }
+
+  .admin_topbar_brand {
+    display: inline-flex;
+  }
+
+  .admin_menu_toggle {
+    display: inline-flex;
+  }
+
+  .admin_topbar_subtitle {
+    max-width: 250px;
+    line-height: 1.4;
+  }
+
+  .admin_section_header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin_card {
+    border-radius: 0.7rem;
+  }
+
+  .admin_inline_form {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -650,6 +723,11 @@
   font-size: 1.75rem;
   color: var(--boutique-gold, #c9a84c);
   line-height: 1;
+  margin-bottom: 1rem;
+
+  img {
+    width: 5rem;
+  }
 }
 
 .admin_login_hint {
@@ -714,5 +792,96 @@
     &:hover {
       color: var(--boutique-gold, #c9a84c);
     }
+  }
+}
+
+.admin_login_label {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(201, 168, 76, 0.86);
+}
+
+.admin_login_subtitle {
+  max-width: 310px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.admin_password_group {
+  .form-label {
+    margin-bottom: 0.45rem;
+  }
+}
+
+.admin_password_wrap {
+  position: relative;
+
+  .form-control {
+    padding-right: 3.1rem;
+  }
+}
+
+.admin_password_toggle {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.admin_drawer {
+  width: 300px !important;
+  background: var(--boutique-footer-bg) !important;
+  border-right: 1px solid rgba(201, 168, 76, 0.2) !important;
+}
+
+.admin_drawer_header {
+  border-bottom: 1px solid rgba(201, 168, 76, 0.16);
+
+  .btn-close {
+    filter: invert(1) sepia(26%) saturate(339%) hue-rotate(8deg) brightness(96%) contrast(89%);
+  }
+}
+
+.admin_drawer_body {
+  padding: 0 !important;
+}
+
+.admin_sidebar_drawer {
+  width: 100%;
+  height: 100%;
+  border-right: none;
+  border-radius: 0;
+  position: static;
+}
+
+@media (max-width: 768px) {
+  .admin_topbar {
+    flex-wrap: wrap;
+  }
+
+  .admin_topbar .admin_outline_btn {
+    width: 100%;
+  }
+
+  .admin_brand_logo_full {
+    display: none;
+  }
+
+  .admin_brand_logo_icon {
+    display: block;
+  }
+
+  .admin_login_card_redesign .card-body {
+    padding: 1.5rem 1.15rem !important;
   }
 }

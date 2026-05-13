@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Card } from "react-bootstrap";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import CommonTable from "@/components/common/ui/CommonTable/CommonTable";
@@ -17,20 +17,42 @@ const FIELDS = [
 ];
 
 export default function CollectionsPage() {
-  const { state, addCollection, updateCollection, deleteCollection } = useAdmin();
+  const { state, isLoading, loadError, refreshState, addCollection, updateCollection, deleteCollection } =
+    useAdmin();
   const [name, setName] = useState("");
-  const [serviceId, setServiceId] = useState("custom-designs");
+  const [serviceId, setServiceId] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
-  const [editingServiceId, setEditingServiceId] = useState<string>("custom-designs");
+  const [editingServiceId, setEditingServiceId] = useState<string>("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const serviceOptions = state.services
-    .filter((s) => s.active !== false)
-    .map((s) => ({ value: s.id, label: s.title }));
+  const serviceOptions = useMemo(
+    () =>
+      state.services
+        .filter((s) => s.active !== false)
+        .map((s) => ({ value: s.id, label: s.title })),
+    [state.services],
+  );
+
+  useEffect(() => {
+    if (serviceOptions.length === 0) {
+      setServiceId("");
+      setEditingServiceId("");
+      return;
+    }
+    const hasCreateSelection = serviceOptions.some((option) => option.value === serviceId);
+    if (!hasCreateSelection) {
+      setServiceId(serviceOptions[0].value);
+    }
+    const hasEditSelection = serviceOptions.some((option) => option.value === editingServiceId);
+    if (!hasEditSelection && !editingId) {
+      setEditingServiceId(serviceOptions[0].value);
+    }
+  }, [serviceOptions, serviceId, editingServiceId, editingId]);
 
   const onCreate = (event: FormEvent) => {
     event.preventDefault();
     if (!name.trim()) return;
+    if (!serviceId.trim()) return;
     addCollection(name.trim(), serviceId);
     setName("");
   };
@@ -45,7 +67,11 @@ export default function CollectionsPage() {
     <section>
       <div className="admin_section_header">
         <h4 className="mb-0">Collections</h4>
+        <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => refreshState()}>
+          Refresh
+        </CommonButton>
       </div>
+      {loadError && <div className="admin_error_banner mb-3">{loadError}</div>}
 
       <Card className="admin_card p-3 mb-4">
         <form onSubmit={onCreate}>
@@ -65,6 +91,7 @@ export default function CollectionsPage() {
                 label="Service"
                 value={serviceId}
                 options={serviceOptions}
+                placeholder={serviceOptions.length ? "Select service" : "No active services available"}
                 onChange={(opt) => setServiceId(opt?.value ?? "")}
               />
             </div>
@@ -75,7 +102,7 @@ export default function CollectionsPage() {
         </form>
       </Card>
 
-      <CommonTable fields={FIELDS} lastColumnWidth="160px">
+      <CommonTable fields={FIELDS} lastColumnWidth="160px" loader={isLoading}>
         {state.collections.map((item) => {
           const productCount = state.products.filter((p) => p.categoryId === item.id).length;
           const isEditing = editingId === item.id;

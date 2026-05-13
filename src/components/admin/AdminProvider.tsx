@@ -29,6 +29,9 @@ type ServiceInput = Omit<Service, "id" | "createdAt" | "updatedAt">;
 
 type AdminContextType = {
   state: AdminState;
+  isLoading: boolean;
+  loadError: string | null;
+  refreshState: () => Promise<AdminState>;
   addCollection: (name: string, serviceId: string) => void;
   updateCollection: (id: string, name: string, serviceId?: string) => void;
   deleteCollection: (id: string) => void;
@@ -47,6 +50,8 @@ const AdminContext = createContext<AdminContextType | null>(null);
 export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [state, setState] = useState<AdminState>(EMPTY_ADMIN_STATE);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastState>({
     show: false,
     message: "",
@@ -57,37 +62,57 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
     setToast({ show: true, message, variant });
   };
 
+  const refreshState = async (skipLoader = false): Promise<AdminState> => {
+    if (!skipLoader) setIsLoading(true);
+    setLoadError(null);
+    console.log("[AdminProvider] Fetching admin state from", ADMIN.GET_STATE);
+    const res = await apiJson<AdminState>(ADMIN.GET_STATE, { skipLoader });
+    console.log("[AdminProvider] Admin state fetched", {
+      services: res.data.services.length,
+      collections: res.data.collections.length,
+      products: res.data.products.length,
+    });
+    setState(res.data);
+    return res.data;
+  };
+
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      const res = await apiJson<AdminState>(ADMIN.GET_STATE);
-      if (cancelled) return;
-      const data = res.data;
-      setState(data);
+      try {
+        const data = await refreshState();
+        if (cancelled) return;
 
-      // Auto-seed MongoDB if collections/services/products are all empty
-      const isEmpty =
-        data.services.length === 0 &&
-        data.collections.length === 0 &&
-        data.products.length === 0;
+        // Auto-seed MongoDB if collections/services/products are all empty
+        const isEmpty =
+          data.services.length === 0 &&
+          data.collections.length === 0 &&
+          data.products.length === 0;
 
-      if (isEmpty) {
-        try {
-          await apiJson(SEED_URL, { method: "POST", skipLoader: true });
-          const seeded = await apiJson<AdminState>(ADMIN.GET_STATE, { skipLoader: true });
-          if (!cancelled) setState(seeded.data);
-        } catch {
-          // Seed failed silently (e.g. MongoDB not configured) — fallback data is already in state
+        if (isEmpty) {
+          try {
+            console.log("[AdminProvider] Empty admin state detected; attempting seed");
+            await apiJson(SEED_URL, { method: "POST", skipLoader: true });
+            if (!cancelled) await refreshState(true);
+          } catch (seedError: unknown) {
+            console.error("[AdminProvider] Seed failed", seedError);
+            notify(getErrorMessage(seedError) || "Seed failed.", "danger");
+          }
         }
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     load().catch((e: unknown) => {
+      setIsLoading(false);
       const message = getErrorMessage(e) || "Failed to load admin state.";
       if (message.toLowerCase().includes("unauthorized")) {
         router.replace("/admin/login");
         return;
       }
+      console.error("[AdminProvider] Failed to load admin state", e);
+      setLoadError(message);
       notify(message, "danger");
     });
 
@@ -99,6 +124,9 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
   const value = useMemo<AdminContextType>(
     () => ({
       state,
+      isLoading,
+      loadError,
+      refreshState: () => refreshState(true),
       addCollection: (name, serviceId) => {
         const trimmed = name.trim();
         if (!trimmed) {
@@ -122,6 +150,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           body: JSON.stringify({ name: trimmed, serviceId: sid }),
         })
           .then((res) => {
+            console.log("[AdminProvider] Collection created", res.data);
             setState((prev) => ({
               ...prev,
               collections: [...prev.collections, res.data],
@@ -141,6 +170,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           body: JSON.stringify({ name: trimmed, serviceId }),
         })
           .then((res) => {
+            console.log("[AdminProvider] Collection updated", res.data);
             setState((prev) => ({
               ...prev,
               collections: prev.collections.map((item) =>
@@ -159,6 +189,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
         }
         apiJson<Collection>(COLLECTIONS.DELETE(id), { method: "DELETE" })
           .then(() => {
+            console.log("[AdminProvider] Collection deleted", id);
             setState((prev) => ({
               ...prev,
               collections: prev.collections.filter((item) => item.id !== id),
@@ -174,6 +205,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           body: JSON.stringify(payload),
         })
           .then((res) => {
+            console.log("[AdminProvider] Product created", res.data);
             setState((prev) => ({ ...prev, products: [res.data, ...prev.products] }));
             notify("Product added.");
           })
@@ -186,6 +218,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           body: JSON.stringify(payload),
         })
           .then((res) => {
+            console.log("[AdminProvider] Product updated", res.data);
             setState((prev) => ({
               ...prev,
               products: prev.products.map((item) => (item.id === id ? res.data : item)),
@@ -197,6 +230,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       deleteProduct: (id) => {
         apiJson<Product>(PRODUCTS.DELETE(id), { method: "DELETE" })
           .then(() => {
+            console.log("[AdminProvider] Product deleted", id);
             setState((prev) => ({
               ...prev,
               products: prev.products.filter((item) => item.id !== id),
@@ -213,6 +247,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           body: JSON.stringify(payload),
         })
           .then((res) => {
+            console.log("[AdminProvider] Service created", res.data);
             setState((prev) => ({ ...prev, services: [res.data, ...prev.services] }));
             notify("Service added.");
           })
@@ -225,6 +260,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           body: JSON.stringify(payload),
         })
           .then((res) => {
+            console.log("[AdminProvider] Service updated", res.data);
             setState((prev) => ({
               ...prev,
               services: prev.services.map((item) => (item.id === id ? res.data : item)),
@@ -236,6 +272,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       deleteService: (id) => {
         apiJson<Service>(SERVICES.DELETE(id), { method: "DELETE" })
           .then(() => {
+            console.log("[AdminProvider] Service deleted", id);
             setState((prev) => ({
               ...prev,
               services: prev.services.filter((item) => item.id !== id),
@@ -246,7 +283,7 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       },
       getServiceById: (id) => state.services.find((item) => item.id === id),
     }),
-    [state],
+    [state, isLoading, loadError],
   );
 
   return (

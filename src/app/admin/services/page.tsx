@@ -38,7 +38,8 @@ const emptyForm = {
 type ServiceFormState = typeof emptyForm;
 
 export default function AdminServicesPage() {
-  const { state, addService, updateService, deleteService } = useAdmin();
+  const { state, isLoading, loadError, refreshState, addService, updateService, deleteService } =
+    useAdmin();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ServiceFormState>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -116,7 +117,11 @@ export default function AdminServicesPage() {
     <section>
       <div className="admin_section_header">
         <h4 className="mb-0">Services</h4>
+        <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => refreshState()}>
+          Refresh
+        </CommonButton>
       </div>
+      {loadError && <div className="admin_error_banner mb-3">{loadError}</div>}
 
       <Card className="admin_card p-3 mb-4">
         <form key={editingId ?? "new"} className="admin_form" onSubmit={onSubmit}>
@@ -212,7 +217,7 @@ export default function AdminServicesPage() {
         </form>
       </Card>
 
-      <CommonTable fields={FIELDS} lastColumnWidth="190px">
+      <CommonTable fields={FIELDS} lastColumnWidth="190px" loader={isLoading}>
         {state.services.map((service) => (
           <tr key={service.id}>
             <td>

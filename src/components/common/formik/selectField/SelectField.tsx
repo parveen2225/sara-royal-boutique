@@ -1,4 +1,4 @@
-import { useState, ReactNode, FocusEventHandler } from 'react';
+import { ReactNode, FocusEventHandler, useMemo } from 'react';
 import Select, {
   components,
   GroupBase,
@@ -62,11 +62,12 @@ const SelectField: React.FC<SelectFieldProps> = ({
   onBlur,
   labelText
 }) => {
-  const initialSelected = options.find((option) => option.value === value) || null;
-  const [selectedOption, setSelectedOption] = useState<Option | null>(initialSelected);
+  const selectedOption = useMemo(
+    () => options.find((option) => option.value === value) || null,
+    [options, value],
+  );
 
   const handleChange = (selected: Option | null) => {
-    setSelectedOption(selected);
     onChange?.(selected);
   };
 

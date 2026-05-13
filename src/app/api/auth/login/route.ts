@@ -37,7 +37,21 @@ export async function POST(req: NextRequest) {
       return res;
     }
 
-    await connectMongo();
+    try {
+      await connectMongo();
+    } catch (mongoError) {
+      console.error("[API /auth/login] Mongo unavailable, trying credential fallback", mongoError);
+      if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+        return jsonError("Invalid email or password", 401);
+      }
+      const token = signAdminToken({ id: "fallback-admin", email: ADMIN_EMAIL, role: "admin" });
+      const res = jsonMessage("Login successful (fallback mode)", {
+        user: { id: "fallback-admin", name: "Admin", email: ADMIN_EMAIL, role: "admin" },
+        token,
+      });
+      res.cookies.set(ADMIN_COOKIE_NAME, token, COOKIE_OPTIONS);
+      return res;
+    }
 
     let admin = await Admin.findOne({ email }).select("+password");
 

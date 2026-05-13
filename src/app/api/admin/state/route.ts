@@ -22,12 +22,20 @@ export async function GET(req: NextRequest) {
   if (!auth.ok) return auth.response;
 
   if (!isMongoConfigured()) {
+    console.warn("[API /admin/state GET] Mongo not configured; serving fallback admin state");
     return jsonOk(getFallbackAdminState());
   }
 
   try {
-    return jsonOk(await loadFromMongo());
-  } catch {
+    const data = await loadFromMongo();
+    console.log("[API /admin/state GET] fetched admin state", {
+      services: data.services.length,
+      collections: data.collections.length,
+      products: data.products.length,
+    });
+    return jsonOk(data);
+  } catch (error) {
+    console.error("[API /admin/state GET] failed to load from Mongo", error);
     return jsonOk(getFallbackAdminState());
   }
 }
@@ -49,6 +57,11 @@ export async function PUT(req: NextRequest) {
     const collections = Array.isArray(body?.collections) ? body.collections : [];
     const products = Array.isArray(body?.products) ? body.products : [];
     const services = Array.isArray(body?.services) ? body.services : [];
+    console.log("[API /admin/state PUT] replacing admin state", {
+      services: services.length,
+      collections: collections.length,
+      products: products.length,
+    });
 
     await Promise.all([Collection.deleteMany({}), Product.deleteMany({}), Service.deleteMany({})]);
     await Promise.all([
@@ -59,6 +72,7 @@ export async function PUT(req: NextRequest) {
 
     return jsonMessage("State updated", await loadFromMongo());
   } catch (error) {
+    console.error("[API /admin/state PUT] failed", error);
     return jsonError(error instanceof Error ? error.message : "Failed to update admin state");
   }
 }

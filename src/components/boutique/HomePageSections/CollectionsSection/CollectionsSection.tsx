@@ -31,7 +31,7 @@ const CollectionsSection: React.FC<CollectionsSectionProps> = ({
 
         <Row className="g-4 g-xl-5">
           {featuredProducts.length > 0 ? (
-            featuredProducts.map((product) => (
+            featuredProducts.map((product) => ( 
               <Col key={product.id} xs={6} sm={6} lg={4}>
                 <ProductCard product={product} />
               </Col>

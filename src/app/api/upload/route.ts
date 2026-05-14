@@ -11,23 +11,40 @@ export const runtime = "nodejs";
 
 let cloudinaryConfigured = false;
 
+const missingCloudinaryMessage =
+  "Cloudinary is not configured. Add credentials to .env.local (local) or your host env (e.g. Vercel): either CLOUDINARY_URL (from Cloudinary dashboard → API Keys → Environment variable), or CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET. Restart the dev server after saving.";
+
 const ensureCloudinary = (): string | null => {
   if (cloudinaryConfigured) return null;
 
+  const envUrl = process.env.CLOUDINARY_URL?.trim();
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
   const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
   const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
 
-  if (!cloudName || !apiKey || !apiSecret) {
-    return "Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.";
+  try {
+    if (envUrl) {
+      // SDK loads cloud_name / api_key / api_secret from CLOUDINARY_URL
+      cloudinary.config(true);
+      cloudinary.config({ secure: true });
+    } else if (cloudName && apiKey && apiSecret) {
+      cloudinary.config({
+        cloud_name: cloudName,
+        api_key: apiKey,
+        api_secret: apiSecret,
+        secure: true,
+      });
+    } else {
+      return missingCloudinaryMessage;
+    }
+  } catch {
+    return "Invalid CLOUDINARY_URL. It must start with cloudinary:// (copy the full value from your Cloudinary dashboard).";
   }
 
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-    secure: true,
-  });
+  const cfg = cloudinary.config() as { cloud_name?: string; api_key?: string; api_secret?: string };
+  if (!cfg.cloud_name || !cfg.api_key || !cfg.api_secret) {
+    return missingCloudinaryMessage;
+  }
 
   cloudinaryConfigured = true;
   return null;
@@ -67,7 +84,7 @@ export async function POST(req: NextRequest) {
   const cloudinaryError = ensureCloudinary();
   if (cloudinaryError) {
     console.error("[API /upload] Cloudinary config missing");
-    return jsonError(cloudinaryError, 500);
+    return jsonError(cloudinaryError, 503);
   }
 
   try {

@@ -14,7 +14,7 @@
   }
 
   @media (max-width: 767px) {
-    padding: 4rem 0;
+    padding: 3rem 0;
   }
 }
 
@@ -209,11 +209,7 @@
   border: 1px solid var(--boutique-border);
   border-radius: 0.65rem;
   box-shadow: 0 16px 42px var(--boutique-card-shadow);
-  transition:
-    transform 0.28s ease,
-    border-color 0.28s ease,
-    box-shadow 0.28s ease,
-    background 0.28s ease;
+  transition: all 0.28s ease-in-out;
   animation: smoothReveal 0.75s ease both;
 
   &::before {
@@ -258,7 +254,7 @@
     font-weight: 700;
     line-height: 1.25;
     color: var(--boutique-text);
-    margin: 1rem 0 0.55rem;
+    margin: 0rem 0 0.55rem;
   }
 
   p {

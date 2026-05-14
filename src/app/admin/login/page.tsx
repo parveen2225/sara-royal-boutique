@@ -44,8 +44,6 @@ export default function AdminLoginPage() {
             <span className="admin_login_logo">
               <Image src={logo} alt="Sara Royal Boutique" />
             </span>
-            {/* <p className="admin_login_label mb-1">Sara Royal Admin</p> */}
-            <h4 className="my-2">Welcome back</h4>
             <p className="text-secondary mb-0 admin_login_subtitle">
               Sign in to manage boutique products and collections.
             </p>
@@ -63,7 +61,7 @@ export default function AdminLoginPage() {
               />
             </div>
 
-            <div className="admin_password_group">
+            <div className="admin_password_group mb-3">
               <label className="form-label" htmlFor="admin-password">
                 Password
               </label>
@@ -90,7 +88,7 @@ export default function AdminLoginPage() {
 
             {error && <div className="admin_error_banner mb-3">{error}</div>}
 
-            <CommonButton type="submit" className="admin_primary_btn w-100 mt-5">
+            <CommonButton type="submit" className="admin_primary_btn w-100 mt-4">
               Login
             </CommonButton>
 

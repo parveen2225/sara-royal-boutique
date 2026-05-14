@@ -44,7 +44,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </Offcanvas>
         <main className="admin_content">
           <AdminNavbar onMenuOpen={() => setMenuOpen(true)} />
+          <div className="admin_content_inner">
           {children}
+          </div>
         </main>
       </div>
     </AdminProvider>

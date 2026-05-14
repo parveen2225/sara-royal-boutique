@@ -182,12 +182,10 @@
 .admin_sidebar {
   width: 260px;
   flex-shrink: 0;
-  background:
-    linear-gradient(180deg, rgba(201, 168, 76, 0.1), rgba(201, 168, 76, 0.03)),
-    var(--boutique-footer-bg);
+  background: var(--bg-app);
   color: #f0e6cc;
   padding: 1.75rem 1.25rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -243,8 +241,11 @@
 
 .admin_content {
   flex: 1;
-  padding: 1.5rem 1.5rem 2.5rem;
   overflow-x: hidden;
+
+  &_inner {
+    padding: 1.5rem 1.5rem 2.5rem;
+  }
 }
 
 .admin_topbar {
@@ -252,15 +253,12 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  background: var(--surface);
-  border: 1px solid var(--border-color);
-  border-radius: 0.75rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-app);
+  border-bottom: 1px solid var(--border-color);
   padding: 0.9rem 1.25rem;
-  box-shadow: 0 4px 16px var(--shadow);
-  transition:
-    background-color 0.3s ease,
-    border-color 0.3s ease;
 }
 
 .admin_topbar_left {
@@ -273,6 +271,13 @@
 .admin_topbar_brand {
   display: none;
   align-items: center;
+}
+
+.admin_topbar_actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .admin_menu_toggle {
@@ -553,17 +558,29 @@
 }
 
 @media (max-width: 992px) {
-  .admin_sidebar {
+  /* Hide only the desktop rail — NOT the copy inside the Offcanvas drawer */
+  .admin_sidebar:not(.admin_sidebar_drawer) {
     display: none;
   }
 
+  .admin_sidebar.admin_sidebar_drawer {
+    display: flex !important;
+    flex-direction: column;
+    min-height: 100%;
+    height: auto;
+    position: relative;
+    color: #f0e6cc;
+  }
+
   .admin_content {
-    padding: 1rem 0.9rem 1.5rem;
+    &_inner {
+      padding: 1rem 0.9rem 1.5rem;
+    }
   }
 
   .admin_topbar {
     padding: 0.8rem 0.85rem;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .admin_topbar_brand {
@@ -574,7 +591,7 @@
     display: inline-flex;
   }
 
-  .admin_topbar_subtitle {
+  .admin_topbar_titles .admin_topbar_subtitle {
     max-width: 250px;
     line-height: 1.4;
   }
@@ -587,11 +604,6 @@
   .admin_card {
     border-radius: 0.7rem;
   }
-
-  .admin_inline_form {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 .admin_inline_form {
@@ -599,11 +611,20 @@
   gap: 0.75rem;
   flex-wrap: wrap;
   align-items: flex-end;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .admin_inline_form_field {
   flex: 1;
   min-width: 180px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+  }
 }
 
 .admin_inline_form_btn {
@@ -839,12 +860,17 @@
 }
 
 .admin_drawer {
-  width: 300px !important;
-  background: var(--boutique-footer-bg) !important;
+  width: min(300px, 88vw) !important;
+  max-width: 100%;
+  background: var(--boutique-footer-bg, #0a0e14) !important;
   border-right: 1px solid rgba(201, 168, 76, 0.2) !important;
+  z-index: 1045;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin_drawer_header {
+  flex-shrink: 0;
   border-bottom: 1px solid rgba(201, 168, 76, 0.16);
 
   .btn-close {
@@ -854,23 +880,63 @@
 
 .admin_drawer_body {
   padding: 0 !important;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin_sidebar_drawer {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   border-right: none;
   border-radius: 0;
   position: static;
+  flex: 1 1 auto;
+  padding: 1rem 1rem 1.5rem;
 }
 
 @media (max-width: 768px) {
   .admin_topbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
-  .admin_topbar .admin_outline_btn {
-    width: 100%;
+  .admin_topbar_left {
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+  }
+
+  .admin_topbar_titles {
+    display: none;
+  }
+
+  .admin_topbar_brand {
+    display: inline-flex !important;
+    order: -1;
+  }
+
+  .admin_topbar_actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .admin_menu_toggle {
+    order: 0;
+  }
+
+  .admin_topbar .admin_outline_btn.admin_logout_btn {
+    width: auto;
+    min-height: 2.5rem !important;
+    padding: 0.4rem 0.85rem !important;
+    font-size: 0.8125rem !important;
   }
 
   .admin_brand_logo_full {
@@ -881,7 +947,218 @@
     display: block;
   }
 
+  .admin_topbar_brand .admin_brand_logo_full {
+    display: none;
+  }
+
+  .admin_topbar_brand .admin_brand_logo_icon {
+    display: block !important;
+  }
+
   .admin_login_card_redesign .card-body {
     padding: 1.5rem 1.15rem !important;
+  }
+}
+
+/* Tablet: compact header, no long subtitle in top bar */
+@media (min-width: 769px) and (max-width: 992px) {
+  .admin_topbar {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .admin_topbar_titles {
+    display: none;
+  }
+
+  .admin_topbar_brand {
+    display: inline-flex !important;
+  }
+
+  .admin_topbar_actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .admin_topbar .admin_outline_btn.admin_logout_btn {
+    width: auto;
+  }
+}
+
+/* Admin tables: horizontal scroll + wrap on small screens */
+.admin_table_scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  .table_box {
+    overflow-x: auto;
+    overflow-y: visible;
+    min-width: 0;
+  }
+
+  .table {
+    min-width: 520px;
+  }
+
+  @media (max-width: 992px) {
+    .table thead th {
+      white-space: normal;
+      font-size: 0.75rem;
+      padding: 0.55rem 0.5rem;
+      vertical-align: middle;
+    }
+
+    .table tbody td {
+      white-space: normal;
+      word-break: break-word;
+      font-size: 0.8125rem;
+      padding: 0.55rem 0.5rem;
+      vertical-align: middle;
+    }
+  }
+}
+
+.form {
+  &-control {
+    background-image: none;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    font-size: 1rem;
+    font-weight: 400;
+    width: 100%;
+    caret-color: var(--foreground);
+    height: 3.125rem;
+    color: var(--input-text);
+    border-radius: 0.75rem;
+    padding: 0.3125rem 1.25rem;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+    .boutique_page & {
+      background: var(--boutique-input-bg);
+      background-color: var(--boutique-input-bg);
+      border-color: var(--boutique-border);
+      color: var(--boutique-text);
+      caret-color: var(--boutique-text);
+
+      &::placeholder {
+        color: var(--boutique-muted);
+      }
+
+      &:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+        background: var(--boutique-input-bg);
+        background-color: var(--boutique-input-bg);
+        color: var(--boutique-text);
+      }
+
+      &.is-invalid {
+        border-color: var(--red);
+      }
+    }
+
+    &:-webkit-autofill::first-line,
+    &:-webkit-autofill,
+    &:-webkit-autofill:hover,
+    &:-webkit-autofill:focus,
+    &:-webkit-autofill:active {
+      background: transparent;
+      background-color: transparent;
+      -webkit-text-fill-color: var(--input-text);
+      overflow: clip;
+      transition: background-color 5000s ease-in-out 0s;
+      -webkit-backdrop-filter: blur(3.375rem);
+      --tw-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+      -webkit-box-shadow: 0 0 0px 1000px var(--input-bg) inset !important;
+      font-size: 1rem;
+      caret-color: var(--foreground);
+      border-color: var(--border-color);
+    }
+
+    &::placeholder {
+      color: var(--placeholderclr);
+      caret-color: var(--placeholderclr);
+      font-size: 1rem;
+    }
+
+    &:-moz-placeholder {
+      opacity: 1;
+      color: var(--placeholderclr);
+      caret-color: var(--placeholderclr);
+      font-size: 1rem;
+    }
+
+    &::-webkit-input-placeholder {
+      opacity: 1;
+      color: var(--placeholderclr);
+      caret-color: var(--placeholderclr);
+      font-size: 1rem;
+    }
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    &:focus {
+      border-color: var(--pink-border);
+      box-shadow: none;
+      background: var(--input-bg);
+      background-color: var(--input-bg);
+      color: var(--input-text);
+    }
+
+    &.is-invalid {
+      border-color: var(--red);
+      background-image: none;
+    }
+
+    &.disabled,
+    &:disabled {
+      background-color: var(--input-bg);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+  }
+
+  &-label {
+    background: var(--label-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.625rem;
+    .boutique_page & {
+      background: var(--boutiqueGoldGradient);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    sup {
+      color: var(--red);
+    }
+  }
+
+  &-check {
+    &-label {
+      color: var(--primaryclr);
+      font-size: 0.875rem;
+      font-weight: normal;
+
+      span {
+        color: var(--textclr);
+      }
+    }
   }
 }

@@ -101,6 +101,10 @@
   color: var(--ivory-text);
   margin-bottom: 1.15rem;
   text-shadow: 0 10px 42px rgba(0, 0, 0, 0.48);
+
+  @media (max-width: 1579px) {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+  }
 }
 
 .hero_subtext {

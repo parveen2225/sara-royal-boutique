@@ -25,16 +25,6 @@ export default function AdminNavbar({ onMenuOpen }: AdminNavbarProps) {
   return (
     <header className="admin_topbar">
       <div className="admin_topbar_left">
-        <CommonButton
-          className="admin_menu_toggle"
-          onClick={onMenuOpen}
-          ariaLabel="Open admin menu"
-        >
-          <span />
-          <span />
-          <span />
-        </CommonButton>
-
         <Link href="/admin/dashboard" className="admin_topbar_brand">
           <Image
             src="/images/logo_3.png"
@@ -47,21 +37,36 @@ export default function AdminNavbar({ onMenuOpen }: AdminNavbarProps) {
           <Image
             src="/images/logo_icon.png"
             alt="Sara Royal"
-            width={32}
-            height={32}
+            width={36}
+            height={36}
             className="admin_brand_logo admin_brand_logo_icon"
             unoptimized
           />
         </Link>
 
-        <div>
+        <div className="admin_topbar_titles">
           <p className="admin_topbar_title">Admin Panel</p>
           <p className="admin_topbar_subtitle">Manage boutique products and collections</p>
         </div>
       </div>
-      <CommonButton className="admin_outline_btn" onClick={() => setShowLogoutConfirm(true)}>
-        Logout
-      </CommonButton>
+
+      <div className="admin_topbar_actions">
+        <CommonButton
+          className="admin_outline_btn admin_logout_btn"
+          onClick={() => setShowLogoutConfirm(true)}
+        >
+          Logout
+        </CommonButton>
+        <CommonButton
+          className="admin_menu_toggle d-flex d-lg-none"
+          onClick={onMenuOpen}
+          ariaLabel="Open admin menu"
+        >
+          <span />
+          <span />
+          <span />
+        </CommonButton>
+      </div>
 
       <CommonModal
         show={showLogoutConfirm}

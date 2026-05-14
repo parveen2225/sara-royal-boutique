@@ -102,7 +102,8 @@ export default function CollectionsPage() {
         </form>
       </Card>
 
-      <CommonTable fields={FIELDS} lastColumnWidth="160px" loader={isLoading}>
+      <div className="admin_table_scroll">
+        <CommonTable fields={FIELDS} lastColumnWidth="160px" loader={isLoading}>
         {state.collections.map((item) => {
           const productCount = state.products.filter((p) => p.categoryId === item.id).length;
           const isEditing = editingId === item.id;
@@ -179,7 +180,8 @@ export default function CollectionsPage() {
             </tr>
           );
         })}
-      </CommonTable>
+        </CommonTable>
+      </div>
 
       <CommonModal
         show={!!deleteId}

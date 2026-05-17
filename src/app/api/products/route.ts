@@ -5,6 +5,12 @@ import { formatProduct, jsonError, jsonMessage, jsonOk } from "@/lib/api/utils";
 import { requireAdmin } from "@/lib/auth/guard";
 import { getFallbackProducts } from "@/lib/fallbackState";
 
+const normalizeSliderDelay = (value: unknown): number => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 3200;
+  return Math.min(15000, Math.max(500, Math.round(parsed)));
+};
+
 export async function GET(req: NextRequest) {
   const categoryId = req.nextUrl.searchParams.get("categoryId");
 
@@ -54,6 +60,7 @@ export async function POST(req: NextRequest) {
       name,
       description: body?.description || "",
       stitchingPrice: String(body?.stitchingPrice || "").trim(),
+      sliderDelayMs: normalizeSliderDelay(body?.sliderDelayMs),
       categoryId,
       imageUrl: imageUrls[0] || body?.imageUrl || "",
       imageName: body?.imageName || "",

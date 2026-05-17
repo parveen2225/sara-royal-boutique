@@ -190,7 +190,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
               <span className="product_detail_section_label">You May Also Like</span>
               <h3 className="related_title">Similar Designs</h3>
             </div>
-            <Row className="g-4 g-xl-5">
+            <Row className="g-3 g-xl-4">
               {related.map((rp) => (
                 <Col key={rp.id} xs={12} sm={6} lg={4}>
                   <ProductCard product={rp} />

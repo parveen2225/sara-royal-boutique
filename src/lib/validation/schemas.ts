@@ -19,6 +19,12 @@ export const productValidationSchema = Yup.object({
       "Enter a valid price (e.g. 4500 or 800-1000).",
     ),
 
+  sliderDelayMs: Yup.number()
+    .typeError("Slider timing must be a number.")
+    .required("Slider timing is required.")
+    .min(500, "Slider timing must be at least 500 ms.")
+    .max(15000, "Slider timing must be 15000 ms or less."),
+
   categoryId: Yup.string().required("Collection is required."),
 
   imageUrls: Yup.array()

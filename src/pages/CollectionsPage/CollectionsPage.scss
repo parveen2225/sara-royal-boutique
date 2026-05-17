@@ -9,11 +9,11 @@
 /* ─── Hero ───────────────────────────────────────── */
 .collections_hero {
   position: relative;
-  min-height: 42vh;
+  min-height: 45vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--navy-black) url("/images/Designer_Suits5.webp") center/cover
+  background: var(--navy-black) url("../../../public/images/punjabi_2.jpg") center/cover
     no-repeat;
   overflow: hidden;
 
@@ -31,8 +31,12 @@
     position: relative;
     z-index: 2;
     text-align: center;
-    padding: 7.5rem 1.5rem 4.5rem;
+    padding: 10rem 1.5rem 4.5rem;
     animation: heroFadeUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+    @media (max-width: 767px) {
+      padding: 7rem 1.5rem 3rem;
+    }
   }
 
   .collections_hero_label {
@@ -59,12 +63,16 @@
 
   .collections_hero_title {
     font-family: $playfair;
-    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-size: clamp(2.4rem, 6vw, 3rem);
     font-weight: 700;
     color: var(--ivory-text);
     margin-bottom: 0.85rem;
     line-height: 1.12;
     text-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+
+    @media (max-width: 767px) {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+    }
   }
 
   .collections_hero_sub {

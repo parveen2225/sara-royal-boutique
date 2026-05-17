@@ -6,6 +6,10 @@ import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import { getWhatsAppUrl } from "@/utils/whatsapp";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import "./AboutPage.scss";
+import aboutImage from "../../../public/images/bridal_couture_3.png";
+import kurti3 from "../../../public/images/Blouse_Stitching_1.png";
+import punjabi1 from "../../../public/images/punjabi_1.jpg";
+import punjabi3 from "../../../public/images/punjabi_3.jpg";
 
 const VALUES = [
   {
@@ -34,17 +38,17 @@ const TEAM = [
   {
     name: "Sara",
     role: "Founder & Boutique Designer",
-    image: "/images/Designer_Suits1.jpg",
+    image: punjabi1,
   },
   {
     name: "Aisha",
     role: "Stitching Specialist",
-    image: "/images/kurti_3.jpg",
+    image: kurti3,
   },
   {
     name: "Zara",
     role: "Fitting Consultant",
-    image: "/images/punjabi_3.jpg",
+    image: punjabi3,
   },
 ];
 
@@ -72,7 +76,7 @@ const AboutPage: React.FC = () => {
             <Col xs={12} md={6}>
               <div className="about_story_img_wrap">
                 <Image
-                  src="/images/punjabi_4.jpg"
+                  src={aboutImage}
                   alt="Sara Royal Boutique stitched ladies suit"
                   width={580}
                   height={680}

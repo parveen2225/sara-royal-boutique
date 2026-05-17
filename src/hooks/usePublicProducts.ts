@@ -12,6 +12,7 @@ type ApiProduct = {
   name: string;
   description: string;
   stitchingPrice: string | number;
+  sliderDelayMs?: number;
   categoryId: string;
   imageUrl: string;
   imageName?: string;
@@ -54,6 +55,10 @@ export const usePublicProducts = () => {
         name: product.name,
         description: product.description,
         price: formatPriceRange(String(product.stitchingPrice)),
+        sliderDelayMs:
+          typeof product.sliderDelayMs === "number" && product.sliderDelayMs > 0
+            ? product.sliderDelayMs
+            : 3200,
         image: product.imageUrl,
         imageUrls:
           product.imageUrls && product.imageUrls.length > 0

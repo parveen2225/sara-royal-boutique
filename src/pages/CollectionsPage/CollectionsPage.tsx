@@ -170,9 +170,9 @@ const CollectionsPage: React.FC = () => {
               <p>No designs found in this category.</p>
             </div>
           ) : (
-            <Row className="g-4 g-xl-5">
+            <Row className="g-3 g-xl-4">
               {filtered.map((product) => (
-                <Col key={product.id} xs={12} sm={6} lg={4} xl={3}>
+                <Col key={product.id} xs={6} lg={4} xl={3}>
                   <ProductCard product={product} />
                 </Col>
               ))}

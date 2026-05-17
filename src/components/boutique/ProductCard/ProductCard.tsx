@@ -18,6 +18,14 @@ interface ProductCardProps {
   className?: string;
 }
 
+const getAutoplayOffset = (id: string) => {
+  let hash = 0;
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 31 + id.charCodeAt(i)) % 1200;
+  }
+  return hash;
+};
+
 const ProductCard: React.FC<ProductCardProps> = ({ product, className = "" }) => {
   const images: string[] =
     product.imageUrls && product.imageUrls.length > 0
@@ -27,6 +35,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = "" }) =>
       : [];
 
   const hasMultiple = images.length > 1;
+  const sliderDelayMs =
+    typeof product.sliderDelayMs === "number" && product.sliderDelayMs >= 500
+      ? product.sliderDelayMs
+      : 3200;
+  const autoplayDelay = sliderDelayMs + getAutoplayOffset(product.id);
 
   return (
     <article className={`product_card ${className}`}>
@@ -37,7 +50,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = "" }) =>
               modules={[Pagination, Autoplay]}
               pagination={{ clickable: true, dynamicBullets: true }}
               loop
-              autoplay={{ delay: 3200, disableOnInteraction: true, pauseOnMouseEnter: true }}
+              autoplay={{
+                delay: autoplayDelay,
+                disableOnInteraction: true,
+                pauseOnMouseEnter: true,
+              }}
               className="product_card_swiper"
             >
               {images.map((src, idx) => (

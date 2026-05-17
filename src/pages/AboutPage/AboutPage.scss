@@ -37,7 +37,7 @@
 
 .about_section_title {
   font-family: $playfair;
-  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-size: clamp(1.75rem, 3.5vw, 2rem);
   font-weight: 700;
   color: var(--boutique-text);
   margin-bottom: 1.25rem;
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--navy-black) url("/images/Designer_Suits5.webp") center/cover
+  background: var(--navy-black) url("../../../public/images/punjabi_3.jpg") top/cover
     no-repeat;
   overflow: hidden;
 
@@ -79,7 +79,7 @@
 
   .about_hero_title {
     font-family: $playfair;
-    font-size: clamp(2rem, 6vw, 4rem);
+    font-size: clamp(2rem, 6vw, 2.5rem);
     font-weight: 700;
     color: var(--ivory-text);
     margin-bottom: 0.75rem;

@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     description: { type: String, default: "", trim: true },
     stitchingPrice: { type: String, default: "", trim: true },
+    sliderDelayMs: { type: Number, default: 3200, min: 500 },
     categoryId: { type: String, required: true, trim: true },
     imageUrl: { type: String, default: "", trim: true },
     imageName: { type: String, trim: true },

@@ -11,7 +11,11 @@ import {
 } from "react";
 
 import type { ThemeMode } from "@/lib/theme/themeInit";
-import { LEGACY_THEME_STORAGE_KEY, THEME_STORAGE_KEY } from "@/lib/theme/themeInit";
+import {
+  DEFAULT_THEME,
+  LEGACY_THEME_STORAGE_KEY,
+  THEME_STORAGE_KEY,
+} from "@/lib/theme/themeInit";
 
 type ThemeContextValue = {
   theme: ThemeMode;
@@ -39,13 +43,13 @@ const applyThemeClass = (theme: ThemeMode) => {
 
 const getStoredTheme = (): ThemeMode => {
   if (typeof window === "undefined") {
-    return "light";
+    return DEFAULT_THEME;
   }
 
   const savedTheme =
     window.localStorage.getItem(THEME_STORAGE_KEY) ??
     window.localStorage.getItem(LEGACY_THEME_STORAGE_KEY);
-  return isThemeMode(savedTheme) ? savedTheme : "light";
+  return isThemeMode(savedTheme) ? savedTheme : DEFAULT_THEME;
 };
 
 const subscribeToTheme = (onStoreChange: () => void) => {
@@ -62,7 +66,7 @@ const subscribeToTheme = (onStoreChange: () => void) => {
   };
 };
 
-const getServerTheme = (): ThemeMode => "light";
+const getServerTheme = (): ThemeMode => DEFAULT_THEME;
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const theme = useSyncExternalStore(

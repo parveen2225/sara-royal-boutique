@@ -15,6 +15,7 @@ interface ProductValues {
   name: string;
   description: string;
   stitchingPrice: string;
+  sliderDelayMs: string;
   categoryId: string;
   imageUrls: string[];
 }
@@ -22,12 +23,18 @@ interface ProductValues {
 interface Props {
   collections: Collection[];
   services?: Service[];
-  initialValues?: Partial<ProductValues> & { stitchingPrice?: number | string; imageUrl?: string; imageUrls?: string[] };
+  initialValues?: Partial<ProductValues> & {
+    stitchingPrice?: number | string;
+    sliderDelayMs?: number | string;
+    imageUrl?: string;
+    imageUrls?: string[];
+  };
   submitLabel?: string;
   onSubmit: (values: {
     name: string;
     description: string;
     stitchingPrice: string;
+    sliderDelayMs: number;
     categoryId: string;
     imageUrl: string;
     imageUrls: string[];
@@ -71,6 +78,8 @@ export default function ProductForm({
     description: initialValues?.description ?? "",
     stitchingPrice:
       initialValues?.stitchingPrice != null ? String(initialValues.stitchingPrice) : "",
+    sliderDelayMs:
+      initialValues?.sliderDelayMs != null ? String(initialValues.sliderDelayMs) : "3200",
     categoryId: initialValues?.categoryId ?? "",
     imageUrls: initImageUrls,
   };
@@ -86,6 +95,10 @@ export default function ProductForm({
           name: values.name.trim(),
           description: values.description.trim(),
           stitchingPrice: values.stitchingPrice.trim(),
+          sliderDelayMs: Math.min(
+            15000,
+            Math.max(500, Number(values.sliderDelayMs.trim()) || 3200),
+          ),
           categoryId: values.categoryId,
           imageUrl: values.imageUrls[0] ?? "",
           imageUrls: values.imageUrls,
@@ -117,6 +130,18 @@ export default function ProductForm({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.stitchingPrice && errors.stitchingPrice}
+              />
+            </Col>
+
+            <Col md={6}>
+              <InputField
+                label="Slider Timing (ms)"
+                name="sliderDelayMs"
+                placeholder="e.g. 3200"
+                value={values.sliderDelayMs}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.sliderDelayMs && errors.sliderDelayMs}
               />
             </Col>
 

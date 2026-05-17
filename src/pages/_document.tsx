@@ -5,7 +5,7 @@ import { getThemeInitScript } from "@/lib/theme/themeInit";
 export default class MyDocument extends Document {
   render() {
     return (
-      <Html lang="en" suppressHydrationWarning>
+      <Html lang="en" className="theme-dark" suppressHydrationWarning>
         <Head>
           <script
             id="theme-init"

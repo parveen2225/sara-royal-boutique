@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} ${plusJakartaDisplay.variable}`}
+      className={`theme-dark ${plusJakartaSans.variable} ${plusJakartaDisplay.variable}`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >

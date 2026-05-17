@@ -29,7 +29,7 @@ const CollectionsSection: React.FC<CollectionsSectionProps> = ({
           </p>
         </div>
 
-        <Row className="g-4 g-xl-5">
+        <Row className="g-3 g-xl-4">
           {featuredProducts.length > 0 ? (
             featuredProducts.map((product) => ( 
               <Col key={product.id} xs={6} sm={6} lg={4}>

@@ -45,6 +45,10 @@ export const getFallbackProducts = () => {
     name: product.name,
     description: product.description,
     stitchingPrice: String(product.price || "").replace(/^₹\s*/, "").trim(),
+    sliderDelayMs:
+      typeof product.sliderDelayMs === "number" && product.sliderDelayMs > 0
+        ? product.sliderDelayMs
+        : 3200,
     categoryId: byName.get(product.category) || "custom-designs",
     imageUrl: product.image,
     imageName: "",

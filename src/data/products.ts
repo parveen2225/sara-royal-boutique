@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   description: string;
   price?: string;
+  sliderDelayMs?: number;
   image: string;
   imageUrls?: string[];
   category: string;

@@ -10,6 +10,7 @@ export type Product = {
   name: string;
   description: string;
   stitchingPrice: string;
+  sliderDelayMs?: number;
   categoryId: string;
   imageUrl: string;
   imageName?: string;

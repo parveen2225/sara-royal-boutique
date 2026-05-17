@@ -7,7 +7,7 @@ import BoutiqueNavbar from "@/components/boutique/Header/Header";
 import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import ServicesSection from "@/components/ServicesSection";
 import "./ServicesPage.scss";
-import image1 from "../../../public/images/punjabi_2.jpg";
+import image1 from "../../../public/images/Royal_Musta_d_Silk_Salwar_Suit_3.png";
 
 const ServicesPage: React.FC = () => {
   return (

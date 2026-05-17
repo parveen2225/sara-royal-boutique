@@ -4,7 +4,7 @@ import { getWhatsAppUrl } from "@/utils/whatsapp";
 import { BoutiqueWhatsAppIcon, BoutiqueArrowRightIcon } from "@/assets/icons/svgIcon";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import "./HeroSection.scss";
-import plazzo2 from "../../../../public/images/plazzo_2.jpg";
+import plazzo2 from "../../../../public/images/kide_war1.png";
 
 interface HeroSectionProps {
   headline?: string;
@@ -13,9 +13,9 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
-  headline = "Stitch Your Style, Feel Like Royalty",
+  headline = <>Stitch <span className="yellow_text">Your Style</span>, Feel Like Royalty</>,
   subtext = "Sara Royal Boutique creates premium ladies dress stitching with perfect fitting, elegant finishing, and designs made around your personal style.",
-  backgroundImage = "/images/punjabi_4.jpg",
+  backgroundImage = "/images/punjabi_3.jpg",
 }) => {
   return (
     <section className="hero_section" aria-label="Hero">
@@ -79,7 +79,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
 
           <div className="hero_stats">
             <div className="hero_stat">
-              <span className="stat_value">500+</span>
+              <span className="stat_value">100+</span>
               <span className="stat_label">Happy Clients</span>
             </div>
             <div className="hero_stat">

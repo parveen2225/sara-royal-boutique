@@ -8,6 +8,7 @@ import { BoutiqueWhatsAppIcon, BoutiqueArrowRightIcon } from "@/assets/icons/svg
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { usePublicServices } from "@/hooks/usePublicServices";
 import "./ServicesSection.scss";
+import ChooseImage from "../../public/images/Mohey_Floral_Embroidered_Anarkali_Suit_4.png";
 
 type ServicesSectionProps = {
   eyebrow?: string;
@@ -38,7 +39,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({
         <div className="services_showcase">
           <div className="services_showcase_visual">
             <Image
-              src="/images/punjabi_4.jpg"
+              src={ChooseImage}
               alt="Sara Royal Boutique custom ladies suit"
               fill
               sizes="(max-width: 991px) 92vw, 42vw"

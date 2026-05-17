@@ -38,6 +38,7 @@ export default function EditProductPage() {
           initialValues={{
             ...product,
             stitchingPrice: String(product.stitchingPrice),
+            sliderDelayMs: String(product.sliderDelayMs ?? 3200),
             imageUrls: product.imageUrls && product.imageUrls.length > 0
               ? product.imageUrls
               : product.imageUrl ? [product.imageUrl] : [],

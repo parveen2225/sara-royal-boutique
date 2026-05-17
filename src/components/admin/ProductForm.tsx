@@ -27,7 +27,7 @@ interface Props {
   onSubmit: (values: {
     name: string;
     description: string;
-    stitchingPrice: number;
+    stitchingPrice: string;
     categoryId: string;
     imageUrl: string;
     imageUrls: string[];
@@ -82,14 +82,10 @@ export default function ProductForm({
       initialValues={initial}
       validationSchema={validationSchema}
       onSubmit={(values, helpers) => {
-        const priceStr = values.stitchingPrice.trim();
-        const price = priceStr.includes("-")
-          ? parseFloat(priceStr.split("-")[0])
-          : parseFloat(priceStr);
         onSubmit({
           name: values.name.trim(),
           description: values.description.trim(),
-          stitchingPrice: isNaN(price) ? 0 : price,
+          stitchingPrice: values.stitchingPrice.trim(),
           categoryId: values.categoryId,
           imageUrl: values.imageUrls[0] ?? "",
           imageUrls: values.imageUrls,

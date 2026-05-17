@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     const product = await Product.create({
       name,
       description: body?.description || "",
-      stitchingPrice: body?.stitchingPrice || 0,
+      stitchingPrice: String(body?.stitchingPrice || "").trim(),
       categoryId,
       imageUrl: imageUrls[0] || body?.imageUrl || "",
       imageName: body?.imageName || "",

@@ -11,7 +11,7 @@ type ApiProduct = {
   id: string;
   name: string;
   description: string;
-  stitchingPrice: number;
+  stitchingPrice: string | number;
   categoryId: string;
   imageUrl: string;
   imageName?: string;

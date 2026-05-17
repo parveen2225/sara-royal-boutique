@@ -49,7 +49,7 @@ export async function PUT(
       {
         name: body?.name,
         description: body?.description,
-        stitchingPrice: body?.stitchingPrice,
+        stitchingPrice: String(body?.stitchingPrice || "").trim(),
         categoryId: body?.categoryId,
         imageUrl: imageUrls[0] || body?.imageUrl || "",
         imageName: body?.imageName || "",

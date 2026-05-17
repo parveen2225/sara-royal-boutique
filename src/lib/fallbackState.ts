@@ -44,7 +44,7 @@ export const getFallbackProducts = () => {
     id: product.id,
     name: product.name,
     description: product.description,
-    stitchingPrice: Number(String(product.price || "0").replace(/[^\d.]/g, "")) || 0,
+    stitchingPrice: String(product.price || "").replace(/^₹\s*/, "").trim(),
     categoryId: byName.get(product.category) || "custom-designs",
     imageUrl: product.image,
     imageName: "",

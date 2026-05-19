@@ -163,8 +163,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.5rem 1.2rem;
-  font-size: 0.78rem;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -198,10 +198,10 @@
   }
 }
 .theme_toggle_btn {
-  min-width: 2.375rem;
-  width: 2.375rem;
-  height: 2.375rem;
-  min-height: 2.375rem;
+  min-width: 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  min-height: 2.6rem;
   padding: 0;
   border-radius: 50%;
   background: rgba(201, 168, 76, 0.08);
@@ -230,9 +230,7 @@
   border: 1px solid var(--boutique-border);
   border-radius: 0.5rem;
   cursor: pointer;
-  transition:
-    border-color 0.25s ease,
-    background 0.25s ease;
+  transition: all 0.3s ease-in-out;
 
   @media (max-width: 991px) {
     display: flex;

@@ -12,6 +12,8 @@ import {
   BoutiqueInstagramIcon,
   BoutiqueCloseIcon,
   BoutiqueArrowRightIcon,
+  LightThemeIcon,
+  DarkThemeIcon,
 } from "@/assets/icons/svgIcon";
 import "./Header.scss";
 import Image from "next/image";
@@ -88,7 +90,7 @@ const Header: React.FC = () => {
               onClick={toggleTheme}
               ariaLabel={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
             >
-              <span aria-hidden="true">{theme === "light" ? "☾" : "☼"}</span>
+              <span aria-hidden="true">{theme === "light" ? <LightThemeIcon /> : <DarkThemeIcon />}</span>
             </CommonButton>
 
             <CommonButton

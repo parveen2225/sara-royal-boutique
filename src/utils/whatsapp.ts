@@ -7,10 +7,40 @@ export const getWhatsAppUrl = (message?: string): string => {
   return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
 };
 
-export const getProductWhatsAppUrl = (productName: string): string =>
-  getWhatsAppUrl(
-    `Hi Sara Royal Boutique, I am interested in *${productName}*. I want to discuss stitching, fabric, measurements, fitting, and INR pricing.`
-  );
+const formatPriceValueForMessage = (price?: string): string => {
+  if (!price?.trim()) return "";
+  return price
+    .trim()
+    .replace(/^INR\s+/i, "")
+    .replace(/₹\s*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+export const buildProductEnquiryMessage = (
+  productName: string,
+  price?: string,
+): string => {
+  const priceValue = formatPriceValueForMessage(price);
+  const stitchingPriceLine = priceValue
+    ? `Stitching Price: ₹${priceValue}`
+    : "Stitching Price: On request";
+
+  return [
+    "Hello Sara Royal Boutique,",
+    "",
+    `I'm interested in *${productName}*.`,
+    "",
+    stitchingPriceLine,
+    "",
+    "Please share further details regarding the stitching process and booking.",
+  ].join("\n");
+};
+
+export const getProductWhatsAppUrl = (
+  productName: string,
+  price?: string,
+): string => getWhatsAppUrl(buildProductEnquiryMessage(productName, price));
 
 export const getServiceWhatsAppUrl = (serviceName: string): string =>
   getWhatsAppUrl(

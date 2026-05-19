@@ -30,3 +30,18 @@ export const formatProduct = (product: RawDoc) => {
     id: (item?.id as string) || item?._id?.toString() || "",
   };
 };
+
+export const formatHeroBanner = (banner: RawDoc) => {
+  const item = typeof banner?.toObject === "function" ? banner.toObject() : banner;
+  return {
+    id: (item?.id as string) || item?._id?.toString() || "",
+    title: String(item?.title ?? ""),
+    subtitle: String(item?.subtitle ?? ""),
+    image: String(item?.image ?? ""),
+    buttonText: String(item?.buttonText ?? ""),
+    buttonLink: String(item?.buttonLink ?? ""),
+    isActive: Boolean(item?.isActive ?? true),
+    createdAt: item?.createdAt,
+    updatedAt: item?.updatedAt,
+  };
+};

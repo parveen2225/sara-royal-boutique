@@ -44,6 +44,14 @@ export const UPLOAD = {
   IMAGE: `${API_BASE}/upload`,
 };
 
+export const HERO_BANNER = {
+  LIST: `${API_BASE}/hero-banner?all=true`,
+  ACTIVE: `${API_BASE}/hero-banner`,
+  CREATE: `${API_BASE}/hero-banner`,
+  UPDATE: `${API_BASE}/hero-banner`,
+  DELETE: `${API_BASE}/hero-banner`,
+};
+
 export const API_ROUTES = {
   HEALTH,
   AUTH,
@@ -52,6 +60,7 @@ export const API_ROUTES = {
   PRODUCTS,
   SERVICES,
   UPLOAD,
+  HERO_BANNER,
 };
 
 export default API_ROUTES;

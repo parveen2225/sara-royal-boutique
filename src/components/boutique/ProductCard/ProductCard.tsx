@@ -109,7 +109,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, className = "" }) =>
         )}
         <CommonButton
           role="link"
-          to={getProductWhatsAppUrl(product.name)}
+          to={getProductWhatsAppUrl(product.name, product.price)}
           target="_blank"
           rel="noopener noreferrer"
           className="product_card_cta"

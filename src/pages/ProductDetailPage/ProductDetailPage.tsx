@@ -58,7 +58,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
   const related = products
     .filter((item) => item.id !== product.id && item.category === product.category)
     .slice(0, 3);
-  const whatsappUrl = getProductWhatsAppUrl(product.name);
+  const whatsappUrl = getProductWhatsAppUrl(product.name, product.price);
 
   return (
     <div className="boutique_page product_detail_page">

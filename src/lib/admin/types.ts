@@ -31,6 +31,18 @@ export type Service = {
   updatedAt: string;
 };
 
+export type HeroBanner = {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  buttonText: string;
+  buttonLink: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type AdminState = {
   collections: Collection[];
   products: Product[];

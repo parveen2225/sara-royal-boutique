@@ -1,5 +1,9 @@
+import { DEFAULT_GALLERY_ITEMS } from "@/data/gallery";
+import { GOOGLE_REVIEWS } from "@/data/googleReviews";
+import { DEFAULT_REELS } from "@/data/reels";
 import { PRODUCTS } from "@/data/products";
 import { SERVICES } from "@/data/services";
+import { GALLERY_CATEGORIES, type GalleryCategory } from "@/lib/admin/types";
 
 const slugify = (value: string) =>
   value
@@ -62,6 +66,35 @@ export const getFallbackProducts = () => {
     updatedAt: new Date().toISOString(),
   }));
 };
+
+export const getFallbackTestimonials = () =>
+  GOOGLE_REVIEWS.map((item) => ({
+    ...item,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+
+export const getFallbackGalleryItems = (category?: GalleryCategory) => {
+  const items = DEFAULT_GALLERY_ITEMS.map((item) => ({
+    ...item,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
+  if (!category) return items;
+  return items.filter((item) => item.category === category);
+};
+
+export const getFallbackGalleryResponse = (category?: GalleryCategory) => ({
+  items: getFallbackGalleryItems(category),
+  categories: [...GALLERY_CATEGORIES],
+});
+
+export const getFallbackReels = () =>
+  DEFAULT_REELS.map((item) => ({
+    ...item,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }));
 
 export const getFallbackAdminState = () => ({
   collections: getFallbackCollections(),

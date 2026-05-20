@@ -1,4 +1,4 @@
-import { JSX, memo, type ReactNode } from "react";
+import { Children, JSX, memo, type ReactNode } from "react";
 import { Col, Placeholder, Row, Table } from "react-bootstrap";
 import { NoRecordIcon, SortIcon } from "../../../../assets/icons/svgIcon";
 import "./CommonTable.scss";
@@ -23,6 +23,8 @@ type TProps = {
 };
 
 const CommonTable = (props: TProps) => {
+  const rowNodes = Children.toArray(props.children).filter(Boolean);
+
   return (
     <>
       <div className={`table_box ${props.className}`}>
@@ -95,8 +97,8 @@ const CommonTable = (props: TProps) => {
                   ))}
                 </tr>
               ))
-            ) : props.children ? (
-              props.children
+            ) : rowNodes.length > 0 ? (
+              rowNodes
             ) : (
               <tr>
                 <td colSpan={props.fields.length} className="no_record_box">

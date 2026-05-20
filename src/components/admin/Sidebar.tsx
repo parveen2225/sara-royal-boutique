@@ -10,6 +10,9 @@ export const adminLinks = [
   { href: "/admin/products", label: "Products" },
   { href: "/admin/services", label: "Services" },
   { href: "/admin/collections", label: "Collections" },
+  { href: "/admin/reels", label: "Reels" },
+  { href: "/admin/testimonials", label: "Testimonials" },
+  { href: "/admin/gallery", label: "Gallery" },
 ];
 
 type SidebarProps = {

@@ -23,6 +23,7 @@ import logoIcon from "../../../../public/images/logo_icon.png";
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Collections", href: "/collections" },
+  { label: "Gallery", href: "/gallery" },
   { label: "Services", href: "/services" },
   { label: "Classes", href: "/classes" },
   { label: "About", href: "/about" },

@@ -43,6 +43,50 @@ export type HeroBanner = {
   updatedAt?: string;
 };
 
+export type Reel = {
+  id: string;
+  title: string;
+  instagramUrl: string;
+  thumbnail: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type Testimonial = {
+  id: string;
+  customerName: string;
+  reviewText: string;
+  rating: number;
+  image: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export const GALLERY_CATEGORIES = [
+  "Bridal",
+  "Anarkali",
+  "Party Wear",
+  "Kurti",
+  "Plazo",
+] as const;
+
+export type GalleryCategory = (typeof GALLERY_CATEGORIES)[number];
+
+export type GalleryItem = {
+  id: string;
+  title: string;
+  image: string;
+  category: GalleryCategory;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type AdminState = {
   collections: Collection[];
   products: Product[];

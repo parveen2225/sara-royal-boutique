@@ -14,6 +14,10 @@ import AboutSection from "@/components/boutique/HomePageSections/AboutSection/Ab
 import ClassesPromoSection from "@/components/boutique/HomePageSections/ClassesPromoSection/ClassesPromoSection";
 import HiringSection from "@/components/boutique/HomePageSections/HiringSection/HiringSection";
 import CtaBannerSection from "@/components/boutique/HomePageSections/CtaBannerSection/CtaBannerSection";
+import ReelsSection from "@/components/boutique/HomePageSections/ReelsSection/ReelsSection";
+import TestimonialsSection from "@/components/boutique/HomePageSections/TestimonialsSection/TestimonialsSection";
+import OrderingProcessSection from "@/components/boutique/HomePageSections/OrderingProcessSection/OrderingProcessSection";
+import MeasurementsGuideSection from "@/components/boutique/HomePageSections/MeasurementsGuideSection/MeasurementsGuideSection";
 import "./HomePage.scss";
 
 const HomePage: React.FC = () => {
@@ -31,7 +35,11 @@ const HomePage: React.FC = () => {
       <HeroSection banner={banner} />
       <CollectionsSection featuredProducts={featuredProducts} isLoading={isLoading} />
       <ServicesSection />
+      <ReelsSection />
+      <OrderingProcessSection />
+      <MeasurementsGuideSection />
       <AboutSection />
+      <TestimonialsSection />
       <ClassesPromoSection />
       <HiringSection />
       <CtaBannerSection />

@@ -1,0 +1,63 @@
+@use "../../../assets/theme/var" as *;
+
+.seo_faq_section {
+  background: var(--boutique-bg);
+  border-top: 1px solid var(--boutique-border);
+
+  .seo_faq_list {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .seo_faq_item {
+    border: 1px solid rgba(201, 168, 76, 0.18);
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    background: rgba(201, 168, 76, 0.03);
+    transition: border-color 0.22s ease;
+
+    &.is_open {
+      border-color: rgba(201, 168, 76, 0.4);
+    }
+  }
+
+  .seo_faq_question {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-family: $playfair;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--boutique-text);
+    cursor: pointer;
+  }
+
+  .seo_faq_icon {
+    flex-shrink: 0;
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    color: var(--gold);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .seo_faq_answer {
+    padding: 0 1.25rem 1.15rem;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--boutique-muted);
+  }
+}

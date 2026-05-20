@@ -52,6 +52,32 @@ export const HERO_BANNER = {
   DELETE: `${API_BASE}/hero-banner`,
 };
 
+export const REELS = {
+  LIST: `${API_BASE}/reels?all=true`,
+  PUBLIC: `${API_BASE}/reels`,
+  CREATE: `${API_BASE}/reels`,
+  UPDATE: `${API_BASE}/reels`,
+  DELETE: `${API_BASE}/reels`,
+};
+
+export const TESTIMONIALS = {
+  LIST: `${API_BASE}/testimonials?all=true`,
+  PUBLIC: `${API_BASE}/testimonials`,
+  CREATE: `${API_BASE}/testimonials`,
+  UPDATE: `${API_BASE}/testimonials`,
+  DELETE: `${API_BASE}/testimonials`,
+};
+
+export const GALLERY = {
+  LIST: `${API_BASE}/gallery?all=true`,
+  PUBLIC: `${API_BASE}/gallery`,
+  BY_CATEGORY: (category: string) =>
+    `${API_BASE}/gallery?category=${encodeURIComponent(category)}`,
+  CREATE: `${API_BASE}/gallery`,
+  UPDATE: `${API_BASE}/gallery`,
+  DELETE: `${API_BASE}/gallery`,
+};
+
 export const API_ROUTES = {
   HEALTH,
   AUTH,
@@ -61,6 +87,9 @@ export const API_ROUTES = {
   SERVICES,
   UPLOAD,
   HERO_BANNER,
+  REELS,
+  TESTIMONIALS,
+  GALLERY,
 };
 
 export default API_ROUTES;

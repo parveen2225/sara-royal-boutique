@@ -12,6 +12,7 @@ import { loadingStore } from "@/lib/loading/loadingStore";
 import CollectionsSection from "@/components/boutique/HomePageSections/CollectionsSection/CollectionsSection";
 import AboutSection from "@/components/boutique/HomePageSections/AboutSection/AboutSection";
 import ClassesPromoSection from "@/components/boutique/HomePageSections/ClassesPromoSection/ClassesPromoSection";
+import DesignStudioSection from "@/components/boutique/HomePageSections/DesignStudioSection/DesignStudioSection";
 import HiringSection from "@/components/boutique/HomePageSections/HiringSection/HiringSection";
 import CtaBannerSection from "@/components/boutique/HomePageSections/CtaBannerSection/CtaBannerSection";
 import ReelsSection from "@/components/boutique/HomePageSections/ReelsSection/ReelsSection";
@@ -40,8 +41,9 @@ const HomePage: React.FC = () => {
       <MeasurementsGuideSection />
       <AboutSection />
       <TestimonialsSection />
+      <DesignStudioSection />
       <ClassesPromoSection />
-      <HiringSection />
+      {/* <HiringSection /> */}
       <CtaBannerSection />
       <BoutiqueFooter />
     </div>

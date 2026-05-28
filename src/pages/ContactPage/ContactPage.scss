@@ -3,303 +3,333 @@
 .contact_page {
   background: var(--boutique-bg);
   color: var(--boutique-text);
-}
 
-.py-section-contact {
-  padding-top: 6rem;
-  padding-bottom: 6rem;
+  .py-section-contact {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
 
-  @media (max-width: 767px) {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-  }
-}
-.contact_hero {
-  position: relative;
-  min-height: 36vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--navy-black)
-    url("/images/plazzo_3.jpg")
-    center/cover no-repeat;
-  overflow: hidden;
-
-  .contact_hero_overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(4, 8, 16, 0.75);
+    @media (max-width: 767px) {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
   }
 
-  .contact_hero_content {
+  .contact_hero {
     position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 7rem 1.25rem 4rem;
-  }
-
-  .contact_hero_label {
-    display: block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-
-  .contact_hero_title {
-    font-family: $playfair;
-    font-size: clamp(2rem, 6vw, 4rem);
-    font-weight: 700;
-    color: var(--ivory-text);
-    margin-bottom: 0.75rem;
-    line-height: 1.15;
-  }
-
-  .contact_hero_sub {
-    font-size: 1.05rem;
-    color: rgba(240, 230, 204, 0.72);
-    max-width: 560px;
-    margin: 0 auto;
-    line-height: 1.65;
-  }
-}
-.contact_section_label {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 0.875rem;
-
-  &::before { content: "✦ "; font-size: 0.6rem; }
-  &::after  { content: " ✦"; font-size: 0.6rem; }
-}
-
-.contact_section_title {
-  font-family: $playfair;
-  font-size: clamp(1.6rem, 3vw, 2.5rem);
-  font-weight: 700;
-  color: var(--boutique-text);
-  margin-bottom: 1rem;
-  line-height: 1.2;
-}
-.contact_intro {
-  font-size: 1rem;
-  line-height: 1.75;
-  color: var(--boutique-muted);
-  margin-bottom: 1.5rem;
-}
-.contact_address_block {
-  padding: 1.25rem 1.5rem;
-  background: var(--boutique-surface);
-  border: 1px solid var(--boutique-border);
-  border-left: 3px solid var(--gold);
-  border-radius: 1rem;
-  margin-bottom: 1.75rem;
-
-  .contact_address_line {
-    font-size: 0.92rem;
-    line-height: 1.6;
-    color: var(--boutique-muted);
-    margin: 0;
-
-    strong {
-      font-family: $playfair;
-      font-size: 1rem;
-      color: var(--boutique-text);
-      display: block;
-      margin-bottom: 0.35rem;
-    }
-  }
-
-  .contact_rating {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--boutique-border);
-
-    .rating_stars {
-      color: #FACC15;
-      font-size: 0.85rem;
-      letter-spacing: 0.05em;
-    }
-
-    .rating_text {
-      font-size: 0.8rem;
-      color: var(--boutique-muted);
-    }
-  }
-}
-
-.contact_cards {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-  margin-bottom: 2rem;
-}
-
-.contact_card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.125rem 1.25rem;
-  background: var(--boutique-surface);
-  border: 1px solid var(--boutique-border);
-  border-radius: 1rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-
-  .contact_card_icon {
+    min-height: 36vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    background: rgba(201, 168, 76, 0.08);
-    border: 1px solid var(--boutique-border);
-    border-radius: 0.75rem;
-    color: var(--gold);
-    flex-shrink: 0;
+    background: var(--navy-black) url("/images/plazzo_3.jpg") center/cover no-repeat;
+    overflow: hidden;
 
-    svg { width: 20px; height: 20px; }
-  }
-
-  .contact_card_text {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-
-  .contact_card_label {
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--boutique-muted);
-  }
-
-  .contact_card_value {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--boutique-text);
-  }
-
-  .contact_card_arrow {
-    color: var(--boutique-muted);
-    flex-shrink: 0;
-    transition: transform 0.25s ease, color 0.25s ease;
-  }
-
-  &:hover {
-    border-color: var(--gold);
-    background: rgba(201, 168, 76, 0.05);
-    transform: translateX(4px);
-
-    .contact_card_icon {
-      background: rgba(201, 168, 76, 0.15);
-      border-color: var(--gold);
+    &_overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(4, 8, 16, 0.75);
     }
 
-    .contact_card_value { color: var(--gold); }
-    .contact_card_arrow {
-      transform: translateX(4px);
+    &_content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 7rem 1.25rem 4rem;
+    }
+
+    &_label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
       color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    &_title {
+      font-family: $playfair;
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700;
+      color: var(--ivory-text);
+      margin-bottom: 0.75rem;
+      line-height: 1.15;
+    }
+
+    &_sub {
+      font-size: 1.05rem;
+      color: rgba(240, 230, 204, 0.72);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.65;
     }
   }
-}
-.contact_order_btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.875rem 2rem;
-  background: var(--boutiqueGoldGradient);
-  color: var(--navy-black);
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 3rem;
-  text-decoration: none;
-  width: 100%;
-  justify-content: center;
-  transition: all 0.3s ease;
 
-  svg { flex-shrink: 0; }
+  .contact_section {
+    &_label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.875rem;
 
-  &:hover {
-    opacity: 0.9;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(201, 168, 76, 0.35);
-    color: var(--navy-black);
-  }
-}
-.contact_map_col {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  height: 100%;
-}
+      &::before {
+        content: "✦ ";
+        font-size: 0.6rem;
+      }
 
-.contact_map_wrap {
-  border-radius: 1.25rem;
-  overflow: hidden;
-  border: 1px solid var(--boutique-border);
-  flex: 1;
-  min-height: 300px;
-}
+      &::after {
+        content: " ✦";
+        font-size: 0.6rem;
+      }
+    }
 
-.contact_map_iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 300px;
-  filter: brightness(0.9) saturate(0.8);
-}
-.contact_hours_card {
-  background: var(--boutique-surface);
-  border: 1px solid var(--boutique-border);
-  border-radius: 1.25rem;
-  padding: 1.5rem 1.75rem;
-
-  .hours_title {
-    font-family: $playfair;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--boutique-text);
-    margin-bottom: 1rem;
+    &_title {
+      font-family: $playfair;
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--boutique-text);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
   }
 
-  .hours_list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .contact_intro {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--boutique-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .contact_address_block {
+    padding: 1.25rem 1.5rem;
+    background: var(--boutique-surface);
+    border: 1px solid var(--boutique-border);
+    border-left: 3px solid var(--gold);
+    border-radius: 1rem;
+    margin-bottom: 1.75rem;
+
+    .contact_address_line {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--boutique-muted);
+      margin: 0;
+
+      strong {
+        font-family: $playfair;
+        font-size: 1rem;
+        color: var(--boutique-text);
+        display: block;
+        margin-bottom: 0.35rem;
+      }
+    }
+
+    .contact_rating {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--boutique-border);
+
+      .rating_stars {
+        color: #facc15;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+      }
+
+      .rating_text {
+        font-size: 0.8rem;
+        color: var(--boutique-muted);
+      }
+    }
+  }
+
+  .contact_cards {
     display: flex;
     flex-direction: column;
-    gap: 0.625rem;
+    gap: 0.875rem;
+    margin-bottom: 2rem;
+  }
 
-    li {
+  .contact_card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.125rem 1.25rem;
+    background: var(--boutique-surface);
+    border: 1px solid var(--boutique-border);
+    border-radius: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+
+    &_icon {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 0.9rem;
+      justify-content: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      background: rgba(201, 168, 76, 0.08);
+      border: 1px solid var(--boutique-border);
+      border-radius: 0.75rem;
+      color: var(--gold);
+      flex-shrink: 0;
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    &_text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    &_label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       color: var(--boutique-muted);
-      padding-bottom: 0.625rem;
-      border-bottom: 1px solid var(--boutique-border);
+    }
 
-      &:last-child { border-bottom: 0; padding-bottom: 0; }
+    &_value {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--boutique-text);
+    }
 
-      span:last-child { color: var(--boutique-text); font-weight: 500; }
+    &_arrow {
+      color: var(--boutique-muted);
+      flex-shrink: 0;
+      transition: transform 0.25s ease, color 0.25s ease;
+    }
 
-      &.hours_note span {
+    &:hover {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, 0.05);
+      transform: translateX(4px);
+
+      .contact_card_icon {
+        background: rgba(201, 168, 76, 0.15);
+        border-color: var(--gold);
+      }
+
+      .contact_card_value {
         color: var(--gold);
-        font-size: 0.82rem;
-        font-style: italic;
+      }
+
+      .contact_card_arrow {
+        transform: translateX(4px);
+        color: var(--gold);
+      }
+    }
+  }
+
+  .contact_order_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.875rem 2rem;
+    background: var(--boutiqueGoldGradient);
+    color: var(--navy-black);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 3rem;
+    text-decoration: none;
+    width: 100%;
+    justify-content: center;
+    transition: all 0.3s ease;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(201, 168, 76, 0.35);
+      color: var(--navy-black);
+    }
+  }
+
+  .contact_map {
+    &_col {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+    }
+
+    &_wrap {
+      border-radius: 1.25rem;
+      overflow: hidden;
+      border: 1px solid var(--boutique-border);
+      flex: 1;
+      min-height: 300px;
+    }
+
+    &_iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 300px;
+      filter: brightness(0.9) saturate(0.8);
+    }
+  }
+
+  .contact_hours_card {
+    background: var(--boutique-surface);
+    border: 1px solid var(--boutique-border);
+    border-radius: 1.25rem;
+    padding: 1.5rem 1.75rem;
+
+    .hours_title {
+      font-family: $playfair;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--boutique-text);
+      margin-bottom: 1rem;
+    }
+
+    .hours_list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9rem;
+        color: var(--boutique-muted);
+        padding-bottom: 0.625rem;
+        border-bottom: 1px solid var(--boutique-border);
+
+        &:last-child {
+          border-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        span:last-child {
+          color: var(--boutique-text);
+          font-weight: 500;
+        }
+
+        &.hours_note span {
+          color: var(--gold);
+          font-size: 0.82rem;
+          font-style: italic;
+        }
       }
     }
   }

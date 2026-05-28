@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Container } from "react-bootstrap";
 import Header from "@/components/boutique/Header/Header";
 import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
-import CommonModal from "@/components/common/Modal/CommonModal";
+import GalleryLightboxModal from "@/components/common/Modal/GalleryLightboxModal/GalleryLightboxModal";
 import { useGallery } from "@/hooks/useGallery";
 import { GALLERY_CATEGORIES, type GalleryCategory } from "@/lib/admin/types";
 import "./GalleryPage.scss";
@@ -98,26 +98,12 @@ const GalleryPage: React.FC = () => {
         </Container>
       </section>
 
-      <CommonModal
+      <GalleryLightboxModal
         show={!!lightboxItem}
-        handleClose={() => setLightboxItem(null)}
-        heading={lightboxItem?.title || "Gallery"}
-        className="gallery_lightbox_modal"
-        variant="large"
-      >
-        {lightboxItem && (
-          <div className="gallery_lightbox_wrap">
-            <Image
-              src={lightboxItem.image}
-              alt={lightboxItem.title}
-              width={900}
-              height={1100}
-              className="gallery_lightbox_image"
-              unoptimized={lightboxItem.image.startsWith("http")}
-            />
-          </div>
-        )}
-      </CommonModal>
+        image={lightboxItem?.image ?? ""}
+        title={lightboxItem?.title ?? "Gallery"}
+        onClose={() => setLightboxItem(null)}
+      />
 
       <BoutiqueFooter />
     </div>

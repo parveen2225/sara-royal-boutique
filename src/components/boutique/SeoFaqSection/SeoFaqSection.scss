@@ -1,6 +1,7 @@
 @use "../../../assets/theme/var" as *;
 
 .seo_faq_section {
+
   background: var(--boutique-bg);
   border-top: 1px solid var(--boutique-border);
 
@@ -60,4 +61,6 @@
     line-height: 1.75;
     color: var(--boutique-muted);
   }
+
+
 }

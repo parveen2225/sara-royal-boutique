@@ -1,0 +1,33 @@
+@use "../../../../assets/theme/_var.scss" as *;
+
+.gallery_lightbox_modal.commonModal {
+  &.modal .modal-dialog {
+    max-width: min(820px, 94vw);
+  }
+
+  &.modal .modal-content {
+    padding: 1.5rem 1.75rem 1.75rem;
+    background: var(--boutique-card-bg, #0e1622);
+    border: 1px solid var(--boutique-border);
+  }
+
+  &.modal .modal-header .modal-title h4 {
+    font-family: $playfair;
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+    color: var(--boutique-text, var(--ivory-text));
+  }
+
+  .gallery_lb_wrap {
+    text-align: center;
+    line-height: 0;
+  }
+
+  .gallery_lb_image {
+    width: 100%;
+    height: auto;
+    max-height: 72vh;
+    object-fit: contain;
+    border-radius: 0.65rem;
+    border: 1px solid var(--boutique-border);
+  }
+}

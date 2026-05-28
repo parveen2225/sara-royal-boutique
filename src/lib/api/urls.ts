@@ -78,6 +78,27 @@ export const GALLERY = {
   DELETE: `${API_BASE}/gallery`,
 };
 
+export const DESIGN_STUDIO = {
+  CATEGORIES: `${API_BASE}/design-studio/categories`,
+  CATEGORIES_ADMIN: `${API_BASE}/design-studio/categories?all=true`,
+  SUBCATEGORIES: `${API_BASE}/design-studio/subcategories`,
+  SUBCATEGORIES_ADMIN: `${API_BASE}/design-studio/subcategories?all=true`,
+  SUBCATEGORIES_BY_CATEGORY: (slug: string) =>
+    `${API_BASE}/design-studio/subcategories?category=${encodeURIComponent(slug)}`,
+  DESIGNS: `${API_BASE}/design-studio/designs`,
+  DESIGNS_ADMIN: `${API_BASE}/design-studio/designs?all=true`,
+  DESIGNS_BY_CATEGORY: (slug: string) =>
+    `${API_BASE}/design-studio/designs?category=${encodeURIComponent(slug)}`,
+  DESIGNS_BY_SUBCATEGORY: (category: string, sub: string) =>
+    `${API_BASE}/design-studio/designs?category=${encodeURIComponent(category)}&subcategory=${encodeURIComponent(sub)}`,
+  DESIGN_BY_SLUG: (slug: string) =>
+    `${API_BASE}/design-studio/designs?slug=${encodeURIComponent(slug)}`,
+  FEATURED: `${API_BASE}/design-studio/designs?featured=true`,
+  TRENDING: `${API_BASE}/design-studio/designs?trending=true`,
+  HOMEPAGE: `${API_BASE}/design-studio/designs?homepageShow=true&limit=8`,
+  SEED: `${API_BASE}/design-studio/seed`,
+};
+
 export const API_ROUTES = {
   HEALTH,
   AUTH,
@@ -90,6 +111,7 @@ export const API_ROUTES = {
   REELS,
   TESTIMONIALS,
   GALLERY,
+  DESIGN_STUDIO,
 };
 
 export default API_ROUTES;

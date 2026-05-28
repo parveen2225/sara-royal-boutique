@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Card, Col, Row } from "react-bootstrap";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import CommonTable from "@/components/common/ui/CommonTable/CommonTable";
-import CommonModal from "@/components/common/Modal/CommonModal";
+import AdminDeleteConfirmModal from "@/components/admin/modal/AdminDeleteConfirmModal/AdminDeleteConfirmModal";
 import InputField from "@/components/common/formik/inputField/InputField";
 import SelectField from "@/components/common/formik/selectField/SelectField";
 import TextareaField from "@/components/common/formik/textareaField/TextareaField";
@@ -362,28 +362,13 @@ export default function AdminHeroBannerPage() {
         ))}
       </CommonTable>
 
-      <CommonModal
+      <AdminDeleteConfirmModal
         show={!!deleteId}
-        handleClose={() => setDeleteId(null)}
         heading="Delete Hero Banner"
-        backdrop="static"
-        className="admin_delete_modal"
-      >
-        <p className="admin_modal_msg">
-          Are you sure you want to delete this hero banner? This action cannot be undone.
-        </p>
-        <div className="admin_modal_actions">
-          <CommonButton
-            className="admin_outline_btn admin_sm_btn"
-            onClick={() => setDeleteId(null)}
-          >
-            Cancel
-          </CommonButton>
-          <CommonButton className="admin_danger_btn admin_sm_btn" onClick={onConfirmDelete}>
-            Delete
-          </CommonButton>
-        </div>
-      </CommonModal>
+        message="Are you sure you want to delete this hero banner? This action cannot be undone."
+        onClose={() => setDeleteId(null)}
+        onConfirm={onConfirmDelete}
+      />
     </section>
   );
 }

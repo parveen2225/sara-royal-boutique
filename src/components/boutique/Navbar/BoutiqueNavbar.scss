@@ -1,6 +1,18 @@
 @use "../../../assets/theme/_var.scss" as *;
 
+@keyframes slideInLink {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 .boutique_nav {
+
   position: fixed;
   top: 0;
   left: 0;
@@ -24,15 +36,14 @@
       color: var(--boutique-text);
     }
   }
-}
 
-.boutique_nav_inner {
+  .boutique_nav_inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
 }
-.boutique_nav_brand {
+  .boutique_nav_brand {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -59,7 +70,7 @@
     }
   }
 }
-.boutique_nav_desktop {
+  .boutique_nav_desktop {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -69,7 +80,7 @@
   }
 }
 
-.boutique_nav_link {
+  .boutique_nav_link {
   font-size: 0.82rem;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -99,14 +110,14 @@
     &::after { width: 55%; }
   }
 }
-.boutique_nav_actions {
+  .boutique_nav_actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
 }
 
-.nav_whatsapp_btn {
+  .nav_whatsapp_btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -129,7 +140,7 @@
   }
   span { @media (max-width: 480px) { display: none; } }
 }
-.boutique_hamburger {
+  .boutique_hamburger {
   display: none;
   flex-direction: column;
   justify-content: center;
@@ -168,7 +179,7 @@
   }
 }
 
-.boutique_offcanvas {
+  .boutique_offcanvas {
   width: 320px !important;
   background: #060B12 !important;
   border-left: 1px solid rgba(201, 168, 76, 0.2) !important;
@@ -178,7 +189,7 @@
     transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 }
-.boutique_offcanvas_header {
+  .boutique_offcanvas_header {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -229,7 +240,7 @@
     }
   }
 }
-.boutique_offcanvas_body {
+  .boutique_offcanvas_body {
   padding: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -237,12 +248,12 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
-.offcanvas_nav {
+  .offcanvas_nav {
   flex: 1;
   padding: 0.75rem 0;
 }
 
-.offcanvas_nav_link {
+  .offcanvas_nav_link {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -299,14 +310,14 @@
     font-weight: 600;
   }
 }
-.offcanvas_footer {
+  .offcanvas_footer {
   padding: 1.5rem;
   border-top: 1px solid rgba(201, 168, 76, 0.12);
   background: rgba(201, 168, 76, 0.02);
   flex-shrink: 0;
 }
 
-.offcanvas_cta_btn {
+  .offcanvas_cta_btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -332,7 +343,7 @@
   }
 }
 
-.offcanvas_social_row {
+  .offcanvas_social_row {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -340,7 +351,7 @@
   margin-bottom: 1.25rem;
 }
 
-.offcanvas_social_link {
+  .offcanvas_social_link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -355,13 +366,13 @@
   &:hover { color: var(--gold); }
 }
 
-.offcanvas_social_sep {
+  .offcanvas_social_sep {
   font-size: 0.45rem;
   color: rgba(201, 168, 76, 0.3);
   line-height: 1;
 }
 
-.offcanvas_tagline {
+  .offcanvas_tagline {
   font-family: $playfair;
   font-size: 0.8rem;
   font-style: italic;
@@ -370,18 +381,9 @@
   margin: 0;
   letter-spacing: 0.06em;
 }
-.offcanvas-backdrop {
+  .offcanvas-backdrop {
   background: rgba(4, 8, 16, 0.82) !important;
 
   &.show { opacity: 1 !important; }
 }
-@keyframes slideInLink {
-  from {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }

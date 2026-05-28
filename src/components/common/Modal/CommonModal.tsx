@@ -33,9 +33,9 @@ const CommonModal = (props: CommonModals) => {
             </Modal.Title>
           </Modal.Header>
         )}
-        <CommonButton onClick={props.handleClose} className="modal_close_btn" ariaLabel="Close modal">
+        <button type="button" onClick={props.handleClose} className="modal_close_btn" aria-label="Close modal">
           <CrossIcon />
-        </CommonButton> 
+        </button> 
         <Modal.Body>{props?.children}</Modal.Body>
       </Modal>
     </>

@@ -93,7 +93,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
 
           <div className="hero_stats">
             <div className="hero_stat">
-              <span className="stat_value">100+</span>
+              <span className="stat_value">400+</span>
               <span className="stat_label">Happy Clients</span>
             </div>
             <div className="hero_stat">

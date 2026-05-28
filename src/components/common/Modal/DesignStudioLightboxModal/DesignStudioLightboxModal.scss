@@ -1,0 +1,279 @@
+@use "../../../../assets/theme/_var.scss" as *;
+
+.design_studio_lightbox_modal.commonModal {
+  &.modal .modal-dialog {
+    max-width: min(980px, 96vw);
+  }
+
+  &.modal .modal-content {
+    padding: 1.5rem 1.75rem 1.75rem;
+    background: var(--boutique-card-bg, #0e1622);
+    border: 1px solid var(--boutique-border);
+  }
+
+  &.modal .modal-header .modal-title h4 {
+    font-family: $playfair;
+    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--boutique-text, var(--ivory-text));
+    margin: 0;
+  }
+
+  &.modal .modal-header .modal-title {
+    margin-bottom: 1.25rem;
+  }
+
+  .ds_lb {
+    &_layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 1.75rem;
+      align-items: start;
+
+      @media (max-width: 991px) {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+    }
+
+    &_gallery {
+      position: sticky;
+      top: 0;
+
+      @media (max-width: 991px) {
+        position: static;
+      }
+    }
+
+    &_main {
+      border-radius: 0.85rem;
+      overflow: hidden;
+      border: 1px solid var(--boutique-border);
+      background: var(--navy-black);
+      line-height: 0;
+    }
+
+    &_image {
+      width: 100%;
+      height: auto;
+      max-height: min(58vh, 520px);
+      object-fit: contain;
+      display: block;
+    }
+
+    &_thumbs {
+      display: flex;
+      gap: 0.55rem;
+      margin-top: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    &_thumb {
+      padding: 0;
+      width: 4.25rem;
+      height: 5.25rem;
+      border: 2px solid transparent;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--navy-black);
+      opacity: 0.7;
+      transition:
+        opacity 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+
+      &.is_active,
+      &:hover {
+        opacity: 1;
+        border-color: var(--gold);
+        transform: translateY(-2px);
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    &_details {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-width: 0;
+    }
+
+    &_badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 0.85rem;
+    }
+
+    &_badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.2;
+
+      &_trending {
+        background: var(--boutiqueGoldGradient);
+        color: var(--navy-black);
+      }
+
+      &_featured {
+        background: rgba(201, 168, 76, 0.15);
+        border: 1px solid rgba(201, 168, 76, 0.45);
+        color: var(--gold-light);
+      }
+
+      &_new {
+        background: rgba(76, 201, 168, 0.12);
+        border: 1px solid rgba(76, 201, 168, 0.35);
+        color: #7dffd4;
+      }
+
+      &_bridal {
+        background: rgba(201, 76, 120, 0.12);
+        border: 1px solid rgba(201, 76, 120, 0.35);
+        color: #ffb8d0;
+      }
+    }
+
+    &_category {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 0.65rem;
+    }
+
+    &_desc {
+      font-size: 0.92rem;
+      line-height: 1.75;
+      color: var(--boutique-muted);
+      margin: 0 0 1.15rem;
+    }
+
+    &_meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 1.15rem;
+
+      @media (max-width: 575px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    &_meta_item {
+      padding: 0.75rem 0.85rem;
+      border-radius: 0.65rem;
+      border: 1px solid var(--boutique-border);
+      background: rgba(201, 168, 76, 0.04);
+    }
+
+    &_meta_label {
+      display: block;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--boutique-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    &_meta_value {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--boutique-text);
+      line-height: 1.35;
+    }
+
+    &_tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.25rem;
+    }
+
+    &_tag {
+      padding: 0.3rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      background: rgba(201, 168, 76, 0.08);
+      border: 1px solid rgba(201, 168, 76, 0.22);
+      color: var(--gold);
+    }
+
+    &_cta {
+      width: 100%;
+      justify-content: center;
+      padding: 0.9rem 1.5rem !important;
+      font-size: 0.78rem !important;
+      letter-spacing: 0.06em !important;
+    }
+
+    &_related {
+      margin-top: 1.75rem;
+      padding-top: 1.35rem;
+      border-top: 1px solid var(--boutique-border);
+      grid-column: 1 / -1;
+    }
+
+    &_related_title {
+      font-family: $playfair;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 0 0 0.85rem;
+      color: var(--boutique-text);
+    }
+
+    &_related_grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+      gap: 0.75rem;
+    }
+
+    &_related_card {
+      padding: 0;
+      border: 1px solid var(--boutique-border);
+      border-radius: 0.65rem;
+      overflow: hidden;
+      background: var(--navy-black);
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.25s ease, transform 0.25s ease;
+
+      &:hover {
+        border-color: rgba(201, 168, 76, 0.45);
+      }
+
+      img {
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        object-fit: cover;
+        display: block;
+      }
+
+      span {
+        display: block;
+        padding: 0.5rem 0.55rem;
+        font-size: 0.65rem;
+        line-height: 1.4;
+        color: var(--boutique-muted);
+      }
+    }
+  }
+}

@@ -5,7 +5,7 @@ import { Card } from "react-bootstrap";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import CommonTable from "@/components/common/ui/CommonTable/CommonTable";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
-import CommonModal from "@/components/common/Modal/CommonModal";
+import AdminDeleteConfirmModal from "@/components/admin/modal/AdminDeleteConfirmModal/AdminDeleteConfirmModal";
 import InputField from "@/components/common/formik/inputField/InputField";
 import SelectField from "@/components/common/formik/selectField/SelectField";
 
@@ -183,28 +183,13 @@ export default function CollectionsPage() {
         </CommonTable>
       </div>
 
-      <CommonModal
+      <AdminDeleteConfirmModal
         show={!!deleteId}
-        handleClose={() => setDeleteId(null)}
         heading="Delete Collection"
-        backdrop="static"
-        className="admin_delete_modal"
-      >
-        <p className="admin_modal_msg">
-          Are you sure you want to delete this collection? All associated data may be affected.
-        </p>
-        <div className="admin_modal_actions">
-          <CommonButton
-            className="admin_outline_btn admin_sm_btn"
-            onClick={() => setDeleteId(null)}
-          >
-            Cancel
-          </CommonButton>
-          <CommonButton className="admin_danger_btn admin_sm_btn" onClick={onConfirmDelete}>
-            Delete
-          </CommonButton>
-        </div>
-      </CommonModal>
+        message="Are you sure you want to delete this collection? All associated data may be affected."
+        onClose={() => setDeleteId(null)}
+        onConfirm={onConfirmDelete}
+      />
     </section>
   );
 }

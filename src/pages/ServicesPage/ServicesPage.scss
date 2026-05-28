@@ -3,99 +3,95 @@
 .services_page {
   background: var(--boutique-bg);
   color: var(--boutique-text);
-}
 
-.services_page_hero {
-  position: relative;
-  overflow: hidden;
-  min-height: 68vh;
-  display: flex;
-  align-items: center;
-  background: var(--navy-black);
-}
+  &_hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 68vh;
+    display: flex;
+    align-items: center;
+    background: var(--navy-black);
 
-.services_page_hero_bg {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      105deg,
-      rgba(4, 8, 16, 0.94) 0%,
-      rgba(8, 12, 20, 0.76) 54%,
-      rgba(4, 8, 16, 0.92) 100%
-    ),
-    url("/images/punjabi_4.jpg") center top / cover no-repeat;
-  transform: scale(1.02);
-}
+    @media (max-width: 767px) {
+      min-height: auto;
+    }
 
-.services_page_hero_inner {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
-  align-items: center;
-  gap: 3rem;
-  padding-top: 10rem;
-  padding-bottom: 4rem;
-}
+    &_bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          105deg,
+          rgba(4, 8, 16, 0.94) 0%,
+          rgba(8, 12, 20, 0.76) 54%,
+          rgba(4, 8, 16, 0.92) 100%
+        ),
+        url("/images/punjabi_4.jpg") center top / cover no-repeat;
+      transform: scale(1.02);
+    }
 
-.services_page_hero_text {
-  max-width: 720px;
+    &_inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      align-items: center;
+      gap: 3rem;
+      padding-top: 10rem;
+      padding-bottom: 4rem;
 
-  h1 {
-    font-family: $playfair;
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 700;
-    line-height: 1.05;
-    color: var(--ivory-text);
-    margin-bottom: 1rem;
+      @media (max-width: 991px) {
+        grid-template-columns: 1fr;
+      }
+
+      @media (max-width: 767px) {
+        padding-top: 7rem;
+        gap: 2rem;
+      }
+    }
+
+    &_text {
+      max-width: 720px;
+
+      h1 {
+        font-family: $playfair;
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 700;
+        line-height: 1.05;
+        color: var(--ivory-text);
+        margin-bottom: 1rem;
+      }
+
+      p {
+        max-width: 620px;
+        color: rgba(240, 230, 204, 0.8);
+        font-size: clamp(1rem, 1.8vw, 1.15rem);
+        line-height: 1.8;
+        margin: 0;
+      }
+    }
+
+    &_image {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      border: 1px solid rgba(201, 168, 76, 0.38);
+      border-radius: 0.85rem;
+      overflow: hidden;
+      box-shadow: 0 28px 65px rgba(0, 0, 0, 0.44);
+
+      @media (max-width: 991px) {
+        max-width: 420px;
+      }
+
+      img {
+        object-fit: cover;
+        object-position: top center;
+      }
+    }
   }
 
-  p {
-    max-width: 620px;
-    color: rgba(240, 230, 204, 0.8);
-    font-size: clamp(1rem, 1.8vw, 1.15rem);
-    line-height: 1.8;
-    margin: 0;
-  }
-}
-
-.services_page_hero_image {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  border: 1px solid rgba(201, 168, 76, 0.38);
-  border-radius: 0.85rem;
-  overflow: hidden;
-  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.44);
-
-  img {
-    object-fit: cover;
-    object-position: top center;
-  }
-}
-
-.services_page_listing {
-  border-top: 0;
-}
-
-@media (max-width: 991px) {
-  .services_page_hero_inner {
-    grid-template-columns: 1fr;
-  }
-
-  .services_page_hero_image {
-    max-width: 420px;
-  }
-}
-
-@media (max-width: 767px) {
-  .services_page_hero {
-    min-height: auto;
-  }
-
-  .services_page_hero_inner {
-    padding-top: 7rem;
-    gap: 2rem;
+  &_listing {
+    border-top: 0;
   }
 }

@@ -1,195 +1,209 @@
 @use "../../../assets/theme/var" as *;
 
+@keyframes reelShimmer {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
 .gallery_page {
   background: var(--boutique-bg);
   color: var(--boutique-text);
-}
 
-.gallery_page_hero {
-  position: relative;
-  overflow: hidden;
-  min-height: 52vh;
-  display: flex;
-  align-items: center;
-  padding: 10rem 0 4.5rem;
-  background: var(--navy-black);
-  text-align: center;
-}
+  &_hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 52vh;
+    display: flex;
+    align-items: center;
+    padding: 10rem 0 4.5rem;
+    background: var(--navy-black);
+    text-align: center;
 
-.gallery_page_hero_bg {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      105deg,
-      rgba(4, 8, 16, 0.92) 0%,
-      rgba(8, 12, 20, 0.72) 48%,
-      rgba(4, 8, 16, 0.9) 100%
-    ),
-    url("/images/punjabi_4.jpg") center center / cover no-repeat;
-  transform: scale(1.03);
-}
-
-.gallery_page_hero_inner {
-  position: relative;
-  z-index: 1;
-
-  h1 {
-    font-family: $playfair;
-    font-size: clamp(2.2rem, 5vw, 3.75rem);
-    color: var(--ivory-text);
-    margin-bottom: 0.75rem;
-    text-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-  }
-
-  p {
-    max-width: 580px;
-    margin: 0 auto;
-    color: rgba(240, 230, 204, 0.82);
-    line-height: 1.75;
-    font-size: 1.05rem;
-  }
-}
-
-.gallery_page_content {
-  background: linear-gradient(180deg, var(--boutique-bg) 0%, rgba(8, 12, 20, 0.98) 100%);
-  padding: 5rem 0;
-}
-
-.gallery_filters {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.65rem;
-  margin-bottom: 2.75rem;
-}
-
-.gallery_filter_btn {
-  padding: 0.6rem 1.25rem;
-  border-radius: 2rem;
-  border: 1px solid rgba(201, 168, 76, 0.28);
-  background: rgba(4, 8, 16, 0.4);
-  color: var(--boutique-muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.22s ease;
-
-  &.is_active,
-  &:hover {
-    background: rgba(201, 168, 76, 0.14);
-    border-color: var(--gold);
-    color: var(--gold);
-    box-shadow: 0 6px 20px rgba(201, 168, 76, 0.15);
-  }
-}
-
-.gallery_shop_grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1.25rem;
-
-  @media (min-width: 1200px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.gallery_shop_card {
-  padding: 0;
-  border: none;
-  border-radius: 0.85rem;
-  overflow: hidden;
-  position: relative;
-  cursor: pointer;
-  background: var(--navy-black);
-  text-align: left;
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
-  transition: transform 0.28s ease, box-shadow 0.28s ease;
-
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.38);
-
-    .gallery_shop_image {
-      transform: scale(1.06);
+    &_bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          105deg,
+          rgba(4, 8, 16, 0.92) 0%,
+          rgba(8, 12, 20, 0.72) 48%,
+          rgba(4, 8, 16, 0.9) 100%
+        ),
+        url("/images/punjabi_4.jpg") center center / cover no-repeat;
+      transform: scale(1.03);
     }
 
-    .gallery_masonry_overlay {
-      opacity: 1;
+    &_inner {
+      position: relative;
+      z-index: 1;
+
+      h1 {
+        font-family: $playfair;
+        font-size: clamp(2.2rem, 5vw, 3.75rem);
+        color: var(--ivory-text);
+        margin-bottom: 0.75rem;
+        text-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      }
+
+      p {
+        max-width: 580px;
+        margin: 0 auto;
+        color: rgba(240, 230, 204, 0.82);
+        line-height: 1.75;
+        font-size: 1.05rem;
+      }
     }
   }
-}
 
-.gallery_shop_image_wrap {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-}
+  &_content {
+    background: linear-gradient(180deg, var(--boutique-bg) 0%, rgba(8, 12, 20, 0.98) 100%);
+    padding: 5rem 0;
+  }
 
-.gallery_shop_image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s ease;
-}
+  .gallery {
+    &_filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+      margin-bottom: 2.75rem;
+    }
 
-.gallery_masonry_overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 1.1rem;
-  background: linear-gradient(transparent 35%, rgba(4, 8, 16, 0.92));
-  opacity: 0;
-  transition: opacity 0.28s ease;
-}
+    &_filter_btn {
+      padding: 0.6rem 1.25rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(201, 168, 76, 0.28);
+      background: rgba(4, 8, 16, 0.4);
+      color: var(--boutique-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.22s ease;
 
-.gallery_masonry_category {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
+      &.is_active,
+      &:hover {
+        background: rgba(201, 168, 76, 0.14);
+        border-color: var(--gold);
+        color: var(--gold);
+        box-shadow: 0 6px 20px rgba(201, 168, 76, 0.15);
+      }
+    }
 
-.gallery_masonry_title {
-  font-family: $playfair;
-  font-size: 1.05rem;
-  color: var(--ivory-text);
-  margin-top: 0.2rem;
-}
+    &_shop_grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.25rem;
 
-.gallery_skeleton_grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-}
+      @media (min-width: 1200px) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
 
-.gallery_skeleton_item {
-  aspect-ratio: 4 / 5;
-  border-radius: 0.85rem;
-  background: rgba(201, 168, 76, 0.08);
-  animation: reelShimmer 1.4s ease-in-out infinite;
-}
+    &_shop_card {
+      padding: 0;
+      border: none;
+      border-radius: 0.85rem;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      background: var(--navy-black);
+      text-align: left;
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
+      transition:
+        transform 0.28s ease,
+        box-shadow 0.28s ease;
 
-.gallery_empty {
-  color: var(--boutique-muted);
-  padding: 3rem 0;
-  text-align: center;
-}
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.38);
 
-.gallery_lightbox_wrap {
-  text-align: center;
-}
+        .gallery_shop_image {
+          transform: scale(1.06);
+        }
 
-.gallery_lightbox_image {
-  width: 100%;
-  height: auto;
-  max-height: 75vh;
-  object-fit: contain;
-  border-radius: 0.5rem;
+        .gallery_masonry_overlay {
+          opacity: 1;
+        }
+      }
+    }
+
+    &_shop_image_wrap {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+    }
+
+    &_shop_image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.45s ease;
+    }
+
+    &_masonry_overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 1.1rem;
+      background: linear-gradient(transparent 35%, rgba(4, 8, 16, 0.92));
+      opacity: 0;
+      transition: opacity 0.28s ease;
+    }
+
+    &_masonry_category {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    &_masonry_title {
+      font-family: $playfair;
+      font-size: 1.05rem;
+      color: var(--ivory-text);
+      margin-top: 0.2rem;
+    }
+
+    &_skeleton_grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    &_skeleton_item {
+      aspect-ratio: 4 / 5;
+      border-radius: 0.85rem;
+      background: rgba(201, 168, 76, 0.08);
+      animation: reelShimmer 1.4s ease-in-out infinite;
+    }
+
+    &_empty {
+      color: var(--boutique-muted);
+      padding: 3rem 0;
+      text-align: center;
+    }
+
+    &_lightbox_wrap {
+      text-align: center;
+    }
+
+    &_lightbox_image {
+      width: 100%;
+      height: auto;
+      max-height: 75vh;
+      object-fit: contain;
+      border-radius: 0.5rem;
+    }
+  }
 }

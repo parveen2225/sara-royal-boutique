@@ -987,6 +987,35 @@
   }
 }
 
+.admin_tab_row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin_tab_btn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 168, 76, 0.28);
+  background: transparent;
+  color: rgba(240, 230, 204, 0.65);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.is_active,
+  &:hover {
+    background: rgba(201, 168, 76, 0.12);
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+}
+
+.admin_gallery_sort_item {
+  text-align: center;
+}
+
 /* Admin tables: horizontal scroll + wrap on small screens */
 .admin_table_scroll {
   width: 100%;

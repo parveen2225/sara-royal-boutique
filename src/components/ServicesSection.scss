@@ -1,6 +1,7 @@
 @use "../assets/theme/_var.scss" as *;
 
 .services_section {
+
   position: relative;
   padding: 7rem 0;
   background:
@@ -16,9 +17,8 @@
   @media (max-width: 767px) {
     padding: 3rem 0;
   }
-}
 
-.section_label {
+  .section_label {
   display: inline-block;
   font-size: 0.72rem;
   font-weight: 600;
@@ -38,7 +38,7 @@
   }
 }
 
-.section_title {
+  .section_title {
   font-family: $playfair;
   font-size: clamp(1.75rem, 3.5vw, 2.75rem);
   font-weight: 700;
@@ -47,7 +47,7 @@
   line-height: 1.2;
 }
 
-.section_sub {
+  .section_sub {
   font-size: 1.05rem;
   color: var(--boutique-muted);
   max-width: 620px;
@@ -55,18 +55,18 @@
   line-height: 1.7;
 }
 
-.section_header {
+  .section_header {
   margin-bottom: 3.5rem;
   animation: smoothReveal 0.8s ease both;
 }
 
-.services_header {
+  .services_header {
   max-width: 760px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.services_showcase {
+  .services_showcase {
   display: grid;
   grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1.05fr);
   gap: 2rem;
@@ -74,7 +74,7 @@
   margin-bottom: 3rem;
 }
 
-.services_showcase_visual {
+  .services_showcase_visual {
   position: relative;
   min-height: 32rem;
   overflow: hidden;
@@ -91,13 +91,13 @@
   }
 }
 
-.services_showcase_img {
+  .services_showcase_img {
   object-fit: cover;
   object-position: top center;
   transform: scale(1.02);
 }
 
-.services_showcase_badge {
+  .services_showcase_badge {
   position: absolute;
   left: 1.25rem;
   right: 1.25rem;
@@ -131,7 +131,7 @@
   }
 }
 
-.services_showcase_copy {
+  .services_showcase_copy {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -175,7 +175,7 @@
   }
 }
 
-.showcase_points {
+  .showcase_points {
   display: flex;
   flex-wrap: wrap;
   gap: 0.65rem;
@@ -197,11 +197,11 @@
   }
 }
 
-.services_grid {
+  .services_grid {
   align-items: stretch;
 }
 
-.service_card {
+  .service_card {
   position: relative;
   height: 100%;
   overflow: hidden;
@@ -265,7 +265,7 @@
   }
 }
 
-.service_card_media {
+  .service_card_media {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
@@ -280,17 +280,17 @@
   }
 }
 
-.service_card_img {
+  .service_card_img {
   object-fit: cover;
   object-position: top center;
   transition: transform 0.45s ease;
 }
 
-.service_card_body {
+  .service_card_body {
   padding: 1.05rem 1.15rem 1.25rem;
 }
 
-.service_icon {
+  .service_icon {
   position: absolute;
   left: 0.85rem;
   bottom: 0.85rem;
@@ -310,7 +310,7 @@
   transition: transform 0.28s ease, background 0.28s ease, color 0.28s ease;
 }
 
-.services_cta {
+  .services_cta {
   margin: 3.25rem auto 0;
   max-width: 860px;
   display: flex;
@@ -331,7 +331,7 @@
   }
 }
 
-.services_cta_actions {
+  .services_cta_actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -339,8 +339,8 @@
   justify-content: flex-end;
 }
 
-.boutique_gold_btn,
-.boutique_outline_btn {
+  .boutique_gold_btn,
+  .boutique_outline_btn {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
@@ -355,7 +355,7 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
-.boutique_gold_btn {
+  .boutique_gold_btn {
   background: var(--boutiqueGoldGradient);
   color: var(--navy-black);
 
@@ -366,7 +366,7 @@
   }
 }
 
-.boutique_outline_btn {
+  .boutique_outline_btn {
   background: transparent;
   color: var(--gold);
   border: 1.5px solid var(--boutique-border);
@@ -387,7 +387,7 @@
   }
 }
 
-@media (max-width: 767px) {
+  @media (max-width: 767px) {
   .services_showcase {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -460,4 +460,5 @@
       padding-right: 1rem;
     }
   }
+}
 }

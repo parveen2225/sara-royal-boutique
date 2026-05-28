@@ -92,3 +92,65 @@ export type AdminState = {
   products: Product[];
   services: Service[];
 };
+
+export type DesignCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  displayOrder: number;
+  isActive: boolean;
+  subcategoryCount?: number;
+  designCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type DesignSubcategory = {
+  id: string;
+  categoryId: string;
+  categorySlug?: string;
+  categoryName?: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  displayOrder: number;
+  isActive: boolean;
+  designCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type StudioDesign = {
+  id: string;
+  title: string;
+  slug: string;
+  categoryId: string;
+  categorySlug: string;
+  categoryName: string;
+  subcategoryId: string;
+  subcategorySlug: string;
+  subcategoryName: string;
+  shortDescription: string;
+  fullDescription: string;
+  thumbnailImage: string;
+  galleryImages: string[];
+  tags: string[];
+  stitchingPrice: string;
+  fabricRecommendation: string;
+  deliveryTimeline: string;
+  featured: boolean;
+  trending: boolean;
+  newArrival: boolean;
+  bridalSpecial: boolean;
+  homepageShow: boolean;
+  activeStatus: boolean;
+  displayOrder: number;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
+  createdAt?: string;
+  updatedAt?: string;
+};

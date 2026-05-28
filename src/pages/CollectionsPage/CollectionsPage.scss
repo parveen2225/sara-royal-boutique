@@ -1,13 +1,46 @@
 @use "../../assets/theme/var" as *;
 
-/* ─── Page Shell ─────────────────────────────────── */
+@keyframes chipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .collections_page {
   background: var(--boutique-bg);
   color: var(--boutique-text);
-}
 
+/* ─── Page Shell ─────────────────────────────────── */
 /* ─── Hero ───────────────────────────────────────── */
-.collections_hero {
+  .collections_hero {
   position: relative;
   min-height: 45vh;
   display: flex;
@@ -17,7 +50,7 @@
     no-repeat;
   overflow: hidden;
 
-  .collections_hero_overlay {
+    &_overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(
@@ -27,7 +60,7 @@
     );
   }
 
-  .collections_hero_content {
+    &_content {
     position: relative;
     z-index: 2;
     text-align: center;
@@ -39,7 +72,7 @@
     }
   }
 
-  .collections_hero_label {
+    &_label {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -61,7 +94,7 @@
     }
   }
 
-  .collections_hero_title {
+    &_title {
     font-family: $playfair;
     font-size: clamp(2.4rem, 6vw, 3rem);
     font-weight: 700;
@@ -75,7 +108,7 @@
     }
   }
 
-  .collections_hero_sub {
+    &_sub {
     font-size: 1.05rem;
     color: rgba(240, 230, 204, 0.68);
     margin: 0;
@@ -83,7 +116,7 @@
   }
 }
 
-.collections_body {
+  .collections_body {
   padding: 5rem 0 7rem;
   background:
     radial-gradient(
@@ -99,12 +132,12 @@
     var(--boutique-bg);
 }
 
-.collections_section_header {
+  .collections_section_header {
   margin-bottom: 2.5rem;
   animation: heroFadeUp 0.7s ease both;
 }
 
-.collections_section_eyebrow {
+  .collections_section_eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -116,7 +149,7 @@
   margin-bottom: 0.75rem;
 }
 
-.collections_section_title {
+  .collections_section_title {
   font-family: $playfair;
   font-size: clamp(1.9rem, 4vw, 3rem);
   font-weight: 700;
@@ -130,7 +163,7 @@
   }
 }
 
-.collections_section_sub {
+  .collections_section_sub {
   font-size: 0.95rem;
   color: var(--boutique-muted);
   margin: 0;
@@ -139,14 +172,14 @@
 }
 
 /* ─── Toolbar ────────────────────────────────────── */
-.collections_toolbar {
+  .collections_toolbar {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
   margin-bottom: 2rem;
 }
 
-.collections_toolbar_top {
+  .collections_toolbar_top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -155,7 +188,7 @@
 }
 
 /* ─── Service chip / pill row ────────────────────── */
-.collections_chips_row {
+  .collections_chips_row {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -169,7 +202,7 @@
   }
 }
 
-.collection_chip {
+  .collection_chip {
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -214,11 +247,11 @@
   }
 }
 
-.chip_label {
+  .chip_label {
   line-height: 1;
 }
 
-.chip_clear {
+  .chip_clear {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -239,7 +272,7 @@
 }
 
 /* ─── Active filter chip row ─────────────────────── */
-.collections_active_filter_row {
+  .collections_active_filter_row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -247,18 +280,9 @@
   animation: chipFadeIn 0.22s ease;
 }
 
-@keyframes chipFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-.collections_active_filter_chip {
+
+  .collections_active_filter_chip {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -273,12 +297,12 @@
     border-color: rgba(201, 168, 76, 0.65);
   }
 
-  &.collections_active_filter_chip--service {
+  &--service {
     background: rgba(201, 168, 76, 0.07);
   }
 }
 
-.active_filter_badge {
+  .active_filter_badge {
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -289,7 +313,7 @@
   border-radius: 2rem;
 }
 
-.active_filter_label {
+  .active_filter_label {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--boutique-text);
@@ -297,7 +321,7 @@
   letter-spacing: 0.03em;
 }
 
-.active_filter_clear_btn {
+  .active_filter_clear_btn {
   width: 1.5rem;
   height: 1.5rem;
   flex-shrink: 0;
@@ -325,7 +349,7 @@
 }
 
 /* ─── Collection dropdown ────────────────────────── */
-.collections_select_wrap {
+  .collections_select_wrap {
   position: relative;
   min-width: 210px;
 
@@ -341,7 +365,7 @@
   }
 }
 
-.collections_select {
+  .collections_select {
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
@@ -371,7 +395,7 @@
 }
 
 /* ─── Divider below toolbar ──────────────────────── */
-.collections_divider {
+  .collections_divider {
   width: 100%;
   height: 1px;
   background: linear-gradient(
@@ -385,7 +409,7 @@
 }
 
 /* ─── Count + grid header ────────────────────────── */
-.collections_grid_header {
+  .collections_grid_header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -393,7 +417,7 @@
   gap: 1rem;
 }
 
-.collections_count {
+  .collections_count {
   font-size: 1.1rem;
   font-weight: 500;
   color: var(--boutique-muted);
@@ -410,7 +434,7 @@
   }
 }
 
-.collections_grid_label {
+  .collections_grid_label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -430,7 +454,7 @@
 }
 
 /* ─── Empty state ────────────────────────────────── */
-.collections_empty {
+  .collections_empty {
   text-align: center;
   padding: 6rem 0;
 
@@ -449,25 +473,15 @@
   }
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.08);
-  }
-}
+
 
 /* ─── Services CTA band ──────────────────────────── */
-.collections_services_band {
+  .collections_services_band {
   padding: 0 0 7rem;
   background: var(--boutique-bg);
 }
 
-.collections_services_inner {
+  .collections_services_inner {
   position: relative;
   display: flex;
   align-items: center;
@@ -522,7 +536,7 @@
   }
 }
 
-.collections_services_label {
+  .collections_services_label {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -539,7 +553,7 @@
   }
 }
 
-.collections_services_actions {
+  .collections_services_actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -547,8 +561,8 @@
   flex-shrink: 0;
 }
 
-.collections_services_gold,
-.collections_services_outline {
+  .collections_services_gold,
+  .collections_services_outline {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -568,7 +582,7 @@
     color 0.25s ease;
 }
 
-.collections_services_gold {
+  .collections_services_gold {
   background: var(--boutiqueGoldGradient);
   color: var(--navy-black);
   box-shadow: 0 6px 24px rgba(201, 168, 76, 0.22);
@@ -580,7 +594,7 @@
   }
 }
 
-.collections_services_outline {
+  .collections_services_outline {
   color: var(--gold);
   background: transparent;
   border: 1.5px solid var(--boutique-border);
@@ -602,7 +616,7 @@
 }
 
 /* ─── Responsive ─────────────────────────────────── */
-@media (max-width: 991px) {
+  @media (max-width: 991px) {
   .collections_toolbar_top {
     flex-direction: column;
     align-items: stretch;
@@ -614,7 +628,7 @@
   }
 }
 
-@media (max-width: 767px) {
+  @media (max-width: 767px) {
   .collections_body {
     padding: 4rem 0 5rem;
   }
@@ -651,14 +665,4 @@
   }
 }
 
-/* ─── Keyframes ──────────────────────────────────── */
-@keyframes heroFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }

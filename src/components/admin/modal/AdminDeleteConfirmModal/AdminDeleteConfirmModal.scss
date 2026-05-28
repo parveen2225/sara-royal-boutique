@@ -1,0 +1,21 @@
+@use "../../../../assets/theme/_var.scss" as *;
+
+.admin_delete_confirm_modal.commonModal {
+  &.modal .modal-dialog {
+    max-width: 28rem;
+  }
+
+  .admin_delete_confirm_msg {
+    color: var(--boutique-muted, rgba(240, 230, 204, 0.72));
+    line-height: 1.65;
+    margin: 0 0 1.25rem;
+    font-size: 0.92rem;
+  }
+
+  .admin_delete_confirm_actions {
+    display: flex;
+    gap: 0.65rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}

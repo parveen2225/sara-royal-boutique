@@ -15,6 +15,7 @@
     "bootstrap": "^5.3.8",
     "cloudinary": "^2.10.0",
     "formik": "^2.4.9",
+    "framer-motion": "^12.40.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2",
     "next": "16.2.3",

@@ -13,6 +13,7 @@ export const adminLinks = [
   { href: "/admin/reels", label: "Reels" },
   { href: "/admin/testimonials", label: "Testimonials" },
   { href: "/admin/gallery", label: "Gallery" },
+  { href: "/admin/design-studio", label: "Design Studio" },
 ];
 
 type SidebarProps = {

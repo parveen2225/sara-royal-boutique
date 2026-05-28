@@ -1,12 +1,12 @@
 @use "../../../../assets/theme/var" as *;
 
 .classes_promo_section {
-  padding: 7rem 0;
   position: relative;
+  padding: 7rem 0;
   overflow: hidden;
-  background: linear-gradient(135deg, #060c1a 0%, #0a1426 55%, #071020 100%);
-  border-top: 1px solid rgba(201, 168, 76, 0.15);
-  border-bottom: 1px solid rgba(201, 168, 76, 0.15);
+  background: linear-gradient(160deg, var(--boutique-surface) 0%, var(--boutique-bg) 100%);
+  border-top: 1px solid var(--boutique-border);
+  border-bottom: 1px solid var(--boutique-border);
 
   &::before {
     content: "CLASSES";
@@ -15,13 +15,13 @@
     top: 50%;
     transform: translateY(-50%);
     font-family: $playfair;
-    font-size: clamp(10rem, 22vw, 20rem);
+    font-size: clamp(8rem, 18vw, 16rem);
     font-weight: 700;
     color: rgba(201, 168, 76, 0.04);
     pointer-events: none;
     white-space: nowrap;
     line-height: 1;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
   }
 
   &::after {
@@ -42,193 +42,277 @@
     padding: 4rem 0;
   }
 
-  .classes_promo_inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 4rem;
-
-    @media (max-width: 991px) {
-      grid-template-columns: 1fr;
-      gap: 2.5rem;
-    }
-  }
-
-  .classes_promo_text {
-    position: relative;
-    z-index: 1;
-  }
-
-  .classes_promo_eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1rem;
-    padding: 0.3rem 0.9rem;
-    border: 1px solid rgba(201, 168, 76, 0.35);
-    border-radius: 999px;
-    background: rgba(201, 168, 76, 0.07);
-  }
-
-  .classes_promo_title {
-    font-family: $playfair;
-    font-size: clamp(2.75rem, 6vw, 4.5rem);
-    font-weight: 700;
-    color: #fff;
-    margin: 0 0 1.25rem;
-    line-height: 1.05;
-
-    em {
-      font-style: italic;
-      background: var(--boutiqueGoldGradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 2px 16px rgba(201, 168, 76, 0.35));
-    }
-  }
-
-  .classes_promo_tags {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 0.7rem;
-    font-weight: 900;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: #080c14;
-    margin-bottom: 1.75rem;
-    padding: 0.5rem 1.5rem;
-    background: var(--boutiqueGoldGradient);
-    border-radius: 999px;
-    box-shadow: 0 4px 20px rgba(201, 168, 76, 0.3);
-
-    .sep {
-      opacity: 0.45;
-    }
-  }
-
-  .classes_promo_list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 2rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem 2rem;
-
-    li {
-      font-size: 0.92rem;
-      color: rgba(240, 230, 204, 0.7);
-      display: flex;
+  .classes_promo {
+    &_grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: clamp(2.5rem, 5vw, 5rem);
       align-items: center;
-      gap: 0.4rem;
+
+      @media (max-width: 991px) {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
     }
 
-    @media (max-width: 576px) {
-      grid-template-columns: 1fr;
+    &_visual {
+      order: 1;
+
+      @media (max-width: 991px) {
+        order: 0;
+      }
+
+      &_frame {
+        position: relative;
+        max-width: 28rem;
+        margin: 0 auto;
+
+        @media (max-width: 575px) {
+          max-width: 22rem;
+        }
+      }
+
+      &_accent {
+        position: absolute;
+        inset: -1rem -1rem 2rem 2rem;
+        border: 1px solid rgba(201, 168, 76, 0.28);
+        border-radius: 1.25rem;
+        pointer-events: none;
+      }
+
+      &_main {
+        position: relative;
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: 1px solid var(--boutique-border);
+        box-shadow: 0 24px 64px var(--boutique-card-shadow);
+        aspect-ratio: 4 / 5;
+
+        .classes_promo_visual_image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center top;
+          display: block;
+        }
+      }
+
+      &_secondary {
+        position: absolute;
+        right: -1.5rem;
+        bottom: -1.5rem;
+        width: 42%;
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 3px solid var(--boutique-bg);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        aspect-ratio: 4 / 5;
+
+        @media (max-width: 575px) {
+          right: -0.5rem;
+          bottom: -1rem;
+          width: 38%;
+        }
+
+        .classes_promo_visual_image {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+      }
+
+      &_badge {
+        position: absolute;
+        top: 1.25rem;
+        left: -1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 5.5rem;
+        padding: 0.85rem 1rem;
+        background: var(--boutiqueGoldGradient);
+        border-radius: 1rem;
+        box-shadow: 0 12px 32px rgba(201, 168, 76, 0.35);
+        text-align: center;
+
+        @media (max-width: 575px) {
+          left: 0;
+          top: 0.75rem;
+          min-width: 4.75rem;
+          padding: 0.65rem 0.75rem;
+        }
+
+        &_value {
+          font-family: $playfair;
+          font-size: 1.15rem;
+          font-weight: 700;
+          color: var(--navy-black);
+          line-height: 1.1;
+        }
+
+        &_label {
+          font-size: 0.58rem;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: rgba(8, 12, 20, 0.65);
+          margin-top: 0.15rem;
+        }
+      }
     }
-  }
 
-  .classes_promo_fee {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    margin-bottom: 2rem;
-    padding: 0.75rem 1.5rem;
-    background: rgba(201, 168, 76, 0.08);
-    border: 1.5px solid rgba(201, 168, 76, 0.25);
-    border-radius: 0.75rem;
+    &_content {
+      order: 2;
 
-    .fee_text {
-      font-size: 0.82rem;
-      color: rgba(240, 230, 204, 0.55);
-      font-weight: 500;
+      @media (max-width: 991px) {
+        order: 1;
+        text-align: center;
+      }
     }
 
-    .fee_amount {
+    &_title {
       font-family: $playfair;
-      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-size: clamp(2.25rem, 5vw, 3.75rem);
       font-weight: 700;
-      color: var(--gold);
-      filter: drop-shadow(0 2px 10px rgba(201, 168, 76, 0.4));
+      color: var(--boutique-text);
+      margin: 0 0 1rem;
+      line-height: 1.08;
+
+      em {
+        font-style: italic;
+        background: var(--boutiqueGoldGradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
     }
-  }
 
-  .classes_promo_badge_wrap {
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
+    &_desc {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--boutique-muted);
+      margin: 0 0 1.5rem;
+      max-width: 34rem;
 
-    @media (max-width: 767px) {
+      @media (max-width: 991px) {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    &_tags {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+      padding: 0.45rem 1.35rem;
+      background: rgba(201, 168, 76, 0.1);
+      border: 1px solid rgba(201, 168, 76, 0.28);
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+
+      &_sep {
+        opacity: 0.45;
+      }
+    }
+
+    &_list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1.5rem;
+      max-width: 34rem;
+
+      @media (max-width: 991px) {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.92rem;
+        color: var(--boutique-muted);
+        line-height: 1.5;
+      }
+
+      &_icon {
+        flex-shrink: 0;
+        color: var(--gold);
+        font-size: 0.55rem;
+        margin-top: 0.45rem;
+      }
+    }
+
+    &_actions {
       display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+
+      @media (max-width: 991px) {
+        justify-content: center;
+      }
+
+      @media (max-width: 575px) {
+        flex-direction: column;
+        width: 100%;
+      }
+    }
+
+    &_btn {
+      @media (max-width: 575px) {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    &_wa_btn {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-top: 2rem;
-    }
-  }
-
-  .classes_promo_badge {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: var(--boutiqueGoldGradient);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-      0 0 0 12px rgba(201, 168, 76, 0.1),
-      0 0 0 24px rgba(201, 168, 76, 0.05),
-      0 20px 60px rgba(201, 168, 76, 0.4);
-    text-align: center;
-    padding: 1.5rem;
-    animation: pulseBadge 3s ease-in-out infinite;
-
-    @media (max-width: 991px) {
-      width: 160px;
-      height: 160px;
-    }
-
-    .badge_line1 {
-      font-size: 0.65rem;
-      font-weight: 900;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: #080c14;
-      display: block;
-    }
-
-    .badge_line2 {
-      font-family: $playfair;
-      font-size: 0.9rem;
+      gap: 0.55rem;
+      padding: 0.85rem 1.75rem;
+      background: transparent;
+      color: var(--gold);
+      font-size: 0.78rem;
       font-weight: 700;
-      color: #080c14;
-      display: block;
-      margin-top: 0.5rem;
-      line-height: 1.2;
-    }
-  }
-}
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1.5px solid var(--boutique-border);
+      border-radius: 999px;
+      text-decoration: none;
+      transition:
+        border-color 0.25s ease,
+        background 0.25s ease,
+        transform 0.25s ease;
 
-@keyframes pulseBadge {
-  0%,
-  100% {
-    transform: scale(1) rotate(-3deg);
-    box-shadow:
-      0 0 0 12px rgba(201, 168, 76, 0.1),
-      0 0 0 24px rgba(201, 168, 76, 0.05),
-      0 20px 60px rgba(201, 168, 76, 0.4);
-  }
-  50% {
-    transform: scale(1.04) rotate(-3deg);
-    box-shadow:
-      0 0 0 16px rgba(201, 168, 76, 0.12),
-      0 0 0 32px rgba(201, 168, 76, 0.06),
-      0 28px 80px rgba(201, 168, 76, 0.55);
+      &:hover {
+        border-color: var(--gold);
+        background: rgba(201, 168, 76, 0.08);
+        transform: translateY(-2px);
+        color: var(--gold);
+      }
+
+      @media (max-width: 575px) {
+        width: 100%;
+      }
+    }
   }
 }

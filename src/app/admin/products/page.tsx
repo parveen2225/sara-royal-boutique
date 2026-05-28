@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import CommonTable from "@/components/common/ui/CommonTable/CommonTable";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
-import CommonModal from "@/components/common/Modal/CommonModal";
+import AdminDeleteConfirmModal from "@/components/admin/modal/AdminDeleteConfirmModal/AdminDeleteConfirmModal";
 import { formatPriceRange } from "@/utils/formatCurrency";
 
 const FIELDS = [
@@ -90,28 +90,13 @@ export default function ProductsPage() {
         ))}
       </CommonTable>
 
-      <CommonModal
+      <AdminDeleteConfirmModal
         show={!!deleteId}
-        handleClose={() => setDeleteId(null)}
         heading="Delete Product"
-        backdrop="static"
-        className="admin_delete_modal"
-      >
-        <p className="admin_modal_msg">
-          Are you sure you want to delete this product? This cannot be undone.
-        </p>
-        <div className="admin_modal_actions">
-          <CommonButton
-            className="admin_outline_btn admin_sm_btn"
-            onClick={() => setDeleteId(null)}
-          >
-            Cancel
-          </CommonButton>
-          <CommonButton className="admin_danger_btn admin_sm_btn" onClick={onConfirmDelete}>
-            Delete
-          </CommonButton>
-        </div>
-      </CommonModal>
+        message="Are you sure you want to delete this product? This cannot be undone."
+        onClose={() => setDeleteId(null)}
+        onConfirm={onConfirmDelete}
+      />
     </section>
   );
 }

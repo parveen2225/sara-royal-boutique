@@ -8,7 +8,7 @@ import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import ProductCard from "@/components/boutique/ProductCard/ProductCard";
 import ProductGallery from "@/components/boutique/ProductGallery/ProductGallery";
 import { type Product } from "@/data/products";
-import { getProductWhatsAppUrl } from "@/utils/whatsapp";
+import { buildProductPageWhatsAppUrl, buildProductSuggestionWhatsAppUrl } from "@/utils/whatsapp";
 import { BoutiqueWhatsAppIcon, BoutiqueInstagramIcon } from "@/assets/icons/svgIcon";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { usePublicProducts } from "@/hooks/usePublicProducts";
@@ -58,7 +58,32 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
   const related = products
     .filter((item) => item.id !== product.id && item.category === product.category)
     .slice(0, 3);
-  const whatsappUrl = getProductWhatsAppUrl(product.name, product.price);
+
+  const handleWhatsAppOrder = () => {
+    const url = buildProductPageWhatsAppUrl(
+      product.id,
+      {
+        name: product.name,
+        price: product.price,
+        category: product.category,
+        description: product.description,
+      },
+      window.location.origin,
+    );
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const handleWhatsAppSuggestion = () => {
+    const url = buildProductSuggestionWhatsAppUrl(
+      product.id,
+      {
+        name: product.name,
+        category: product.category,
+      },
+      window.location.origin,
+    );
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="boutique_page product_detail_page">
@@ -124,14 +149,20 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
 
                 <div className="product_detail_cta_group">
                   <CommonButton
-                    role="link"
-                    to={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    type="button"
+                    onClick={handleWhatsAppOrder}
                     className="product_detail_order_btn"
                     svgIcon={<BoutiqueWhatsAppIcon width={20} height={20} />}
                   >
                     Order via WhatsApp
+                  </CommonButton>
+                  <CommonButton
+                    type="button"
+                    onClick={handleWhatsAppSuggestion}
+                    className="product_detail_suggest_btn"
+                    svgIcon={<BoutiqueWhatsAppIcon width={20} height={20} />}
+                  >
+                    Get Design Suggestions
                   </CommonButton>
                   <CommonButton role="link" to="/collections" className="product_detail_back_btn">
                     ← Back to Collections

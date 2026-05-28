@@ -61,12 +61,7 @@
         }
 
         &:hover {
-          svg path {
-            fill: var(--purple);
-          }
-          .boutique_page & svg path {
-            fill: var(--boutique-gold);
-          }
+          transform: rotate(90deg);
         }
       }
 
@@ -134,6 +129,12 @@
         font-family: $playfair;
         color: var(--boutique-text, var(--ivory-text));
       }
+    }
+  }
+
+  &.large {
+    .modal-dialog {
+      max-width: min(960px, 96vw);
     }
   }
 }

@@ -99,7 +99,7 @@ const DesignCategoryPage: React.FC<Props> = ({ category }) => {
           ) : (
             <Row className="g-3">
               {subcategories.map((sub, i) => (
-                <Col key={sub.id} xs={12} sm={6} md={4} lg={3}>
+                <Col key={sub.id} xs={6} sm={4} md={4} lg={3} xl={2}>
                   <motion.div
                     initial={{ opacity: 0, scale: 0.96 }}
                     whileInView={{ opacity: 1, scale: 1 }}

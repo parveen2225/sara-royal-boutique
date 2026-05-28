@@ -17,7 +17,7 @@
   .ds_hero {
     position: relative;
     overflow: hidden;
-    padding: 9rem 0 4rem;
+    padding: 10rem 0 4rem;
     background: var(--navy-black);
     text-align: center;
 
@@ -158,6 +158,10 @@
   .ds_section {
     padding: 4.5rem 0;
 
+    @media (max-width: 767px) {
+      padding: 2rem 0;
+    }
+
     &_head {
       text-align: center;
       margin-bottom: 2.5rem;
@@ -260,7 +264,7 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      padding: 1.25rem;
+      padding: 1.25rem 1rem;
       background: linear-gradient(transparent 30%, rgba(4, 8, 16, 0.92));
       opacity: 0.92;
       transition: opacity 0.3s ease;
@@ -271,6 +275,10 @@
       font-size: 1.25rem;
       font-weight: 700;
       color: var(--ivory-text);
+
+      @media (max-width: 991px) {
+        font-size: 1rem;
+      }
     }
 
     &_count {

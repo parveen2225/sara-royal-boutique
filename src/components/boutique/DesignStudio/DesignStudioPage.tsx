@@ -161,7 +161,7 @@ const DesignStudioPage: React.FC = () => {
           ) : (
             <Row className="g-4">
               {categories.map((cat, i) => (
-                <Col key={cat.id} xs={12} sm={6} lg={3} xl={3}>
+                <Col key={cat.id} xs={6} sm={4} lg={3} xl={2}>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}

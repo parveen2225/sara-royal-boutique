@@ -58,8 +58,8 @@ const Header: React.FC = () => {
         <Container className="boutique_header_inner">
 
           <Link href="/" className="boutique_header_brand">
-            <Image src={logo} alt="Logo" className="d-none d-md-block " />
-            <Image src={logoIcon} alt="Logo" className="d-block d-md-none " />
+            <Image src={logo} alt="Logo" className="d-none d-lg-block " />
+            <Image src={logoIcon} alt="Logo" className="d-block d-lg-none " />
           </Link>
 
           <nav className="boutique_header_desktop" aria-label="Main navigation">

@@ -92,13 +92,13 @@ const Header: React.FC = () => {
             <Image
               src={logo}
               alt="Sara Royal Boutique Logo"
-              className="d-none d-lg-block"
+              className="d-none d-xl-block"
               priority
             />
             <Image
               src={logoIcon}
               alt="Sara Royal Boutique"
-              className="d-block d-lg-none"
+              className="d-block d-xl-none"
               priority
             />
           </Link>

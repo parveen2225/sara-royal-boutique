@@ -3,8 +3,15 @@
 // ─── Keyframes ───────────────────────────────────────────────────────────────
 
 @keyframes blinkBanner {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.2; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
 }
 
 @keyframes mobileNavLinkIn {
@@ -12,6 +19,7 @@
     opacity: 0;
     transform: translateX(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -116,7 +124,11 @@
       width: 230px;
       height: auto;
 
-      @media (max-width: 991px) {
+      @media (max-width: 1399px) {
+        width: 150px;
+      }
+
+      @media (max-width: 1199px) {
         width: 55px;
       }
 
@@ -134,7 +146,7 @@
     flex: 1;
     justify-content: center;
 
-    @media (max-width: 991px) {
+    @media (max-width: 1199px) {
       display: none;
     }
   }
@@ -273,7 +285,7 @@
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 
-    @media (max-width: 991px) {
+    @media (max-width: 1199px) {
       display: flex;
     }
 
@@ -316,7 +328,7 @@
 .mobile_menu_backdrop {
   display: none;
 
-  @media (max-width: 991px) {
+  @media (max-width: 1199px) {
     display: block;
     position: fixed;
     inset: 0;
@@ -339,7 +351,7 @@
 .boutique_mobile_menu {
   display: none;
 
-  @media (max-width: 991px) {
+  @media (max-width: 1199px) {
     display: flex;
     flex-direction: column;
     position: fixed;

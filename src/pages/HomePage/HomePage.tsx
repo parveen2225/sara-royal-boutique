@@ -38,7 +38,7 @@ const HomePage: React.FC = () => {
       <MeasurementsGuideSection />
       <AboutSection />
       <TestimonialsSection />
-      <DesignStudioSection />
+      {/* <DesignStudioSection /> */}
       <ClassesPromoSection />
       {/* <HiringSection /> */}
       <CtaBannerSection />

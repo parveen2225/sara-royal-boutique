@@ -2,10 +2,8 @@
 
 import React from "react";
 import { useSyncExternalStore } from "react";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import HeroSection from "@/components/boutique/HeroSection/HeroSection";
 import { useHeroBanner } from "@/hooks/useHeroBanner";
-import Header from "@/components/boutique/Header/Header";
 import ServicesSection from "@/components/ServicesSection";
 import { usePublicProducts } from "@/hooks/usePublicProducts";
 import { loadingStore } from "@/lib/loading/loadingStore";
@@ -32,7 +30,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="boutique_page">
-      <Header />
       <HeroSection banner={banner} />
       <CollectionsSection featuredProducts={featuredProducts} isLoading={isLoading} />
       <ServicesSection />
@@ -45,7 +42,6 @@ const HomePage: React.FC = () => {
       <ClassesPromoSection />
       {/* <HiringSection /> */}
       <CtaBannerSection />
-      <BoutiqueFooter />
     </div>
   );
 };

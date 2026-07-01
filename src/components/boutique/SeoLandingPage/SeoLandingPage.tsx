@@ -3,8 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
-import Header from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import SeoFaqSection from "@/components/boutique/SeoFaqSection/SeoFaqSection";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { BoutiqueWhatsAppIcon } from "@/assets/icons/svgIcon";
@@ -21,7 +19,6 @@ const SeoLandingPage: React.FC<SeoLandingPageProps> = ({ config }) => {
 
   return (
     <div className="boutique_page seo_landing_page">
-      <Header />
 
       <section className="seo_page_hero">
         <div className="seo_page_hero_bg" />
@@ -113,7 +110,6 @@ const SeoLandingPage: React.FC<SeoLandingPageProps> = ({ config }) => {
         </Container>
       </section>
 
-      <BoutiqueFooter />
     </div>
   );
 };

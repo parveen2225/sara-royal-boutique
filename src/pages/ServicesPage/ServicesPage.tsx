@@ -3,8 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import { Container } from "react-bootstrap";
-import BoutiqueNavbar from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import ServicesSection from "@/components/ServicesSection";
 import "./ServicesPage.scss";
 import image1 from "../../../public/images/Royal_Musta_d_Silk_Salwar_Suit_3.png";
@@ -12,7 +10,6 @@ import image1 from "../../../public/images/Royal_Musta_d_Silk_Salwar_Suit_3.png"
 const ServicesPage: React.FC = () => {
   return (
     <div className="boutique_page services_page">
-      <BoutiqueNavbar />
 
       <section className="services_page_hero">
         <div className="services_page_hero_bg" />
@@ -44,7 +41,6 @@ const ServicesPage: React.FC = () => {
         className="services_page_listing"
       />
 
-      <BoutiqueFooter />
     </div>
   );
 };

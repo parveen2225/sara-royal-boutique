@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import Script from "next/script";
 import { getThemeInitScript } from "@/lib/theme/themeInit";
 import Loader from "@/components/common/ui/loader/Loader";
+import ConditionalLayout from "@/components/common/layout/ConditionalLayout";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-body",
@@ -44,7 +45,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning>
         <ThemeProvider>
           <Loader />
-          {children}
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
         </ThemeProvider>
       </body>
     </html>

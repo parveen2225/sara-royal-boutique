@@ -3,8 +3,6 @@
 import React, { useMemo, useState } from "react";
 import { Container } from "react-bootstrap";
 import { motion } from "framer-motion";
-import Header from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import DesignBreadcrumb from "@/components/boutique/DesignStudio/DesignBreadcrumb";
 import DesignCard from "@/components/boutique/DesignStudio/DesignCard";
 import DesignStudioLightboxModal from "@/components/common/Modal/DesignStudioLightboxModal/DesignStudioLightboxModal";
@@ -31,7 +29,6 @@ const DesignSubcategoryPage: React.FC<Props> = ({ category, subcategory }) => {
 
   return (
     <div className="boutique_page design_studio_page">
-      <Header />
 
       <section className="ds_hero ds_hero_compact">
         <div className="ds_hero_bg" aria-hidden="true" />
@@ -88,7 +85,6 @@ const DesignSubcategoryPage: React.FC<Props> = ({ category, subcategory }) => {
         onOpenRelated={setLightboxDesign}
       />
 
-      <BoutiqueFooter />
 
       <script
         type="application/ld+json"

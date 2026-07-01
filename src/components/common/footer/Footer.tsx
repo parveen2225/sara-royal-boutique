@@ -4,7 +4,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { getWhatsAppUrl } from "@/utils/whatsapp";
 import { BoutiqueWhatsAppIcon, BoutiqueInstagramIcon } from "@/assets/icons/svgIcon";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
-import "./BoutiqueFooter.scss";
+import "./Footer.scss";
 import Image from "next/image";
 import logo from "../../../../public/images/logo_1.png";
 
@@ -19,7 +19,7 @@ const FOOTER_LINKS = [
 const INSTAGRAM_URL = "https://www.instagram.com/sararoyalboutique";
 const GOOGLE_REVIEW_URL = "https://g.page/r/CW8_ymiprhnvEBM/review";
 
-const BoutiqueFooter: React.FC = () => {
+const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -30,14 +30,13 @@ const BoutiqueFooter: React.FC = () => {
           <Col xs={12} md={5} lg={4}>
             <div className="footer_brand">
               <Link href="/" className="footer_logo">
-                <Image src={logo} alt="logo" />
+                <Image src={logo} alt="Sara Royal Boutique" />
               </Link>
               <p className="footer_tagline">
                 Elegance in every stitch. Premium stitched suits and boutique designs crafted for the modern woman.
               </p>
             </div>
           </Col>
-
 
           <Col xs={6} md={3} lg={2}>
             <h6 className="footer_heading">Quick Links</h6>
@@ -51,7 +50,6 @@ const BoutiqueFooter: React.FC = () => {
               ))}
             </ul>
           </Col>
-
 
           <Col xs={6} md={4} lg={3}>
             <h6 className="footer_heading">Connect With Us</h6>
@@ -91,7 +89,6 @@ const BoutiqueFooter: React.FC = () => {
             </div>
           </Col>
 
-
           <Col xs={12} md={12} lg={3}>
             <div className="footer_order_cta">
               <h6 className="footer_heading">Place an Order</h6>
@@ -114,16 +111,13 @@ const BoutiqueFooter: React.FC = () => {
         <div className="boutique_footer_bottom">
           <p className="footer_copyright">
             © {currentYear}{" "}
-            <span className="footer_brand_name">Sara Royal Boutique</span>. All
-            rights reserved.
+            <span className="footer_brand_name">Sara Royal Boutique</span>. All rights reserved.
           </p>
-          <p className="footer_made_with">
-            Crafted with elegance &amp; care
-          </p>
+          <p className="footer_made_with">Crafted with elegance &amp; care</p>
         </div>
       </Container>
     </footer>
   );
 };
 
-export default BoutiqueFooter;
+export default Footer;

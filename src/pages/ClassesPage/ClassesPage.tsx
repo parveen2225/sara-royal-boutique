@@ -4,8 +4,6 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Col, Container, Row } from "react-bootstrap";
-import BoutiqueNavbar from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { BoutiqueWhatsAppIcon } from "@/assets/icons/svgIcon";
 import {
@@ -20,7 +18,6 @@ import "./ClassesPage.scss";
 const ClassesPage: React.FC = () => {
   return (
     <div className="boutique_page classes_page">
-      <BoutiqueNavbar />
 
       <section className="classes_hero">
         <div className="classes_hero_bg">
@@ -281,7 +278,6 @@ const ClassesPage: React.FC = () => {
         </Container>
       </section>
 
-      <BoutiqueFooter />
     </div>
   );
 };

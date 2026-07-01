@@ -3,8 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { Col, Container, Row } from "react-bootstrap";
-import BoutiqueNavbar from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import ProductCard from "@/components/boutique/ProductCard/ProductCard";
 import ProductGallery from "@/components/boutique/ProductGallery/ProductGallery";
 import { type Product } from "@/data/products";
@@ -33,15 +31,12 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
     if (isLoading) {
       return (
         <div className="boutique_page">
-          <BoutiqueNavbar />
           <div style={{ minHeight: "60vh" }} />
-          <BoutiqueFooter />
         </div>
       );
     }
     return (
       <div className="boutique_page">
-        <BoutiqueNavbar />
         <div className="product_not_found">
           <span className="not_found_icon">✦</span>
           <h2>Design Not Found</h2>
@@ -50,7 +45,6 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
             Browse Collections
           </CommonButton>
         </div>
-        <BoutiqueFooter />
       </div>
     );
   }
@@ -87,7 +81,6 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
 
   return (
     <div className="boutique_page product_detail_page">
-      <BoutiqueNavbar />
 
       <section className="product_detail_section">
         <Container>
@@ -232,7 +225,6 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
         </section>
       )}
 
-      <BoutiqueFooter />
     </div>
   );
 };

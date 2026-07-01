@@ -1,8 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import { Col, Container, Row } from "react-bootstrap";
-import BoutiqueNavbar from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import { getWhatsAppUrl } from "@/utils/whatsapp";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import "./AboutPage.scss";
@@ -55,9 +53,8 @@ const TEAM = [
 const AboutPage: React.FC = () => {
   return (
     <div className="boutique_page about_page">
-      <BoutiqueNavbar />
 
-      
+
       <section className="about_hero">
         <div className="about_hero_overlay" />
         <div className="about_hero_content">
@@ -69,7 +66,7 @@ const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      
+
       <section className="about_story py-section-about">
         <Container>
           <Row className="align-items-center g-5">
@@ -113,7 +110,7 @@ const AboutPage: React.FC = () => {
         </Container>
       </section>
 
-      
+
       <section className="about_mission">
         <Container>
           <div className="mission_inner">
@@ -132,7 +129,7 @@ const AboutPage: React.FC = () => {
         </Container>
       </section>
 
-      
+
       <section className="about_values py-section-about">
         <Container>
           <div className="text-center mb-5">
@@ -153,7 +150,7 @@ const AboutPage: React.FC = () => {
         </Container>
       </section>
 
-      
+
       <section className="about_team py-section-about">
         <Container>
           <div className="text-center mb-5">
@@ -184,7 +181,7 @@ const AboutPage: React.FC = () => {
         </Container>
       </section>
 
-      
+
       <section className="about_udyam py-section-about">
         <Container>
           <div className="text-center mb-5">
@@ -308,7 +305,6 @@ const AboutPage: React.FC = () => {
         </Container>
       </section>
 
-      <BoutiqueFooter />
     </div>
   );
 };

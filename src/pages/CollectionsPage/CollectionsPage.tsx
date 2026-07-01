@@ -2,8 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import BoutiqueNavbar from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import ProductCard from "@/components/boutique/ProductCard/ProductCard";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { getWhatsAppUrl } from "@/utils/whatsapp";
@@ -79,7 +77,6 @@ const CollectionsPage: React.FC = () => {
 
   return (
     <div className="boutique_page collections_page">
-      <BoutiqueNavbar />
 
       <section className="collections_hero">
         <div className="collections_hero_overlay" />
@@ -213,7 +210,6 @@ const CollectionsPage: React.FC = () => {
         </Container>
       </section>
 
-      <BoutiqueFooter />
     </div>
   );
 };

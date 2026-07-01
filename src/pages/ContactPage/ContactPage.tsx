@@ -1,7 +1,5 @@
 import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import BoutiqueNavbar from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import { getWhatsAppUrl } from "@/utils/whatsapp";
 import {
   BoutiqueWhatsAppIcon,
@@ -50,7 +48,6 @@ const CONTACT_ITEMS = [
 const ContactPage: React.FC = () => {
   return (
     <div className="boutique_page contact_page">
-      <BoutiqueNavbar />
       <section className="contact_hero">
         <div className="contact_hero_overlay" />
         <div className="contact_hero_content">
@@ -165,7 +162,6 @@ const ContactPage: React.FC = () => {
         </Container>
       </section>
 
-      <BoutiqueFooter />
     </div>
   );
 };

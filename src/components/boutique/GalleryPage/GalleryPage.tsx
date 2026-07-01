@@ -3,8 +3,6 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { Container } from "react-bootstrap";
-import Header from "@/components/boutique/Header/Header";
-import BoutiqueFooter from "@/components/boutique/Footer/BoutiqueFooter";
 import GalleryLightboxModal from "@/components/common/Modal/GalleryLightboxModal/GalleryLightboxModal";
 import { useGallery } from "@/hooks/useGallery";
 import { GALLERY_CATEGORIES, type GalleryCategory } from "@/lib/admin/types";
@@ -23,7 +21,6 @@ const GalleryPage: React.FC = () => {
 
   return (
     <div className="boutique_page gallery_page">
-      <Header />
 
       <section className="gallery_page_hero">
         <div className="gallery_page_hero_bg" />
@@ -105,7 +102,6 @@ const GalleryPage: React.FC = () => {
         onClose={() => setLightboxItem(null)}
       />
 
-      <BoutiqueFooter />
     </div>
   );
 };

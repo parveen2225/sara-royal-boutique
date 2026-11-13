@@ -41,7 +41,6 @@
   // ── Scrolled state ─────────────────────────────────────────────────────────
   &.scrolled {
     backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
     border-bottom-color: var(--boutique-border);
 
     .header_top_banner {

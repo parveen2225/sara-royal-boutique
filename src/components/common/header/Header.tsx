@@ -38,6 +38,7 @@ const Header: React.FC = () => {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const menuPanelRef = useRef<HTMLDivElement>(null);
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -46,10 +47,11 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on route change
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+  // Close menu on route change (adjust state during render, not in an effect)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
+    if (menuOpen) setMenuOpen(false);
+  }
 
   // Close menu on outside click (clicks on backdrop or outside panel)
   useEffect(() => {
@@ -79,12 +81,12 @@ const Header: React.FC = () => {
       {/* ── Main header bar ─────────────────────────────────────────── */}
       <header className={`boutique_header ${scrolled ? "scrolled" : ""}`}>
         {/* Top hiring banner */}
-        <div className="header_top_banner">
+        {/* <div className="header_top_banner">
           <Link href="/#hiring" className="banner_link">
             <span className="blink_text">✦ WE ARE HIRING! ✦</span>
             <span className="banner_sub">Female Staff Required - Apply Now</span>
           </Link>
-        </div>
+        </div> */}
 
         {/* Main row: logo | desktop nav | actions */}
         <Container className="boutique_header_inner">

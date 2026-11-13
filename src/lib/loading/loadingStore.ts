@@ -1,6 +1,10 @@
 type Listener = () => void;
 
 let pendingCount = 0;
+// The app is considered "not ready" until the initial page load (markup,
+// assets, fonts) finishes, so the loader stays up for that whole stretch
+// regardless of any individual API call.
+let appReady = false;
 const listeners = new Set<Listener>();
 
 const emit = () => {
@@ -13,7 +17,12 @@ export const loadingStore = {
     return () => listeners.delete(listener);
   },
   getSnapshot() {
-    return pendingCount > 0;
+    return pendingCount > 0 || !appReady;
+  },
+  // Always "loading" on the server and on first hydration, so the loader is
+  // present in the very first HTML the browser paints — never after it.
+  getServerSnapshot() {
+    return true;
   },
   start() {
     pendingCount += 1;
@@ -26,6 +35,12 @@ export const loadingStore = {
   reset() {
     pendingCount = 0;
     emit();
+  },
+  markAppReady() {
+    if (!appReady) {
+      appReady = true;
+      emit();
+    }
   },
 };
 

@@ -15,6 +15,7 @@ export const useGallery = (category?: GalleryCategory | "All") => {
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [categories, setCategories] = useState<GalleryCategory[]>([...GALLERY_CATEGORIES]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,13 +27,14 @@ export const useGallery = (category?: GalleryCategory | "All") => {
     apiJson<GalleryResponse>(url, { skipLoader: true })
       .then((res) => {
         if (cancelled) return;
+        setHasError(false);
         setItems(res.data?.items ?? []);
         if (res.data?.categories?.length) {
           setCategories(res.data.categories as GalleryCategory[]);
         }
       })
       .catch(() => {
-        if (!cancelled) setItems([]);
+        if (!cancelled) { setItems([]); setHasError(true); }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -43,5 +45,5 @@ export const useGallery = (category?: GalleryCategory | "All") => {
     };
   }, [category]);
 
-  return { items, categories, isLoading };
+  return { items, categories, isLoading, hasError };
 };

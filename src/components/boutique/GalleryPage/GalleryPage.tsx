@@ -15,7 +15,7 @@ const GalleryPage: React.FC = () => {
   const [lightboxItem, setLightboxItem] = useState<{ image: string; title: string } | null>(
     null,
   );
-  const { items, isLoading } = useGallery(filter === "All" ? undefined : filter);
+  const { items, isLoading, hasError } = useGallery(filter === "All" ? undefined : filter);
 
   const filters = useMemo(() => ["All" as const, ...GALLERY_CATEGORIES], []);
 
@@ -58,7 +58,10 @@ const GalleryPage: React.FC = () => {
               ))}
             </div>
           ) : items.length === 0 ? (
-            <p className="gallery_empty text-center">No gallery images yet. Check back soon.</p>
+            <div className="gallery_empty text-center" role="status">
+              <p>{hasError ? "We couldn’t load the gallery right now." : "No gallery images in this category yet."}</p>
+              <a href="https://wa.me/919779379004" target="_blank" rel="noopener noreferrer">Ask us to share our latest work</a>
+            </div>
           ) : (
             <div className="gallery_shop_grid">
               {items.map((item) => (
@@ -66,9 +69,10 @@ const GalleryPage: React.FC = () => {
                   key={item.id}
                   type="button"
                   className="gallery_shop_card"
-                  onClick={() =>
-                    setLightboxItem({ image: item.image, title: item.title || item.category })
-                  }
+                  onClick={() => {
+                    const image = item.image?.trim();
+                    if (image) setLightboxItem({ image, title: item.title || item.category });
+                  }}
                   aria-label={`View ${item.title || item.category}`}
                 >
                   <div className="gallery_shop_image_wrap">
@@ -95,12 +99,12 @@ const GalleryPage: React.FC = () => {
         </Container>
       </section>
 
-      <GalleryLightboxModal
+      {lightboxItem?.image && <GalleryLightboxModal
         show={!!lightboxItem}
-        image={lightboxItem?.image ?? ""}
-        title={lightboxItem?.title ?? "Gallery"}
+        image={lightboxItem.image}
+        title={lightboxItem.title}
         onClose={() => setLightboxItem(null)}
-      />
+      />}
 
     </div>
   );

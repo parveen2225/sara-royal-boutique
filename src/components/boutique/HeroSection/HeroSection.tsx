@@ -91,19 +91,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ banner }) => {
             <span className="badge_value">Custom Stitching</span>
           </div>
 
-          <div className="hero_stats">
-            <div className="hero_stat">
-              <span className="stat_value">400+</span>
-              <span className="stat_label">Happy Clients</span>
-            </div>
-            <div className="hero_stat">
-              <span className="stat_value">100%</span>
-              <span className="stat_label">Custom Fit</span>
-            </div>
-            <div className="hero_stat">
-              <span className="stat_value">5.0</span>
-              <span className="stat_label">Customer Rating</span>
-            </div>
+          <div className="hero_stats" aria-label="Our promise">
+            <div className="hero_stat"><span className="stat_value">Made for you</span><span className="stat_label">Custom Stitching</span></div>
+            <div className="hero_stat"><span className="stat_value">Measured to fit</span><span className="stat_label">Personal Fitting</span></div>
+            <div className="hero_stat"><span className="stat_value">Made with care</span><span className="stat_label">Boutique Finish</span></div>
           </div>
         </div>
       </div>

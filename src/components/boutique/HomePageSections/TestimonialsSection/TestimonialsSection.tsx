@@ -42,7 +42,7 @@ const TestimonialsSection: React.FC = () => {
           <span className="section_label">Client Love</span>
           <h2 className="section_title">What Our Clients Say</h2>
           <p className="section_sub mx-auto">
-            Real Google reviews from Sara Royal Boutique, Kharar (5.0 ★ · 27 reviews on Google).
+            Reviews from customers who have visited Sara Royal Boutique in Kharar.
           </p>
           <a
             href={SARA_ROYAL_GOOGLE_MAPS_URL}

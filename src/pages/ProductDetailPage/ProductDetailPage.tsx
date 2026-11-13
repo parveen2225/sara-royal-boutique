@@ -129,6 +129,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
                 <div className="product_detail_divider" aria-hidden="true" />
 
                 <p className="product_detail_desc">{product.description}</p>
+                <p className="product_detail_desc">To enquire, share this design name and your preferred fabric, colour, occasion, and measurements with us on WhatsApp. We can confirm the order details with you directly.</p>
 
                 {product.tags && product.tags.length > 0 && (
                   <div className="product_detail_tags">

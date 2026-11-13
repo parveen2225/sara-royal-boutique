@@ -62,7 +62,7 @@ const DesignCard: React.FC<DesignCardProps> = ({ design, onOpen, index = 0 }) =>
           </CommonButton>
           <CommonButton
             role="link"
-            to={buildDesignStudioWhatsAppUrl(design.title)}
+            to={buildDesignStudioWhatsAppUrl([design.title, design.categoryId, design.subcategoryId, design.stitchingPrice ? `Listed stitching price: ${design.stitchingPrice}` : ""].filter(Boolean).join(" | "))}
             target="_blank"
             rel="noopener noreferrer"
             className="ds_card_btn ds_card_btn_wa w-100"

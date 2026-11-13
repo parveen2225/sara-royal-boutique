@@ -25,7 +25,7 @@ const GalleryLightboxModal: React.FC<GalleryLightboxModalProps> = ({
     className="gallery_lightbox_modal boutique-modal"
     variant="large"
   >
-    <div className="gallery_lb_wrap">
+    {image.trim() && <div className="gallery_lb_wrap">
       <Image
         src={image}
         alt={title}
@@ -34,7 +34,7 @@ const GalleryLightboxModal: React.FC<GalleryLightboxModalProps> = ({
         className="gallery_lb_image"
         unoptimized={image.startsWith("http")}
       />
-    </div>
+    </div>}
   </CommonModal>
 );
 

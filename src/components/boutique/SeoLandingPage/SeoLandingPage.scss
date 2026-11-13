@@ -85,7 +85,7 @@
     }
 
     &_highlights {
-      background: rgba(8, 12, 20, 0.5);
+      background: rgba(var(--boutique-panel-ink-rgb), 0.5);
       border-top: 1px solid var(--boutique-border);
     }
 

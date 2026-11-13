@@ -61,7 +61,7 @@
   }
 
   &_content {
-    background: linear-gradient(180deg, var(--boutique-bg) 0%, rgba(8, 12, 20, 0.98) 100%);
+    background: linear-gradient(180deg, var(--boutique-bg) 0%, var(--boutique-panel-bg-end) 100%);
     padding: 5rem 0;
   }
 
@@ -78,7 +78,7 @@
       padding: 0.6rem 1.25rem;
       border-radius: 2rem;
       border: 1px solid rgba(201, 168, 76, 0.28);
-      background: rgba(4, 8, 16, 0.4);
+      background: rgba(var(--boutique-panel-ink-rgb), 0.4);
       color: var(--boutique-muted);
       font-size: 0.78rem;
       font-weight: 700;

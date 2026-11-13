@@ -40,8 +40,23 @@
 
   // ── Scrolled state ─────────────────────────────────────────────────────────
   &.scrolled {
+    // Themed, near-opaque bar so the header has a stable background of its
+    // own instead of blurring through whichever section happens to be behind
+    // it — that's what keeps the nav text readable on every section.
+    background: var(--boutique-nav-bg);
     backdrop-filter: blur(30px);
     border-bottom-color: var(--boutique-border);
+
+    // On the solid bar the links follow the theme; while the header is
+    // transparent they stay fixed white over the dark hero photo (below).
+    .header_nav_link {
+      color: var(--boutique-text);
+
+      &:hover,
+      &.active {
+        color: var(--gold);
+      }
+    }
 
     .header_top_banner {
       height: 0;
@@ -155,6 +170,9 @@
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    // Unscrolled the header is transparent over the page's dark hero photo,
+    // so this stays a fixed light tone in both themes. The scrolled state
+    // above swaps it for the reactive colour once there's a solid bar.
     color: var(--white);
     padding: 0.5rem 0.875rem;
     border-radius: 0.5rem;

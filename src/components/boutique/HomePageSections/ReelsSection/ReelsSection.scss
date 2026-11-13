@@ -110,7 +110,11 @@
     font-family: $playfair;
     font-size: 0.95rem;
     font-weight: 600;
-    color: var(--boutique-text);
+    // Always sits on the dark photo scrim in .reel_card_body, so the text
+    // must stay a fixed light tone in both themes, not the reactive
+    // boutique-text color (which turns dark in Light Theme and becomes
+    // unreadable against the scrim).
+    color: var(--ivory-text);
     margin: 0 0 0.3rem;
     line-height: 1.35;
     display: -webkit-box;

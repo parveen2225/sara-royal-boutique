@@ -71,6 +71,13 @@ $playfair:
   --boutique-footer-bg: #1a1208;
   --boutique-footer-text: #f0e6cc;
   --boutique-modal-border: rgba(201, 168, 76, 0.4);
+  // Base RGB triplet for solid panel/card tints that have no photo behind
+  // them (testimonial cards, measurement cards, CTA banners, etc). Plugged
+  // into rgba(var(--boutique-panel-ink-rgb), <alpha>) at each call site so
+  // every such panel repaints correctly between themes.
+  --boutique-panel-ink-rgb: 245, 237, 216;
+  --boutique-panel-bg-start: #f3ead7;
+  --boutique-panel-bg-end: #f3ead7;
   --background: var(--boutique-bg);
   --bg-app: var(--boutique-bg);
   --surface: var(--boutique-surface);
@@ -142,6 +149,9 @@ $playfair:
   --boutique-footer-bg: #040810;
   --boutique-footer-text: #f0e6cc;
   --boutique-modal-border: rgba(201, 168, 76, 0.3);
+  --boutique-panel-ink-rgb: 4, 8, 16;
+  --boutique-panel-bg-start: #060a12;
+  --boutique-panel-bg-end: #0a0f18;
   --input-bg: var(--boutique-input-bg);
   --input-text: var(--boutique-text);
   --shadow: rgba(0, 0, 0, 0.38);

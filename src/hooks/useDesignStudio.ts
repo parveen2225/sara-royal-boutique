@@ -15,11 +15,10 @@ import {
 
 export const useDesignCategories = () => {
   const [categories, setCategories] = useState<DesignCategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // starts true; this effect runs once, so it never needs to set it to true again
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
     apiJson<DesignCategory[]>(DESIGN_STUDIO.CATEGORIES, { skipLoader: true })
       .then((res) => {
         if (!cancelled) setCategories(extractListData(res.data));
@@ -39,36 +38,30 @@ export const useDesignCategories = () => {
 };
 
 export const useDesignSubcategories = (categorySlug?: string) => {
-  const [subcategories, setSubcategories] = useState<DesignSubcategory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // `loaded` remembers which category the data belongs to, so "loading" and "no category" are derived, not set in the effect.
+  const [loaded, setLoaded] = useState<{ slug: string; list: DesignSubcategory[] } | null>(null);
 
   useEffect(() => {
-    if (!categorySlug) {
-      setSubcategories([]);
-      setIsLoading(false);
-      return;
-    }
+    if (!categorySlug) return;
     let cancelled = false;
-    setIsLoading(true);
     apiJson<DesignSubcategory[]>(DESIGN_STUDIO.SUBCATEGORIES_BY_CATEGORY(categorySlug), {
       skipLoader: true,
     })
       .then((res) => {
-        if (!cancelled) setSubcategories(extractListData(res.data));
+        if (!cancelled) setLoaded({ slug: categorySlug, list: extractListData(res.data) });
       })
       .catch(() => {
         if (!cancelled) {
-          setSubcategories(getFallbackDesignSubcategories(categorySlug).filter((s) => s.isActive));
+          setLoaded({ slug: categorySlug, list: getFallbackDesignSubcategories(categorySlug).filter((s) => s.isActive) });
         }
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, [categorySlug]);
 
+  const subcategories = categorySlug ? (loaded?.list ?? []) : []; // previous list stays visible while a new category loads, as before
+  const isLoading = Boolean(categorySlug) && loaded?.slug !== categorySlug;
   return { subcategories, isLoading };
 };
 
@@ -85,8 +78,8 @@ type DesignFilters = {
 };
 
 export const useDesigns = (filters: DesignFilters = {}) => {
-  const [designs, setDesigns] = useState<StudioDesign[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // `loaded` remembers which request (url) the data belongs to, so "loading" is derived instead of being set inside the effect.
+  const [loaded, setLoaded] = useState<{ url: string; list: StudioDesign[] } | null>(null);
 
   const {
     categorySlug,
@@ -100,31 +93,30 @@ export const useDesigns = (filters: DesignFilters = {}) => {
     limit,
   } = filters;
 
+  const params = new URLSearchParams();
+  if (categorySlug) params.set("category", categorySlug);
+  if (subcategorySlug) params.set("subcategory", subcategorySlug);
+  if (search?.trim()) params.set("search", search.trim());
+  if (featured) params.set("featured", "true");
+  if (trending) params.set("trending", "true");
+  if (bridal) params.set("bridal", "true");
+  if (newArrival) params.set("newArrival", "true");
+  if (homepageShow) params.set("homepageShow", "true");
+  if (limit) params.set("limit", String(limit));
+  const qs = params.toString();
+  const url = qs ? `${DESIGN_STUDIO.DESIGNS}?${qs}` : DESIGN_STUDIO.DESIGNS;
+
   useEffect(() => {
     let cancelled = false;
-    setIsLoading(true);
-
-    const params = new URLSearchParams();
-    if (categorySlug) params.set("category", categorySlug);
-    if (subcategorySlug) params.set("subcategory", subcategorySlug);
-    if (search?.trim()) params.set("search", search.trim());
-    if (featured) params.set("featured", "true");
-    if (trending) params.set("trending", "true");
-    if (bridal) params.set("bridal", "true");
-    if (newArrival) params.set("newArrival", "true");
-    if (homepageShow) params.set("homepageShow", "true");
-    if (limit) params.set("limit", String(limit));
-    const qs = params.toString();
-    const url = qs ? `${DESIGN_STUDIO.DESIGNS}?${qs}` : DESIGN_STUDIO.DESIGNS;
-
     apiJson<StudioDesign[]>(url, { skipLoader: true })
       .then((res) => {
-        if (!cancelled) setDesigns(extractListData(res.data));
+        if (!cancelled) setLoaded({ url, list: extractListData(res.data) });
       })
       .catch(() => {
         if (!cancelled) {
-          setDesigns(
-            getFallbackDesigns({
+          setLoaded({
+            url,
+            list: getFallbackDesigns({
               categorySlug,
               subcategorySlug,
               search,
@@ -135,16 +127,14 @@ export const useDesigns = (filters: DesignFilters = {}) => {
               homepageShow,
               limit,
             }),
-          );
+          });
         }
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, [
+    url,
     categorySlug,
     subcategorySlug,
     search,
@@ -156,6 +146,8 @@ export const useDesigns = (filters: DesignFilters = {}) => {
     limit,
   ]);
 
+  const designs = loaded?.list ?? []; // the previous list stays visible while new filters load, as before
+  const isLoading = loaded?.url !== url;
   return { designs, isLoading };
 };
 

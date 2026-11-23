@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ReactNode } from "react";
 import { Dropdown } from "react-bootstrap";
 import './CustomInputDropdown.scss';
@@ -37,11 +37,15 @@ const CustomInputDropdown: React.FC<CustomInputDropdownProps> = ({
     return options.length > 0 ? options[0] : { value: '', label: '' };
   });
 
-  useEffect(() => {
-    if (!defaultSelectedOption && options.length > 0) {
-      setSelectedOption(options[0]);
-    }
-  }, [options, defaultSelectedOption]);
+  // When the options (or the default) change and there is no explicit default, select the first option.
+  // Done during render, guarded by a change check (not in an effect).
+  const [seenOptions, setSeenOptions] = useState(options);
+  const [seenDefault, setSeenDefault] = useState(defaultSelectedOption);
+  if (seenOptions !== options || seenDefault !== defaultSelectedOption) {
+    setSeenOptions(options);
+    setSeenDefault(defaultSelectedOption);
+    if (!defaultSelectedOption && options.length > 0) setSelectedOption(options[0]);
+  }
 
   const handleSelect = (option: DropdownOption) => {
     setSelectedOption(option);

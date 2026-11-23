@@ -43,16 +43,11 @@ const Loader = ({ show, variant = DEFAULT_VARIANT }: LoaderProps) => {
   // Keep the loader mounted slightly past isLoading turning false so the
   // opacity transition can play instead of the overlay disappearing instantly.
   const [mounted, setMounted] = useState(isLoading);
-  const [leaving, setLeaving] = useState(false);
+  if (isLoading && !mounted) setMounted(true); // a new load re-mounts it (adjusted during render)
+  const leaving = mounted && !isLoading; // fading out
 
   useEffect(() => {
-    if (isLoading) {
-      setLeaving(false);
-      setMounted(true);
-      return;
-    }
-    if (!mounted) return;
-    setLeaving(true);
+    if (isLoading || !mounted) return;
     const timer = setTimeout(() => setMounted(false), FADE_OUT_MS);
     return () => clearTimeout(timer);
   }, [isLoading, mounted]);

@@ -92,9 +92,6 @@ export default function AdminLoginPage() {
               Login
             </CommonButton>
 
-            <p className="text-secondary text-center mt-3 mb-0 admin_login_hint">
-              Demo: admin@sararoyal.com / admin123
-            </p>
           </form>
         </Card.Body>
       </Card>

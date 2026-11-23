@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import type { StudioDesign } from "@/lib/admin/types";
@@ -48,9 +48,12 @@ const DesignStudioLightboxModal: React.FC<DesignStudioLightboxModalProps> = ({
 }) => {
   const [activeImage, setActiveImage] = useState(0);
 
-  useEffect(() => {
+  // Show the first image whenever a different design is opened (adjust state during render, not in an effect).
+  const [shownDesignId, setShownDesignId] = useState(design?.id);
+  if (shownDesignId !== design?.id) {
+    setShownDesignId(design?.id);
     setActiveImage(0);
-  }, [design?.id]);
+  }
 
   if (!design) return null;
 

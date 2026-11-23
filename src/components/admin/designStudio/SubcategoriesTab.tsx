@@ -15,6 +15,7 @@ import { STATUS_OPTIONS, SUBCATEGORY_TABLE_FIELDS } from "@/components/admin/des
 import { FALLBACK_IMAGE } from "@/components/admin/designStudio/types";
 import type { DesignStudioAdminApi } from "@/components/admin/designStudio/useDesignStudioAdmin";
 import type { DesignSubcategory } from "@/lib/admin/types";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 
 type Props = { studio: DesignStudioAdminApi };
@@ -171,7 +172,7 @@ const SubcategoriesTab: React.FC<Props> = ({ studio }) => {
           </Card>
 
           <div className="admin_table_scroll">
-            <CommonTable
+            <CommonTable empty={<EmptyState icon="grid" title="No Subcategories Yet" text="Create a subcategory with the form above to group designs inside a category." />}
               fields={SUBCATEGORY_TABLE_FIELDS}
               lastColumnWidth="220px"
               loader={subcategoriesLoading}

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from "react";
 import { Card } from "react-bootstrap";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import CommonTable from "@/components/common/ui/CommonTable/CommonTable";
@@ -8,6 +8,7 @@ import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import AdminDeleteConfirmModal from "@/components/admin/modal/AdminDeleteConfirmModal/AdminDeleteConfirmModal";
 import InputField from "@/components/common/formik/inputField/InputField";
 import SelectField from "@/components/common/formik/selectField/SelectField";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const FIELDS = [
   { label: "Name", key: "name" },
@@ -33,21 +34,14 @@ export default function CollectionsPage() {
     [state.services],
   );
 
-  useEffect(() => {
-    if (serviceOptions.length === 0) {
-      setServiceId("");
-      setEditingServiceId("");
-      return;
-    }
-    const hasCreateSelection = serviceOptions.some((option) => option.value === serviceId);
-    if (!hasCreateSelection) {
-      setServiceId(serviceOptions[0].value);
-    }
-    const hasEditSelection = serviceOptions.some((option) => option.value === editingServiceId);
-    if (!hasEditSelection && !editingId) {
-      setEditingServiceId(serviceOptions[0].value);
-    }
-  }, [serviceOptions, serviceId, editingServiceId, editingId]);
+  // Keep the selections valid (same rules as before, applied during render and guarded so it settles immediately).
+  if (serviceOptions.length === 0) {
+    if (serviceId !== "") setServiceId("");
+    if (editingServiceId !== "") setEditingServiceId("");
+  } else {
+    if (!serviceOptions.some((option) => option.value === serviceId)) setServiceId(serviceOptions[0].value);
+    if (!editingId && !serviceOptions.some((option) => option.value === editingServiceId)) setEditingServiceId(serviceOptions[0].value);
+  }
 
   const onCreate = (event: FormEvent) => {
     event.preventDefault();
@@ -103,7 +97,7 @@ export default function CollectionsPage() {
       </Card>
 
       <div className="admin_table_scroll">
-        <CommonTable fields={FIELDS} lastColumnWidth="160px" loader={isLoading}>
+        <CommonTable empty={<EmptyState icon="grid" title="No Stitching Collections Yet" text="Create a collection with the form above, then add products to it." />} fields={FIELDS} lastColumnWidth="160px" loader={isLoading}>
         {state.collections.map((item) => {
           const productCount = state.products.filter((p) => p.categoryId === item.id).length;
           const isEditing = editingId === item.id;

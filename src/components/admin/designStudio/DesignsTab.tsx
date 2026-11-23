@@ -14,6 +14,7 @@ import { formatAdminDate } from "@/lib/api/listData";
 import { STATUS_OPTIONS, DESIGN_TABLE_FIELDS } from "@/components/admin/designStudio/constants";
 import { FALLBACK_IMAGE } from "@/components/admin/designStudio/types";
 import type { DesignStudioAdminApi } from "@/components/admin/designStudio/useDesignStudioAdmin";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 type Props = { studio: DesignStudioAdminApi };
 
@@ -389,7 +390,7 @@ const DesignsTab: React.FC<Props> = ({ studio }) => {
           </Card>
 
           <div className="admin_table_scroll">
-            <CommonTable fields={DESIGN_TABLE_FIELDS} lastColumnWidth="320px" loader={designsLoading}>
+            <CommonTable empty={<EmptyState icon="palette" title="No Designs Yet" text="Add a design with the form above. Published designs appear in the Design Studio." />} fields={DESIGN_TABLE_FIELDS} lastColumnWidth="320px" loader={designsLoading}>
               {designs.map((design) => {
                 const thumbSrc = design.thumbnailImage?.trim() || FALLBACK_IMAGE;
                 return (

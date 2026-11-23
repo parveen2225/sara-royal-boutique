@@ -1,11 +1,15 @@
-import CollectionsPage from "@/pages/CollectionsPage/CollectionsPage";
+import { Suspense } from "react";
+import SuitCollectionsPage from "@/pages/SuitCollectionsPage/SuitCollectionsPage";
 
 export const metadata = {
-  title: "Collections — Sara Royal Boutique",
-  description:
-    "Browse our full collection of premium stitched suits. Lawn, formal, bridal, casual & embroidered designs — all custom stitched.",
+  title: "Unstitched Suits Collection — Sara Royal Boutique",
+  description: "Shop premium unstitched ladies suit fabrics. Order on WhatsApp, delivered all over India. Stitching available.",
 };
 
 export default function Collections() {
-  return <CollectionsPage />;
+  return (
+    <Suspense fallback={null}>
+      <SuitCollectionsPage />
+    </Suspense>
+  );
 }

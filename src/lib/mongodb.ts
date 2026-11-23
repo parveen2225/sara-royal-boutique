@@ -24,8 +24,12 @@ const getMongoUri = (): string => {
 
 export const isMongoConfigured = (): boolean => VALID_SCHEME.test(getMongoUri());
 
+// TLS is required for every remote host (Atlas); only loopback servers (local dev / isolated tests) skip it.
+const isLoopbackUri = (uri: string): boolean => /^mongodb:\/\/(?:[^@/]*@)?(?:127\.0\.0\.1|localhost)(?::\d+)?(?:[/?]|$)/i.test(uri);
+
 const getMongoOptions = (): mongoose.ConnectOptions => {
   const caFile = process.env.MONGODB_TLS_CA_FILE?.trim();
+  const tls = !isLoopbackUri(getMongoUri());
 
   return {
     autoIndex: process.env.NODE_ENV !== "production",
@@ -37,8 +41,8 @@ const getMongoOptions = (): mongoose.ConnectOptions => {
     socketTimeoutMS: 45000,
     connectTimeoutMS: 15000,
     family: 4,
-    tls: true,
-    ...(caFile ? { tlsCAFile: caFile } : {}),
+    tls,
+    ...(tls && caFile ? { tlsCAFile: caFile } : {}),
   };
 };
 

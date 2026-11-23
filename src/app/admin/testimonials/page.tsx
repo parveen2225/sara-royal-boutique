@@ -15,6 +15,7 @@ import { apiJson } from "@/lib/api/client";
 import { extractListData, formatAdminDate } from "@/lib/api/listData";
 import { TESTIMONIALS } from "@/lib/api/urls";
 import { uploadImages } from "@/lib/api/upload";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const TABLE_FIELDS = [
   { label: "Photo", key: "photo" },
@@ -70,22 +71,33 @@ export default function AdminTestimonialsPage() {
     [form.image],
   );
 
+  const fetchTestimonials = useCallback(async () => {
+    const res = await apiJson<Testimonial[]>(TESTIMONIALS.LIST, { skipLoader: true });
+    return extractListData<Testimonial>(res.data);
+  }, []);
+
   const loadTestimonials = useCallback(async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const res = await apiJson<Testimonial[]>(TESTIMONIALS.LIST, { skipLoader: true });
-      setTestimonials(extractListData<Testimonial>(res.data));
+      setTestimonials(await fetchTestimonials());
     } catch (error: unknown) {
       setLoadError(getErrorMessage(error) || "Failed to load testimonials.");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchTestimonials]);
 
+  // First load on mount. Written as a promise chain (not a call to loadTestimonials) so no state is set synchronously in the effect;
+  // `isLoading` already starts as true.
   useEffect(() => {
-    loadTestimonials().catch(() => {});
-  }, [loadTestimonials]);
+    let cancelled = false;
+    fetchTestimonials()
+      .then((data) => { if (!cancelled) setTestimonials(data); })
+      .catch((error: unknown) => { if (!cancelled) setLoadError(getErrorMessage(error) || "Failed to load testimonials."); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [fetchTestimonials]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -323,7 +335,7 @@ export default function AdminTestimonialsPage() {
       </Card>
 
       <div className="admin_table_scroll">
-        <CommonTable fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
+        <CommonTable empty={<EmptyState icon="chat" title="No Testimonials Yet" text="Add a customer review with the form above. Active testimonials appear on the website." />} fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
           {testimonials.map((item) => {
             const avatarSrc = item.image?.trim() || "/images/logo_icon.png";
             return (

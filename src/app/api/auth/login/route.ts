@@ -2,9 +2,12 @@ import bcrypt from "bcryptjs";
 import type { NextRequest } from "next/server";
 import connectMongo, { isMongoConfigured } from "@/lib/mongodb";
 import Admin from "@/models/Admin";
-import { ADMIN_COOKIE_NAME, ADMIN_EMAIL, ADMIN_PASSWORD } from "@/lib/admin/constants";
+import { ADMIN_COOKIE_NAME } from "@/lib/admin/constants";
 import { jsonError, jsonMessage } from "@/lib/api/utils";
 import { signAdminToken } from "@/lib/auth/session";
+import { isOwnerRole } from "@/lib/auth/permissions";
+import { clientIp, rateLimit, resetRateLimit } from "@/lib/rateLimit";
+import { isEmail } from "@/lib/validation";
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -14,76 +17,74 @@ const COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 7,
 };
 
+// Compared against when the email is unknown so response time does not reveal which emails exist.
+const DUMMY_HASH = "$2a$10$CwTycUXWue0Thq9StjUM0uJ8.4t3yS8Zr1b5C7p8pXf0yQmV0m2eK";
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: Record<string, unknown> = {};
+    try {
+      body = await req.json();
+    } catch {
+      return jsonError("Invalid request", 400);
+    }
     const email = String(body?.email || "").trim().toLowerCase();
     const password = String(body?.password || "");
 
-    if (!email || !password) {
+    if (!email || !password || password.length > 200 || !isEmail(email)) {
       return jsonError("Email and password are required", 400);
     }
 
-    if (!isMongoConfigured()) {
-      if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-        return jsonError("Invalid email or password", 401);
-      }
-      const token = signAdminToken({ id: "demo-admin", email: ADMIN_EMAIL, role: "admin" });
-      const res = jsonMessage("Login successful", {
-        user: { id: "demo-admin", name: "Admin", email: ADMIN_EMAIL, role: "admin" },
-        token,
-      });
-      res.cookies.set(ADMIN_COOKIE_NAME, token, COOKIE_OPTIONS);
+    // Two limits: per IP+email, and per email alone (so rotating or spoofing X-Forwarded-For cannot brute-force one account).
+    const emailKey = `login-email:${email}`;
+    const emailLimit = rateLimit(emailKey, 30, 15 * 60 * 1000);
+    if (!emailLimit.allowed) {
+      const res = jsonError("Too many login attempts. Please try again later.", 429);
+      res.headers.set("Retry-After", String(emailLimit.retryAfterSec));
+      return res;
+    }
+    const limitKey = `login:${clientIp(req.headers)}:${email}`;
+    const limit = rateLimit(limitKey, 8, 15 * 60 * 1000);
+    if (!limit.allowed) {
+      const res = jsonError("Too many login attempts. Please try again later.", 429);
+      res.headers.set("Retry-After", String(limit.retryAfterSec));
       return res;
     }
 
+    if (!isMongoConfigured()) return jsonError("Service unavailable", 503);
     try {
       await connectMongo();
-    } catch (mongoError) {
-      console.error("[API /auth/login] Mongo unavailable, trying credential fallback", mongoError);
-      if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-        return jsonError("Invalid email or password", 401);
-      }
-      const token = signAdminToken({ id: "fallback-admin", email: ADMIN_EMAIL, role: "admin" });
-      const res = jsonMessage("Login successful (fallback mode)", {
-        user: { id: "fallback-admin", name: "Admin", email: ADMIN_EMAIL, role: "admin" },
-        token,
-      });
-      res.cookies.set(ADMIN_COOKIE_NAME, token, COOKIE_OPTIONS);
-      return res;
+    } catch {
+      return jsonError("Service unavailable", 503);
     }
 
-    let admin = await Admin.findOne({ email }).select("+password");
-
-    if (!admin && email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10);
-      admin = await Admin.create({
-        name: "Admin",
-        email: ADMIN_EMAIL,
-        password: hashedPassword,
-        role: "admin",
-      });
-      admin = await Admin.findOne({ email }).select("+password");
+    // First-run bootstrap: only when NO admin exists yet and both env vars are set (never a hardcoded password).
+    const bootEmail = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
+    const bootPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD ?? "";
+    if (bootEmail && bootPassword.length >= 12 && email === bootEmail && password === bootPassword && (await Admin.estimatedDocumentCount()) === 0) {
+      await Admin.create({ name: "Owner", email: bootEmail, password: await bcrypt.hash(bootPassword, 12), role: "owner" });
     }
 
-    const validPassword = admin ? await bcrypt.compare(password, admin.password) : false;
-    if (!admin || !validPassword) {
+    const admin = await Admin.findOne({ email }).select("+password");
+    const validPassword = await bcrypt.compare(password, admin?.password ?? DUMMY_HASH);
+    if (!admin || !validPassword || admin.active === false) {
       return jsonError("Invalid email or password", 401);
     }
 
-    const token = signAdminToken({
-      id: admin._id.toString(),
-      email: admin.email,
-      role: admin.role,
-    });
+    resetRateLimit(limitKey);
+    resetRateLimit(emailKey);
+    const role = isOwnerRole(admin.role) ? "owner" : "staff";
+    const token = signAdminToken({ id: admin._id.toString(), email: admin.email, role });
+    await Admin.updateOne({ _id: admin._id }, { $set: { lastLoginAt: new Date() } });
 
     const res = jsonMessage("Login successful", {
-      user: { id: admin._id.toString(), name: admin.name, email: admin.email, role: admin.role },
+      user: { id: admin._id.toString(), name: admin.name, email: admin.email, role },
       token,
     });
     res.cookies.set(ADMIN_COOKIE_NAME, token, COOKIE_OPTIONS);
     return res;
   } catch (error) {
-    return jsonError(error instanceof Error ? error.message : "Login failed", 500);
+    console.error("[API /auth/login]", error instanceof Error ? error.message : error);
+    return jsonError("Login failed", 500);
   }
 }

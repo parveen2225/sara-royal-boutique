@@ -41,7 +41,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
           <span className="not_found_icon">✦</span>
           <h2>Design Not Found</h2>
           <p>This collection piece is no longer available.</p>
-          <CommonButton role="link" to="/collections" className="boutique_gold_btn_inline">
+          <CommonButton role="link" to="/stitching" className="boutique_gold_btn_inline">
             Browse Collections
           </CommonButton>
         </div>
@@ -88,7 +88,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
           <nav className="product_breadcrumb" aria-label="Breadcrumb">
             <Link href="/">Home</Link>
             <span className="breadcrumb_sep">✦</span>
-            <Link href="/collections">Collections</Link>
+            <Link href="/stitching">Stitching</Link>
             <span className="breadcrumb_sep">✦</span>
             <span aria-current="page">{product.name}</span>
           </nav>
@@ -158,7 +158,7 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productId }) => {
                   >
                     Get Design Suggestions
                   </CommonButton>
-                  <CommonButton role="link" to="/collections" className="product_detail_back_btn">
+                  <CommonButton role="link" to="/stitching" className="product_detail_back_btn">
                     ← Back to Collections
                   </CommonButton>
                 </div>

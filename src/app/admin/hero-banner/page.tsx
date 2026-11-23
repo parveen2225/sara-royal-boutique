@@ -14,6 +14,7 @@ import { type HeroBanner } from "@/lib/admin/types";
 import { apiJson } from "@/lib/api/client";
 import { HERO_BANNER } from "@/lib/api/urls";
 import { uploadImages } from "@/lib/api/upload";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const TABLE_FIELDS = [
   { label: "Preview", key: "preview" },
@@ -64,22 +65,33 @@ export default function AdminHeroBannerPage() {
     [form.image],
   );
 
+  const fetchBanners = useCallback(async () => {
+    const res = await apiJson<HeroBanner[]>(HERO_BANNER.LIST, { skipLoader: true });
+    return res.data;
+  }, []);
+
   const loadBanners = useCallback(async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const res = await apiJson<HeroBanner[]>(HERO_BANNER.LIST, { skipLoader: true });
-      setBanners(res.data);
+      setBanners(await fetchBanners());
     } catch (error: unknown) {
       setLoadError(getErrorMessage(error) || "Failed to load hero banners.");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchBanners]);
 
+  // First load on mount. Written as a promise chain (not a call to loadBanners) so no state is set synchronously in the effect;
+  // `isLoading` already starts as true.
   useEffect(() => {
-    loadBanners().catch(() => {});
-  }, [loadBanners]);
+    let cancelled = false;
+    fetchBanners()
+      .then((data) => { if (!cancelled) setBanners(data); })
+      .catch((error: unknown) => { if (!cancelled) setLoadError(getErrorMessage(error) || "Failed to load hero banners."); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [fetchBanners]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -312,7 +324,7 @@ export default function AdminHeroBannerPage() {
         </form>
       </Card>
 
-      <CommonTable fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
+      <CommonTable empty={<EmptyState icon="banner" title="No Hero Banners Yet" text="Add a banner with the form above. Active banners appear at the top of the home page." />} fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
         {banners.map((banner) => (
           <tr key={banner.id}>
             <td>

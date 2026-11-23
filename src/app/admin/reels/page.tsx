@@ -14,6 +14,7 @@ import { apiJson } from "@/lib/api/client";
 import { extractListData, formatAdminDate } from "@/lib/api/listData";
 import { REELS } from "@/lib/api/urls";
 import { uploadImages } from "@/lib/api/upload";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const TABLE_FIELDS = [
   { label: "Preview", key: "preview" },
@@ -62,22 +63,33 @@ export default function AdminReelsPage() {
     [form.thumbnail],
   );
 
+  const fetchReels = useCallback(async () => {
+    const res = await apiJson<Reel[]>(REELS.LIST, { skipLoader: true });
+    return extractListData<Reel>(res.data);
+  }, []);
+
   const loadReels = useCallback(async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const res = await apiJson<Reel[]>(REELS.LIST, { skipLoader: true });
-      setReels(extractListData<Reel>(res.data));
+      setReels(await fetchReels());
     } catch (error: unknown) {
       setLoadError(getErrorMessage(error) || "Failed to load reels.");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchReels]);
 
+  // First load on mount. Written as a promise chain (not a call to loadReels) so no state is set synchronously in the effect;
+  // `isLoading` already starts as true.
   useEffect(() => {
-    loadReels().catch(() => {});
-  }, [loadReels]);
+    let cancelled = false;
+    fetchReels()
+      .then((data) => { if (!cancelled) setReels(data); })
+      .catch((error: unknown) => { if (!cancelled) setLoadError(getErrorMessage(error) || "Failed to load reels."); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [fetchReels]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -291,7 +303,7 @@ export default function AdminReelsPage() {
       </Card>
 
       <div className="admin_table_scroll">
-        <CommonTable fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
+        <CommonTable empty={<EmptyState icon="film" title="No Reels Yet" text="Add an Instagram reel link with the form above to feature it on the website." />} fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
           {reels.map((reel) => {
             const thumbSrc = reel.thumbnail?.trim() || "/images/kide_war1.png";
             return (

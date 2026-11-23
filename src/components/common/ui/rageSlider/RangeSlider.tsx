@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Slider from 'rc-slider';
 import './RangeSlider.scss';
 
@@ -22,11 +22,10 @@ const RangeSlider = ({
     const isControlled = value !== undefined;
     const [internalValue, setInternalValue] = useState<number>(value ?? min);
 
-    useEffect(() => {
-        if (isControlled && value !== internalValue) {
-            setInternalValue(value);
-        }
-    }, [value]);
+    // Follow the controlled value (adjust state during render, not in an effect).
+    if (isControlled && value !== internalValue) {
+        setInternalValue(value);
+    }
 
     const handleSliderChange = (newValue: number | number[]) => {
         if (typeof newValue === 'number') {

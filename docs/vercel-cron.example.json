@@ -1,0 +1,6 @@
+{
+  "_note": "EXAMPLE ONLY (hosting was not confirmed). If you deploy on Vercel, merge the \"crons\" entry into your vercel.json and set CRON_SECRET in the project environment; Vercel then calls this path with GET and 'Authorization: Bearer <CRON_SECRET>'. 30 21 * * * = 03:00 India time, daily. Try the endpoint with ?dryRun=true first.",
+  "crons": [
+    { "path": "/api/admin/maintenance/cleanup-uploads", "schedule": "30 21 * * *" }
+  ]
+}

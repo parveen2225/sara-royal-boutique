@@ -11,6 +11,7 @@ import logo from "../../../../public/images/logo_1.png";
 const FOOTER_LINKS = [
   { label: "Home", href: "/" },
   { label: "Collections", href: "/collections" },
+  { label: "Stitching", href: "/stitching" },
   { label: "Classes", href: "/classes" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },

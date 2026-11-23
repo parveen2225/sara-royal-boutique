@@ -1,5 +1,8 @@
+import { normalizeLegacyWhatsAppNumber } from "@/lib/validation";
+
+// wa.me needs the number with its country code; a bare "9988854440" does not open the boutique's chat.
 const WHATSAPP_PHONE =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "9988854440";
+  normalizeLegacyWhatsAppNumber(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER) ?? "919988854440";
 
 export const getWhatsAppUrl = (message?: string): string => {
   const text =

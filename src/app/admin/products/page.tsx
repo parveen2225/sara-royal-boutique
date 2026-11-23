@@ -7,6 +7,7 @@ import CommonTable from "@/components/common/ui/CommonTable/CommonTable";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import AdminDeleteConfirmModal from "@/components/admin/modal/AdminDeleteConfirmModal/AdminDeleteConfirmModal";
 import { formatPriceRange } from "@/utils/formatCurrency";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const FIELDS = [
   { label: "Image", key: "image" },
@@ -44,7 +45,7 @@ export default function ProductsPage() {
         </CommonButton>
       </div>
 
-      <CommonTable fields={FIELDS} lastColumnWidth="160px">
+      <CommonTable fields={FIELDS} lastColumnWidth="160px" empty={<EmptyState icon="package" title="No Products Yet" text="Add a stitched design with its photos and price. Products are shown inside your stitching collections." action={<CommonButton role="link" to="/admin/products/add" className="admin_primary_btn">+ Add Product</CommonButton>} />}>
         {state.products.map((item) => (
           <tr key={item.id}>
             <td>
@@ -66,7 +67,7 @@ export default function ProductsPage() {
             <td>{getCategoryName(item.categoryId)}</td>
             <td>
               <span className="admin_price_badge">
-                ₹ {formatPriceRange(String(item.stitchingPrice))}
+                {formatPriceRange(String(item.stitchingPrice))}
               </span>
             </td>
             <td>

@@ -232,14 +232,10 @@ export function useDesignStudioAdmin() {
     }
   }, [designForm.categoryId, loadFormSubcategories]);
 
-  useEffect(() => {
-    if (subcategoryForm.categoryId || editingSubcategoryId) return;
-    if (categories.length > 0) {
-      setSubcategoryForm((prev) =>
-        prev.categoryId ? prev : { ...prev, categoryId: categories[0].id },
-      );
-    }
-  }, [categories, subcategoryForm.categoryId, editingSubcategoryId]);
+  // Default the subcategory form to the first category (same condition as before; applied during render, guarded).
+  if (!subcategoryForm.categoryId && !editingSubcategoryId && categories.length > 0) {
+    setSubcategoryForm((prev) => (prev.categoryId ? prev : { ...prev, categoryId: categories[0].id }));
+  }
 
   const resetDesignForm = () => {
     setEditingDesignId(null);

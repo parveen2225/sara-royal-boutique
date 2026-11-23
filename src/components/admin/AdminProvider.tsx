@@ -4,9 +4,10 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Toast, ToastContainer } from "react-bootstrap";
 import { AdminState, Collection, Product, Service } from "@/lib/admin/types";
 import { apiJson } from "@/lib/api/client";
-import { ADMIN, COLLECTIONS, PRODUCTS, SERVICES } from "@/lib/api/urls";
+import { ADMIN, AUTH, COLLECTIONS, PRODUCTS, SERVICES } from "@/lib/api/urls";
+import { canStaffOpen, firstStaffRoute } from "@/lib/admin/access";
 import { EMPTY_ADMIN_STATE } from "@/lib/admin/constants";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const SEED_URL = "/api/seed";
 
@@ -49,6 +50,7 @@ const AdminContext = createContext<AdminContextType | null>(null);
 
 export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [state, setState] = useState<AdminState>(EMPTY_ADMIN_STATE);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -89,7 +91,8 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
           data.collections.length === 0 &&
           data.products.length === 0;
 
-        if (isEmpty) {
+        // Auto-seeding sample data is a development convenience only; the server also refuses it in production.
+        if (isEmpty && process.env.NODE_ENV !== "production") {
           try {
             console.log("[AdminProvider] Empty admin state detected; attempting seed");
             await apiJson(SEED_URL, { method: "POST", skipLoader: true });
@@ -108,7 +111,14 @@ export const AdminProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
       const message = getErrorMessage(e) || "Failed to load admin state.";
       if (message.toLowerCase().includes("unauthorized")) {
-        router.replace("/admin/login");
+        // The legacy state endpoint is owner-only. A signed-in staff member is not logged out: they are limited
+        // to the suit pages they have permission for. Anyone else goes back to the login page.
+        apiJson<{ role: string; permissions: Record<string, boolean> }>(AUTH.ME, { skipLoader: true })
+          .then((me) => {
+            if (me.data.role !== "staff") return router.replace("/admin/login");
+            if (!canStaffOpen(pathname ?? "", me.data.permissions)) router.replace(firstStaffRoute(me.data.permissions));
+          })
+          .catch(() => router.replace("/admin/login"));
         return;
       }
       console.error("[AdminProvider] Failed to load admin state", e);

@@ -13,6 +13,7 @@ import SelectField from "@/components/common/formik/selectField/SelectField";
 import TextareaField from "@/components/common/formik/textareaField/TextareaField";
 import { Service } from "@/lib/admin/types";
 import { uploadImages } from "@/lib/api/upload";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const FIELDS = [
   { label: "Image", key: "image" },
@@ -224,7 +225,7 @@ export default function AdminServicesPage() {
         </form>
       </Card>
 
-      <CommonTable fields={FIELDS} lastColumnWidth="190px" loader={isLoading}>
+      <CommonTable empty={<EmptyState icon="scissors" title="No Services Yet" text="Add the stitching services you offer with the form above." />} fields={FIELDS} lastColumnWidth="190px" loader={isLoading}>
         {state.services.map((service) => (
           <tr key={service.id}>
             <td>

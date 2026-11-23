@@ -1,4 +1,4 @@
-import { Children, JSX, memo, type ReactNode } from "react";
+import { Children, JSX, cloneElement, isValidElement, memo, type ReactElement, type ReactNode } from "react";
 import { Col, Placeholder, Row, Table } from "react-bootstrap";
 import { NoRecordIcon, SortIcon } from "../../../../assets/icons/svgIcon";
 import "./CommonTable.scss";
@@ -20,14 +20,32 @@ type TProps = {
   sortKey?: string;
   sortOrder?: 'asc' | 'desc';
   onSort?: (key: string) => void;
+  /** Phones: show each row as a labelled card instead of a wide table (the labels come from `fields`). */
+  mobileCards?: boolean;
+  /** Replaces the default "No Record Found" row with a custom empty state. */
+  empty?: ReactNode;
 };
 
 const CommonTable = (props: TProps) => {
-  const rowNodes = Children.toArray(props.children).filter(Boolean);
+  const rawRows = Children.toArray(props.children).filter(Boolean);
+  // Card mode: copy each column's heading onto its cell (data-label) so the phone layout can print "Label  value".
+  const rowNodes = props.mobileCards
+    ? rawRows.map((row) => {
+        if (!isValidElement(row) || row.type !== "tr") return row;
+        const tr = row as ReactElement<{ children?: ReactNode }>;
+        let i = 0;
+        return cloneElement(tr, {}, Children.map(tr.props.children, (cell) => {
+          if (!isValidElement(cell)) return cell;
+          const label = props.fields[i++]?.label;
+          const c = cell as ReactElement<{ children?: ReactNode }>;
+          return cloneElement(c as ReactElement<Record<string, unknown>>, { "data-label": typeof label === "string" ? label : "" }, <div className="ad_cell">{c.props.children}</div>);
+        }));
+      })
+    : rawRows;
 
   return (
     <>
-      <div className={`table_box ${props.className}`}>
+      <div className={`table_box ${props.mobileCards ? "ad_cards" : ""} ${!props.loader && rowNodes.length === 0 ? "is_empty" : ""} ${props.className ?? ""}`}>
         {props.tableTitle && (
           <div className="table_box_head">
             <Row className="align-items-center">
@@ -101,10 +119,14 @@ const CommonTable = (props: TProps) => {
               rowNodes
             ) : (
               <tr>
-                <td colSpan={props.fields.length} className="no_record_box">
-                  <NoRecordIcon />
-                  <p>No Record Found</p>
-                </td>
+                {props.empty ? (
+                  <td colSpan={props.fields.length} className="ad_empty_cell">{props.empty}</td>
+                ) : (
+                  <td colSpan={props.fields.length} className="no_record_box">
+                    <NoRecordIcon />
+                    <p>No Record Found</p>
+                  </td>
+                )}
               </tr>
             )}
           </tbody>

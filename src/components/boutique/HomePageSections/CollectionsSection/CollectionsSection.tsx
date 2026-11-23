@@ -21,7 +21,7 @@ const CollectionsSection: React.FC<CollectionsSectionProps> = ({
     <section className="section_collections py-section" id="collections">
       <Container>
         <div className="section_header text-center">
-          <span className="section_label">Our Collections</span>
+          <span className="section_label">Stitching Designs</span>
           <h2 className="section_title">Elegant Designs for Every Occasion</h2>
           <p className="section_sub">
             Explore stitched suits, kurtis, designer wear, and graceful festive
@@ -47,7 +47,7 @@ const CollectionsSection: React.FC<CollectionsSectionProps> = ({
         </Row>
 
         <div className="section_footer_cta">
-          <CommonButton role="link" to="/collections" className="boutique_outline_btn">
+          <CommonButton role="link" to="/stitching" className="boutique_outline_btn">
             Browse Full Collection
             <BoutiqueArrowRightIcon width={16} height={16} />
           </CommonButton>

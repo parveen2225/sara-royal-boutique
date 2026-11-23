@@ -18,6 +18,7 @@ import { apiJson } from "@/lib/api/client";
 import { extractListData, formatAdminDate } from "@/lib/api/listData";
 import { GALLERY } from "@/lib/api/urls";
 import { uploadImages } from "@/lib/api/upload";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 const TABLE_FIELDS = [
   { label: "Preview", key: "preview" },
@@ -82,24 +83,35 @@ export default function AdminGalleryPage() {
     [form.image],
   );
 
+  const fetchItems = useCallback(async () => {
+    const res = await apiJson<GalleryListResponse | GalleryItem[]>(GALLERY.LIST, {
+      skipLoader: true,
+    });
+    return extractListData<GalleryItem>(res.data);
+  }, []);
+
   const loadItems = useCallback(async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const res = await apiJson<GalleryListResponse | GalleryItem[]>(GALLERY.LIST, {
-        skipLoader: true,
-      });
-      setItems(extractListData<GalleryItem>(res.data));
+      setItems(await fetchItems());
     } catch (error: unknown) {
       setLoadError(getErrorMessage(error) || "Failed to load gallery.");
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [fetchItems]);
 
+  // First load on mount. Written as a promise chain (not a call to loadItems) so no state is set synchronously in the effect;
+  // `isLoading` already starts as true.
   useEffect(() => {
-    loadItems().catch(() => {});
-  }, [loadItems]);
+    let cancelled = false;
+    fetchItems()
+      .then((data) => { if (!cancelled) setItems(data); })
+      .catch((error: unknown) => { if (!cancelled) setLoadError(getErrorMessage(error) || "Failed to load gallery."); })
+      .finally(() => { if (!cancelled) setIsLoading(false); });
+    return () => { cancelled = true; };
+  }, [fetchItems]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -314,7 +326,7 @@ export default function AdminGalleryPage() {
       </Card>
 
       <div className="admin_table_scroll">
-        <CommonTable fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
+        <CommonTable empty={<EmptyState icon="image" title="No Gallery Images Yet" text="Upload your boutique photos with the form above to show them in the website gallery." />} fields={TABLE_FIELDS} lastColumnWidth="220px" loader={isLoading}>
           {items.map((item) => {
             const thumbSrc = item.image?.trim() || "/images/kide_war1.png";
             return (

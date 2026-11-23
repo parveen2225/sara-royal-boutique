@@ -5,6 +5,7 @@ import DesignSubcategory from "@/models/DesignSubcategory";
 import Design from "@/models/Design";
 import { createSlug, jsonError, jsonOk } from "@/lib/api/utils";
 import { requireAdmin } from "@/lib/auth/guard";
+import { seedAllowed, SEED_DISABLED_MESSAGE } from "@/lib/seedGuard";
 import {
   DESIGN_STUDIO_CATALOG,
   DESIGN_STUDIO_IMAGES,
@@ -13,6 +14,7 @@ import {
 export async function POST(req: NextRequest) {
   const auth = requireAdmin(req);
   if (!auth.ok) return auth.response;
+  if (!seedAllowed()) return jsonError(SEED_DISABLED_MESSAGE, 403);
 
   if (!isMongoConfigured()) {
     return jsonError("MongoDB is not configured. Set MONGODB_URI in .env.local.", 503);

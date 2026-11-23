@@ -24,6 +24,12 @@ export default function sitemap() {
       priority: 0.8,
     },
     {
+      url: `${BASE_URL}/stitching`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+    {
       url: `${BASE_URL}/services`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,

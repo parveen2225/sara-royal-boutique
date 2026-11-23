@@ -7,6 +7,8 @@ import { Container } from "react-bootstrap";
 import { getWhatsAppUrl } from "@/utils/whatsapp";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { useCart } from "@/lib/useShop";
+import ShoppingBagIcon from "@/components/shop/ShoppingBagIcon";
 import {
   BoutiqueWhatsAppIcon,
   BoutiqueInstagramIcon,
@@ -22,6 +24,7 @@ import logoIcon from "../../../../public/images/logo_icon.png";
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Collections", href: "/collections" },
+  { label: "Stitching", href: "/stitching" },
   { label: "Design Studio", href: "/design-studio" },
   { label: "Gallery", href: "/gallery" },
   { label: "Services", href: "/services" },
@@ -37,6 +40,7 @@ const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
+  const { count: cartCount } = useCart();
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const [prevPathname, setPrevPathname] = useState(pathname);
 
@@ -118,6 +122,15 @@ const Header: React.FC = () => {
           </nav>
 
           <div className="boutique_header_actions">
+            <Link
+              href="/cart"
+              className={`header_cart_btn ${pathname === "/cart" ? "is_active" : ""}`}
+              aria-label={cartCount > 0 ? `Shopping bag, ${cartCount} ${cartCount === 1 ? "item" : "items"}` : "Shopping bag, empty"}
+              aria-current={pathname === "/cart" ? "page" : undefined}
+            >
+              <ShoppingBagIcon size={20} />
+              {cartCount > 0 && <span className="header_cart_badge" aria-hidden="true">{cartCount > 99 ? "99+" : cartCount}</span>}
+            </Link>
             <CommonButton
               role="link"
               to={getWhatsAppUrl()}

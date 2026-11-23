@@ -14,6 +14,7 @@ import { formatAdminDate } from "@/lib/api/listData";
 import { STATUS_OPTIONS, CATEGORY_TABLE_FIELDS } from "@/components/admin/designStudio/constants";
 import { FALLBACK_IMAGE } from "@/components/admin/designStudio/types";
 import type { DesignStudioAdminApi } from "@/components/admin/designStudio/useDesignStudioAdmin";
+import EmptyState from "@/components/admin/ui/EmptyState";
 
 type Props = { studio: DesignStudioAdminApi };
 
@@ -148,7 +149,7 @@ const CategoriesTab: React.FC<Props> = ({ studio }) => {
           </Card>
 
           <div className="admin_table_scroll">
-            <CommonTable
+            <CommonTable empty={<EmptyState icon="tag" title="No Design Categories Yet" text="Create a category with the form above to organise the Design Studio." />}
               fields={CATEGORY_TABLE_FIELDS}
               lastColumnWidth="220px"
               loader={categoriesLoading}

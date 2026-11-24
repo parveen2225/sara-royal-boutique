@@ -644,3 +644,72 @@
     .header_whatsapp_btn { padding: 0.5rem; gap: 0; min-width: 2.6rem; min-height: 2.6rem; border-radius: 50%; justify-content: center; .btn_label { display: none; } }
   }
 }
+
+// ─── Theme- and state-aware colours ───────────────────────────────────────────────────────────────────────────────
+// Applied only when <Header> sets data-header-tone (see src/lib/headerTone.ts). Routes without it (Collections, About)
+// keep every rule above exactly as before.
+//
+//   state                         bar background             links / icons
+//   plain (any scroll) / scrolled themed nav bar (solid)     themed text; gold-TEXT token for active, hover and icons
+//   hero + not scrolled           transparent + dark scrim   ivory text; light gold for active / hover and icons
+//
+// --boutique-gold-text is >= 4.5:1 on the light theme's ivory/white/beige surfaces (brand gold is only 2.1:1 there).
+.boutique_header[data-header-tone] {
+  --hdr-link: var(--boutique-text);
+  --hdr-accent: var(--boutique-gold-text);
+  --hdr-icon: var(--boutique-gold-text);
+  --hdr-icon-line: color-mix(in srgb, var(--boutique-gold-text) 55%, transparent);
+  --hdr-icon-bg: color-mix(in srgb, var(--boutique-gold) 12%, transparent);
+
+  // A solid themed bar whenever there is no dark hero behind the header, or once the page has scrolled.
+  &[data-header-tone="plain"],
+  &.scrolled {
+    background: var(--boutique-nav-bg);
+    backdrop-filter: blur(30px);
+    border-bottom-color: var(--boutique-border);
+  }
+
+  // Dark photo hero behind a transparent header: light text on a soft dark scrim that guarantees contrast whatever the photo is.
+  &[data-header-tone="hero"]:not(.scrolled) {
+    --hdr-link: #ffffff;
+    --hdr-accent: var(--boutique-gold-light);
+    --hdr-icon: var(--boutique-gold-light);
+    --hdr-icon-line: rgba(232, 212, 160, 0.55);
+    --hdr-icon-bg: rgba(8, 12, 20, 0.35);
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 -2.75rem 0;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(4, 8, 16, 0.7) 0%, rgba(4, 8, 16, 0.42) 58%, rgba(4, 8, 16, 0) 100%);
+    }
+  }
+
+  .header_nav_link { color: var(--hdr-link); }
+  .header_nav_link:hover,
+  .header_nav_link.active { color: var(--hdr-accent); }
+  .header_nav_link::after { background: var(--hdr-accent); }
+  .header_nav_link:focus-visible { outline: 2px solid var(--hdr-accent); outline-offset: 2px; }
+
+  // Cart, account and theme-toggle buttons + the mobile hamburger: icon colour and a visible (>= 3:1) boundary.
+  .header_cart_btn,
+  .theme_toggle_btn {
+    color: var(--hdr-icon);
+    background: var(--hdr-icon-bg);
+    border-color: var(--hdr-icon-line);
+
+    &:hover,
+    &.is_active { color: var(--hdr-icon); background: color-mix(in srgb, var(--boutique-gold) 24%, transparent); border-color: var(--hdr-icon); }
+    &:focus-visible { outline: 2px solid var(--hdr-icon); outline-offset: 3px; }
+  }
+  .boutique_hamburger {
+    border-color: var(--hdr-icon-line);
+    background: var(--hdr-icon-bg);
+    .h_bar { background: var(--hdr-icon); }
+    &:hover,
+    &.is-open { border-color: var(--hdr-icon); }
+    &:focus-visible { outline: 2px solid var(--hdr-icon); outline-offset: 3px; }
+  }
+}

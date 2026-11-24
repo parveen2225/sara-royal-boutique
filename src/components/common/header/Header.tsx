@@ -10,6 +10,8 @@ import { useTheme } from "@/components/theme/ThemeProvider";
 import { useCart } from "@/lib/useShop";
 import ShoppingBagIcon from "@/components/shop/ShoppingBagIcon";
 import { isAccountLinkHiddenOn, isCustomerAuthConfigured } from "@/lib/customerAuth/publicConfig";
+import { useAuthLauncher } from "@/components/account/AuthLauncher";
+import { headerToneFor } from "@/lib/headerTone";
 import {
   BoutiqueWhatsAppIcon,
   BoutiqueInstagramIcon,
@@ -44,6 +46,7 @@ const Header: React.FC = () => {
   const { count: cartCount } = useCart();
   // Customer account link: only once Firebase is configured, and never on Collections / About (they stay unchanged).
   const showAccount = isCustomerAuthConfigured() && !isAccountLinkHiddenOn(pathname);
+  const { openAuth } = useAuthLauncher();
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const [prevPathname, setPrevPathname] = useState(pathname);
 
@@ -86,7 +89,7 @@ const Header: React.FC = () => {
   return (
     <>
       {/* ── Main header bar ─────────────────────────────────────────── */}
-      <header className={`boutique_header ${scrolled ? "scrolled" : ""}`}>
+      <header className={`boutique_header ${scrolled ? "scrolled" : ""}`} data-header-tone={headerToneFor(pathname)}>
         {/* Top hiring banner */}
         {/* <div className="header_top_banner">
           <Link href="/#hiring" className="banner_link">
@@ -139,6 +142,14 @@ const Header: React.FC = () => {
                 href="/my-account"
                 className={`header_cart_btn header_account_btn ${/^\/(my-account|login|signup|verify-email|forgot-password)/.test(pathname ?? "") ? "is_active" : ""}`}
                 aria-label="My account"
+                onClick={(e) => {
+                  // Plain click: open the login modal in place (it continues to My Account once logged in, or goes straight
+                  // there for a remembered session). Modified clicks / no-JS keep the normal /my-account link.
+                  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                  if (/^\/my-account/.test(pathname ?? "")) return;
+                  e.preventDefault();
+                  openAuth("login", { next: "/my-account" });
+                }}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />

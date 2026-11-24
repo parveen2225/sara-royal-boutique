@@ -38,7 +38,7 @@
     font-weight: 600;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--boutique-gold-text);
     margin-bottom: 1rem;
 
     &::before {
@@ -153,5 +153,18 @@
         transform: translateX(3px);
       }
     }
+  }
+}
+
+// Light theme: the suit rails use brand gold for TEXT (2.1:1 on white/ivory). Their rules live in shop.scss, which is shared
+// with Collections, so the accessible gold is applied here, scoped to the two homepage rails by their section ids.
+.theme-light {
+  #featured-suits,
+  #new-arrivals {
+    .shop_eyebrow,
+    .shop_price_now,
+    .shop_btn:not(.shop_btn_solid),
+    .shop_card_title a:hover { color: var(--boutique-gold-text); }
+    .shop_btn:not(.shop_btn_solid):hover:not(:disabled) { color: #1a1208; } // gold fill on hover keeps dark text
   }
 }

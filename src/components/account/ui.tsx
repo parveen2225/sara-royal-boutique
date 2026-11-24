@@ -15,16 +15,6 @@ export function AccountPage({ children, wide }: { children: ReactNode; wide?: bo
   );
 }
 
-export function AccountHeading({ eyebrow, title, lead }: { eyebrow: string; title: string; lead?: ReactNode }) {
-  return (
-    <>
-      <p className="acct_eyebrow">{eyebrow}</p>
-      <h1 className="acct_title">{title}</h1>
-      {lead && <p className="acct_lead">{lead}</p>}
-    </>
-  );
-}
-
 type FieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & { label: string; error?: string | false; hint?: ReactNode; children?: ReactNode };
 
 export function Field({ label, error, hint, type = "text", children, ...input }: FieldProps) {
@@ -74,6 +64,10 @@ export function NotConfigured() {
     </Notice>
   );
 }
+
+const noopSubscribe = () => () => undefined;
+/** false during server rendering and hydration, true afterwards (lets portal-based UI open without a hydration mismatch). */
+export function useIsClient() { return useSyncExternalStore(noopSubscribe, () => true, () => false); }
 
 const subscribeStorage = (cb: () => void) => { window.addEventListener("storage", cb); return () => window.removeEventListener("storage", cb); };
 const readNumber = (key: string) => { try { return Number(window.localStorage.getItem(key) ?? 0) || 0; } catch { return 0; } };

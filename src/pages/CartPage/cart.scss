@@ -1,0 +1,144 @@
+// Cart page (/cart). Scoped under .cart_page; uses the shared theme tokens so it works in light + dark.
+// Separate from shop.scss on purpose: that file is shared with suit cards, the homepage rail and Collections.
+
+.cart_page {
+  // Status colours that stay readable (>= 4.5:1) on each theme's surface; never colour-only (icons + text are used too).
+  --cart-danger: #ff8b98;
+  --cart-danger-bg: rgba(255, 139, 152, 0.1);
+  --cart-danger-line: rgba(255, 139, 152, 0.45);
+  --cart-accent-text: var(--boutique-gold-text); // accessible gold for text on either theme
+  --cart-card: linear-gradient(165deg, var(--boutique-surface), var(--boutique-panel-bg-end, var(--boutique-surface)));
+  --cart-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  --cart-on-danger: #1a0507;
+}
+.theme-light .cart_page {
+  --cart-danger: #a4161a;
+  --cart-danger-bg: rgba(164, 22, 26, 0.07);
+  --cart-danger-line: rgba(164, 22, 26, 0.4);
+  --cart-shadow: 0 14px 36px rgba(139, 105, 20, 0.14);
+  --cart-on-danger: #ffffff;
+}
+
+// ───────────── Heading ─────────────
+.cart_head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 0 0 1.75rem;
+  .shop_eyebrow { margin: 0 0 0.3rem; color: var(--cart-accent-text); }
+  h1 { font-family: var(--font-display); font-size: clamp(1.9rem, 4.5vw, 2.7rem); font-weight: 700; line-height: 1.1; margin: 0; color: var(--boutique-text); }
+}
+.cart_count {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.95rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+  color: var(--cart-accent-text); background: rgba(201, 168, 76, 0.1); border: 1px solid var(--boutique-border);
+}
+
+// ───────────── Layout ─────────────
+.cart_layout {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(21rem, 25rem); gap: 2rem; align-items: start;
+  @media (max-width: 1199.98px) { grid-template-columns: minmax(0, 1fr) 22rem; gap: 1.5rem; }
+  @media (max-width: 991.98px) { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+}
+
+// ───────────── Product cards ─────────────
+.cart_list { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.cart_item {
+  display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) auto; grid-template-areas: "img info side"; gap: 1.25rem; padding: 1.1rem;
+  border-radius: 1.2rem; border: 1px solid var(--boutique-border); background: var(--boutique-card-bg); box-shadow: var(--cart-shadow);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  &:hover { border-color: rgba(201, 168, 76, 0.5); }
+  &.has_issue { border-color: var(--cart-danger-line); background: linear-gradient(0deg, var(--cart-danger-bg), var(--cart-danger-bg)), var(--boutique-card-bg); }
+  @media (max-width: 767.98px) { grid-template-columns: 6rem minmax(0, 1fr); grid-template-areas: "img info" "side side"; gap: 0.9rem 1rem; padding: 0.95rem; }
+}
+.cart_img {
+  grid-area: img; position: relative; width: 100%; aspect-ratio: 4 / 5; align-self: start; border-radius: 0.9rem; overflow: hidden;
+  background: var(--boutique-surface-hover); border: 1px solid var(--boutique-border); display: block;
+  img { object-fit: cover; transition: transform 0.4s ease; }
+  &:hover img { transform: scale(1.04); }
+}
+.cart_info { grid-area: info; min-width: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.cart_name {
+  margin: 0; font-family: var(--font-display); font-size: clamp(1.02rem, 2.2vw, 1.2rem); font-weight: 600; line-height: 1.3;
+  a { color: var(--boutique-text); text-decoration: none; &:hover { color: var(--cart-accent-text); } &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 3px; border-radius: 4px; } }
+}
+.cart_meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; margin: 0; font-size: 0.85rem; color: var(--boutique-muted); }
+.cart_sku { padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.06em; color: var(--boutique-text); background: rgba(201, 168, 76, 0.12); border: 1px solid var(--boutique-border); }
+.cart_unit strong { color: var(--boutique-text); font-weight: 600; }
+.cart_issue svg { flex: none; margin-top: 0.12rem; }
+.cart_issue { display: flex; gap: 0.45rem; align-items: flex-start; margin: 0; padding: 0.5rem 0.7rem; border-radius: 0.7rem; font-size: 0.84rem; line-height: 1.4; color: var(--cart-danger); background: var(--cart-danger-bg); border: 1px solid var(--cart-danger-line); }
+.cart_unavailable { align-self: flex-start; padding: 0.25rem 0.7rem; border-radius: 999px; font-size: 0.82rem; font-weight: 700; color: var(--cart-danger); border: 1px solid var(--cart-danger-line); background: var(--cart-danger-bg); }
+
+// Quantity stepper (shared component, restyled here only): 44px touch targets, visible focus, readable disabled state.
+.cart_item .shop_qty {
+  align-self: flex-start; margin-top: auto; border: 1px solid var(--boutique-modal-border, var(--boutique-border)); background: var(--boutique-input-bg); border-radius: 999px;
+  button { width: 2.75rem; height: 2.75rem; display: grid; place-items: center; border: 0; background: transparent; color: var(--boutique-text); font-size: 1.25rem; line-height: 1; cursor: pointer; transition: background 0.2s ease, color 0.2s ease;
+    &:hover:not(:disabled) { background: rgba(201, 168, 76, 0.18); color: var(--cart-accent-text); }
+    &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: -3px; border-radius: 999px; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; } }
+  span { min-width: 2.4rem; text-align: center; font-weight: 700; font-size: 1rem; color: var(--boutique-text); }
+}
+
+.cart_side {
+  grid-area: side; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 0.75rem; text-align: right; min-width: 7.5rem;
+  @media (max-width: 767.98px) { flex-direction: row; align-items: center; justify-content: space-between; text-align: left; min-width: 0; padding-top: 0.85rem; border-top: 1px solid var(--boutique-border); }
+}
+.cart_line_total { display: grid; gap: 0.1rem; span { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--boutique-muted); font-weight: 600; } strong { font-size: 1.35rem; line-height: 1.1; color: var(--boutique-text); font-weight: 700; } }
+
+.cart_remove {
+  display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.5rem; padding: 0.35rem 0.8rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  color: var(--boutique-muted); background: transparent; border: 1px solid var(--boutique-border); transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  &:hover { color: var(--cart-danger); border-color: var(--cart-danger-line); background: var(--cart-danger-bg); }
+  &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 2px; }
+}
+
+// ───────────── Clear cart ─────────────
+.cart_footer { margin-top: 1.1rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.cart_continue_link { color: var(--cart-accent-text); font-weight: 600; font-size: 0.92rem; text-decoration: none; display: inline-flex; gap: 0.4rem; align-items: center; &:hover { text-decoration: underline; text-underline-offset: 3px; } &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 3px; border-radius: 4px; } }
+.cart_clear { @extend .cart_remove; }
+.cart_confirm {
+  display: flex; align-items: center; gap: 0.75rem 1rem; flex-wrap: wrap; width: 100%; padding: 0.85rem 1rem; border-radius: 0.9rem; font-size: 0.92rem; color: var(--boutique-text);
+  border: 1px solid var(--cart-danger-line); background: var(--cart-danger-bg);
+  p { margin: 0; flex: 1 1 14rem; font-weight: 600; }
+  .cart_confirm_actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+}
+.cart_btn_danger { min-height: 2.6rem; padding: 0.4rem 1.1rem; border-radius: 999px; font-weight: 700; font-size: 0.88rem; cursor: pointer; color: var(--cart-on-danger); background: var(--cart-danger); border: 1px solid var(--cart-danger);
+  &:hover { filter: brightness(1.08); } &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 2px; } }
+.cart_btn_ghost { min-height: 2.6rem; padding: 0.4rem 1.1rem; border-radius: 999px; font-weight: 600; font-size: 0.88rem; cursor: pointer; color: var(--boutique-text); background: transparent; border: 1px solid var(--boutique-modal-border, var(--boutique-border));
+  &:hover { border-color: var(--boutique-gold); color: var(--cart-accent-text); } &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 2px; } }
+
+// ───────────── Order summary ─────────────
+.cart_summary {
+  position: sticky; top: 6.5rem; padding: 1.6rem; border-radius: 1.4rem; border: 1px solid var(--boutique-modal-border, var(--boutique-border)); box-shadow: var(--cart-shadow);
+  background: radial-gradient(120% 60% at 50% -10%, rgba(201, 168, 76, 0.14), transparent 62%), var(--cart-card); overflow: hidden;
+  &::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, transparent, var(--boutique-gold), transparent); }
+  @media (max-width: 991.98px) { position: static; padding: 1.25rem; }
+  h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; margin: 0 0 1.1rem; color: var(--boutique-text); }
+}
+.cart_rows { margin: 0 0 1.1rem; display: grid; gap: 0.7rem; }
+.cart_row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-size: 0.94rem; margin: 0;
+  dt { font-weight: 500; color: var(--boutique-muted); } dd { margin: 0; font-weight: 600; color: var(--boutique-text); text-align: right; }
+  &.is_note dd { font-weight: 500; font-size: 0.85rem; color: var(--boutique-muted); max-width: 11rem; }
+  &.is_total { margin-top: 0.3rem;
+    dt small { display: block; margin: 0.1rem 0 0; font-size: 0.74rem; font-weight: 500; color: var(--boutique-muted); } padding-top: 1rem; border-top: 1px solid var(--boutique-border); align-items: center;
+    dt { font-size: 0.98rem; font-weight: 700; color: var(--boutique-text); } dd { font-size: 1.65rem; line-height: 1; font-weight: 700; color: var(--boutique-text); } }
+}
+.cart_fineprint { margin: -0.3rem 0 1.2rem; font-size: 0.8rem; line-height: 1.5; color: var(--boutique-muted); }
+
+.cart_cta {
+  display: inline-flex; width: 100%; align-items: center; justify-content: center; gap: 0.6rem; min-height: 3.2rem; padding: 0.8rem 1.4rem; border-radius: 999px; font-size: 1rem; font-weight: 700; letter-spacing: 0.01em;
+  cursor: pointer; text-decoration: none; transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 3px; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; transform: none; }
+}
+// WhatsApp green with dark text: 8:1 contrast (white on #25d366 would be < 2:1).
+.cart_cta_wa { color: #04210f; background: #25d366; border: 1px solid #25d366; box-shadow: 0 10px 26px rgba(37, 211, 102, 0.28);
+  &:hover:not(:disabled) { background: #2be072; transform: translateY(-1px); box-shadow: 0 14px 30px rgba(37, 211, 102, 0.36); } }
+.cart_cta_secondary { margin-top: 0.7rem; color: var(--cart-accent-text); background: transparent; border: 1px solid var(--boutique-gold);
+  &:hover { background: rgba(201, 168, 76, 0.14); } }
+
+.cart_howto {
+  margin: 1.35rem 0 0; padding: 1rem 1.05rem; list-style: none; display: grid; gap: 0.65rem; border-radius: 1rem; background: rgba(201, 168, 76, 0.07); border: 1px solid var(--boutique-border);
+  li { display: grid; grid-template-columns: 1.15rem 1fr; gap: 0.6rem; font-size: 0.84rem; line-height: 1.5; color: var(--boutique-muted); }
+  li svg { margin-top: 0.15rem; color: var(--cart-accent-text); }
+  strong { color: var(--boutique-text); font-weight: 600; }
+}
+.cart_wa_unavailable { margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--boutique-muted); }
+.cart_page .shop_error { color: var(--cart-danger); background: var(--cart-danger-bg); border-color: var(--cart-danger-line); font-weight: 500; }
+.cart_page .shop_notice { color: var(--boutique-text); }

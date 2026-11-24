@@ -128,3 +128,36 @@ test("static: Firebase confined to customer-account code; Admin SDK server-only;
   const env = read(".env.example");
   for (const k of ["NEXT_PUBLIC_FIREBASE_API_KEY", "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", "NEXT_PUBLIC_FIREBASE_PROJECT_ID", "NEXT_PUBLIC_FIREBASE_APP_ID", "FIREBASE_PROJECT_ID"]) assert.match(env, new RegExp(`^# ${k}=\\s`, "m"), k);
 });
+
+test("static: one reusable auth modal; every account route renders it; Firebase is only loaded when it opens", () => {
+  const dir = "src/components/account/";
+  for (const f of ["AuthModal.tsx", "AuthModalLayout.tsx", "AuthModalHost.tsx", "AuthLauncher.tsx", "AuthPage.tsx", "authModalContext.ts", "LoginForm.tsx", "SignupForm.tsx", "ForgotPasswordForm.tsx", "VerifyEmailView.tsx"]) assert.ok(fs.existsSync(path.join(root, dir, f)), f);
+  // the modal switches between all four views and uses react-bootstrap's accessible Modal (focus trap, ESC, aria)
+  const modal = read(dir + "AuthModal.tsx");
+  for (const v of ["LoginForm", "SignupForm", "ForgotPasswordForm", "VerifyEmailView"]) assert.match(modal, new RegExp(`<${v} />`), v);
+  assert.match(modal, /from "react-bootstrap"/);
+  assert.match(modal, /aria-labelledby=\{AUTH_TITLE_ID\}/);
+  assert.match(modal, /aria-label="Close"/);
+  // the form views keep their Formik + Yup validation and the same Firebase-backed actions
+  for (const f of ["LoginForm", "SignupForm", "ForgotPasswordForm"]) { const s = read(`${dir}${f}.tsx`); assert.match(s, /useFormik/, f); assert.match(s, /Yup\./, f); }
+  assert.match(read(dir + "LoginForm.tsx"), /await login\(v\.email, v\.password\)/);
+  assert.match(read(dir + "SignupForm.tsx"), /await signup\(v\.name, v\.email, v\.password\)/);
+  assert.match(read(dir + "ForgotPasswordForm.tsx"), /await resetPassword\(v\.email\)/);
+  // the four auth routes render the modal over the stage; My Account opens it for logged-out visitors
+  for (const [route, view] of [["login", "login"], ["signup", "signup"], ["forgot-password", "forgot"], ["verify-email", "verify"]]) assert.match(read(`src/app/(account)/${route}/page.tsx`), new RegExp(`<AuthPage view="${view}" />`), route);
+  const mine = read(dir + "MyAccountView.tsx");
+  assert.match(mine, /<AuthModal\b/);
+  assert.doesNotMatch(mine, /router\.replace\(`?\/login/, "logged-out My Account no longer redirects to a plain login page");
+  // the header opens the modal through the launcher, which never imports Firebase (it is a lazily loaded chunk)
+  assert.match(read("src/components/common/header/Header.tsx"), /openAuth\("login"/);
+  const launcher = read(dir + "AuthLauncher.tsx");
+  assert.match(launcher, /dynamic\(\(\) => import\("\.\/AuthModalHost"\), \{ ssr: false \}\)/);
+  assert.doesNotMatch(launcher.replace(/^\s*\/\/.*$/gm, ""), /firebase/i, "launcher code never imports Firebase");
+  // open-redirect guard still applies to the post-login destination (page mode and launcher)
+  assert.match(read(dir + "AuthPage.tsx"), /safeNextPath\(params\?\.get\("next"\)\)/);
+  assert.match(launcher, /safeNextPath\(options\.next\)/);
+  // styling: Bootstrap + SCSS only
+  assert.doesNotMatch(read(dir + "account.scss"), /@tailwind|@apply/);
+  assert.equal(walk(path.join(root, "src/components/account")).some((f) => /\.module\.(s?css)$/.test(f)), false);
+  assert.doesNotMatch(read("package.json"), /tailwind/i);
+});

@@ -1,35 +1,90 @@
-// Customer account pages (signup, login, forgot password, verify email, my account).
-// Uses the site's theme variables (gold / ivory / navy, light + dark). Scoped under .acct_* so no other page changes.
+// Customer account UI: the auth modal (login, signup, forgot password, verify email), the branded stage behind it on the
+// /login etc. routes, and the My Account page. Everything is scoped under .acct_* so no other page changes.
+// Uses the site's theme variables (gold / ivory / navy; dark + light). Bootstrap provides the modal mechanics.
 
-.acct_page {
-  background: var(--boutique-bg); color: var(--boutique-text); min-height: 75vh;
-  padding-top: 7rem; padding-bottom: 4rem;
-  @media (max-width: 575px) { padding-top: 6rem; padding-bottom: 3rem; }
+$gold-gradient: linear-gradient(135deg, var(--boutique-gold-light), var(--boutique-gold));
+
+// ───────────────────────────── Modal shell ─────────────────────────────
+.modal-backdrop.acct_backdrop {
+  --bs-backdrop-bg: #02050b;
+  --bs-backdrop-opacity: 0.78;
+  backdrop-filter: blur(6px);
 }
 
-.acct_card {
-  max-width: 30rem; margin: 0 auto; padding: 2rem 1.75rem;
-  background: var(--boutique-card-bg, var(--boutique-surface)); border: 1px solid var(--boutique-border);
-  border-radius: 1.25rem; box-shadow: var(--boutique-card-shadow, none);
-  @media (max-width: 575px) { padding: 1.5rem 1.15rem; border-radius: 1rem; }
-  &.is_wide { max-width: 40rem; }
+.acct_dialog {
+  max-width: 27.5rem;
+  margin-left: auto; margin-right: auto;
+  @media (max-width: 575.98px) { max-width: none; margin: 0.6rem; }
+}
+// Smooth open / close: a soft rise + scale instead of Bootstrap's slide.
+.modal.fade .acct_dialog { transform: translateY(18px) scale(0.965); opacity: 0; transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease; }
+.modal.show .acct_dialog { transform: none; opacity: 1; }
+
+.acct_modal.modal-content {
+  position: relative; overflow: hidden; max-height: calc(100dvh - 1.5rem);
+  border-radius: 1.5rem; color: var(--boutique-text);
+  border: 1px solid var(--boutique-modal-border, var(--boutique-border));
+  background:
+    radial-gradient(120% 70% at 50% -10%, rgba(201, 168, 76, 0.16), transparent 62%),
+    linear-gradient(165deg, var(--boutique-surface) 0%, var(--boutique-panel-bg-end, var(--boutique-surface)) 100%);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(201, 168, 76, 0.07), 0 0 70px rgba(201, 168, 76, 0.09);
+  // thin gold edge light along the top
+  &::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; z-index: 2; background: linear-gradient(90deg, transparent, var(--boutique-gold), transparent); opacity: 0.9; }
+  &.is_shake { animation: acct_shake 0.45s ease; }
+  @media (max-width: 575.98px) { border-radius: 1.25rem; }
+}
+@keyframes acct_shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+
+.acct_close {
+  position: absolute; top: 0.85rem; right: 0.85rem; z-index: 3; width: 2.4rem; height: 2.4rem; display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid var(--boutique-border); background: rgba(201, 168, 76, 0.07); color: var(--boutique-muted); cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  &:hover { color: var(--boutique-gold-text); border-color: var(--boutique-gold); background: rgba(201, 168, 76, 0.14); transform: rotate(90deg); }
+  &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 2px; }
 }
 
-.acct_eyebrow { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--boutique-gold); font-weight: 600; margin: 0 0 0.4rem; }
-.acct_title { font-family: var(--font-display); font-size: clamp(1.55rem, 4vw, 1.9rem); font-weight: 700; color: var(--boutique-text); margin: 0 0 0.5rem; }
-.acct_lead { color: var(--boutique-muted); font-size: 0.95rem; line-height: 1.55; margin: 0 0 1.5rem; }
+.acct_modal_body.modal-body { padding: 2.2rem 2rem 1.75rem; overflow-y: auto; overscroll-behavior: contain; @media (max-width: 575.98px) { padding: 1.9rem 1.2rem 1.4rem; } }
+.acct_view { animation: acct_view_in 0.32s ease both; }
+@keyframes acct_view_in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
+@media (prefers-reduced-motion: reduce) {
+  .modal.fade .acct_dialog { transform: none; transition: opacity 0.15s linear; }
+  .acct_view, .acct_modal.is_shake { animation: none; }
+  .acct_close:hover { transform: none; }
+}
+
+// ───────────────────────────── Modal header ─────────────────────────────
+.acct_head { text-align: center; margin-bottom: 1.5rem; }
+.acct_emblem {
+  display: inline-grid; place-items: center; width: 4.1rem; height: 4.1rem; margin-bottom: 0.9rem; border-radius: 50%;
+  border: 1px solid var(--boutique-modal-border, var(--boutique-border)); background: radial-gradient(circle at 50% 35%, rgba(201, 168, 76, 0.2), rgba(201, 168, 76, 0.04) 70%);
+  box-shadow: 0 0 0 5px rgba(201, 168, 76, 0.05), 0 8px 24px rgba(0, 0, 0, 0.3);
+  img { width: auto; height: 2.3rem; object-fit: contain; }
+  &.is_icon { color: var(--boutique-gold-text); }
+}
+.acct_eyebrow { font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--boutique-gold-text); font-weight: 600; margin: 0 0 0.35rem; }
+.acct_title { font-family: var(--font-display); font-size: clamp(1.45rem, 4vw, 1.75rem); font-weight: 700; line-height: 1.2; color: var(--boutique-text); margin: 0 0 0.5rem; }
+.acct_lead { color: var(--boutique-muted); font-size: 0.92rem; line-height: 1.55; margin: 0 auto; max-width: 23rem; strong { color: var(--boutique-text); font-weight: 600; word-break: break-word; } }
+.acct_ornament {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin-top: 1.1rem;
+  &::before, &::after { content: ""; height: 1px; width: 3.2rem; background: linear-gradient(90deg, transparent, var(--boutique-gold)); }
+  &::after { transform: scaleX(-1); }
+  i { width: 0.42rem; height: 0.42rem; background: var(--boutique-gold); transform: rotate(45deg); box-shadow: 0 0 10px rgba(201, 168, 76, 0.6); }
+}
+
+// ───────────────────────────── Forms ─────────────────────────────
 .acct_form { display: grid; gap: 1rem; }
 
 .acct_field {
   display: grid; gap: 0.35rem;
-  label { font-size: 0.86rem; font-weight: 600; color: var(--boutique-text); }
+  label { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.02em; color: var(--boutique-text); }
   .acct_input_wrap { position: relative; }
   input {
-    width: 100%; min-height: 46px; padding: 0.7rem 0.95rem; border-radius: 0.75rem; font-size: 1rem; // 16px: no iOS zoom
+    width: 100%; min-height: 48px; padding: 0.7rem 1rem; border-radius: 0.85rem; font-size: 1rem; // 16px: no iOS zoom
     background: var(--boutique-input-bg); color: var(--boutique-text); border: 1px solid var(--boutique-border);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     &::placeholder { color: var(--boutique-muted); opacity: 0.8; }
+    &:hover:not(:disabled) { border-color: rgba(201, 168, 76, 0.45); }
     &:focus { outline: none; border-color: var(--boutique-gold); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.22); }
     &[aria-invalid="true"] { border-color: #e5484d; }
     &:disabled { opacity: 0.6; }
@@ -38,67 +93,156 @@
   .acct_toggle {
     position: absolute; top: 50%; right: 0.35rem; transform: translateY(-50%); width: 2.6rem; height: 2.6rem;
     display: grid; place-items: center; border: 0; border-radius: 0.6rem; background: transparent; color: var(--boutique-muted); cursor: pointer;
-    &:hover { color: var(--boutique-gold); }
+    &:hover { color: var(--boutique-gold-text); }
     &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 1px; }
   }
-  .acct_error { color: #ff8b98; font-size: 0.82rem; margin: 0; }
+  .acct_error { color: #ff8b98; font-size: 0.8rem; margin: 0; }
   .acct_hint { color: var(--boutique-muted); font-size: 0.8rem; margin: 0; }
 }
 .theme-light .acct_field .acct_error { color: #c62828; }
 
 .acct_rules {
-  list-style: none; padding: 0; margin: 0.15rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.75rem;
-  font-size: 0.78rem; color: var(--boutique-muted);
-  li { display: flex; align-items: center; gap: 0.35rem; }
-  li::before { content: "○"; font-size: 0.7rem; }
-  li.is_met { color: var(--boutique-gold); }
-  li.is_met::before { content: "●"; }
+  list-style: none; padding: 0; margin: 0.2rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 0.75rem;
+  font-size: 0.76rem; color: var(--boutique-muted);
+  li { display: flex; align-items: center; gap: 0.4rem; transition: color 0.2s ease; }
+  li::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; border: 1px solid currentColor; flex: none; transition: background 0.2s ease, box-shadow 0.2s ease; }
+  li.is_met { color: var(--boutique-gold-text); }
+  li.is_met::before { background: var(--boutique-gold); border-color: var(--boutique-gold); box-shadow: 0 0 8px rgba(201, 168, 76, 0.55); }
   @media (max-width: 380px) { grid-template-columns: 1fr; }
 }
 
 .acct_btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 46px; padding: 0.7rem 1.4rem;
-  border-radius: 999px; border: 1px solid var(--boutique-gold); font-weight: 600; font-size: 0.95rem; cursor: pointer;
-  background: transparent; color: var(--boutique-gold); text-decoration: none; transition: all 0.2s ease;
-  &:hover:not(:disabled) { background: var(--boutique-gold); color: #1a1208; }
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 48px; padding: 0.7rem 1.5rem;
+  border-radius: 999px; border: 1px solid var(--boutique-gold); font-weight: 600; font-size: 0.95rem; cursor: pointer; line-height: 1.2;
+  background: transparent; color: var(--boutique-gold-text); text-decoration: none; transition: all 0.2s ease;
+  &:hover:not(:disabled) { background: rgba(201, 168, 76, 0.14); color: var(--boutique-gold-text); }
   &:disabled { opacity: 0.55; cursor: not-allowed; }
   &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 3px; }
-  &.is_solid { background: linear-gradient(135deg, var(--boutique-gold-light), var(--boutique-gold)); color: #1a1208; border-color: transparent;
-    &:hover:not(:disabled) { filter: brightness(1.06); } }
+  &.is_solid { background: $gold-gradient; color: #1a1208; border-color: transparent; box-shadow: 0 8px 22px rgba(201, 168, 76, 0.25);
+    &:hover:not(:disabled) { background: $gold-gradient; color: #1a1208; filter: brightness(1.07); transform: translateY(-1px); box-shadow: 0 12px 28px rgba(201, 168, 76, 0.32); } }
   &.is_block { width: 100%; }
-  &.is_link { border: 0; min-height: auto; padding: 0; background: none; color: var(--boutique-gold); text-decoration: underline; font-weight: 500;
-    &:hover:not(:disabled) { background: none; color: var(--boutique-gold-light); } }
+  &.is_small { min-height: 38px; padding: 0.4rem 1rem; font-size: 0.85rem; }
+  &.is_link { border: 0; min-height: auto; padding: 0.3rem; background: none; color: var(--boutique-muted); text-decoration: underline; font-weight: 500;
+    &:hover:not(:disabled) { background: none; color: var(--boutique-gold-text); } }
 }
 
-.acct_spinner { width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: acct_spin 0.7s linear infinite; }
+// A text-style button that behaves like a link (switches views inside the modal).
+.acct_inline {
+  display: inline; padding: 0; border: 0; background: none; font: inherit; font-size: 0.88rem; color: var(--boutique-gold-text); cursor: pointer; text-decoration: none;
+  transition: color 0.2s ease;
+  &:hover:not(:disabled) { color: var(--boutique-gold-text); text-decoration: underline; text-underline-offset: 3px; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 3px; border-radius: 4px; }
+  &.is_strong { font-weight: 600; font-size: inherit; }
+}
+
+.acct_spinner { width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: acct_spin 0.7s linear infinite; display: inline-block; }
 @keyframes acct_spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .acct_spinner { animation-duration: 2s; } }
 
 .acct_notice {
-  border-radius: 0.75rem; padding: 0.8rem 0.95rem; font-size: 0.9rem; line-height: 1.5; margin: 0 0 1rem;
+  border-radius: 0.85rem; padding: 0.75rem 0.95rem; font-size: 0.88rem; line-height: 1.5; margin: 0 0 1rem;
   border: 1px solid var(--boutique-border); background: rgba(201, 168, 76, 0.08); color: var(--boutique-text);
   &.is_error { border-color: rgba(229, 72, 77, 0.5); background: rgba(229, 72, 77, 0.1); }
-  &.is_success { border-color: rgba(201, 168, 76, 0.55); }
+  &.is_success { border-color: rgba(201, 168, 76, 0.55); background: rgba(201, 168, 76, 0.1); }
   p { margin: 0; } p + p { margin-top: 0.35rem; }
 }
 
-.acct_row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.88rem; }
-.acct_foot { margin: 1.4rem 0 0; text-align: center; color: var(--boutique-muted); font-size: 0.9rem;
-  a { color: var(--boutique-gold); font-weight: 600; } }
-.acct_link { color: var(--boutique-gold); font-size: 0.88rem; &:hover { color: var(--boutique-gold-light); } }
+.acct_row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: -0.25rem; }
+.acct_foot { margin: 1.35rem 0 0; text-align: center; color: var(--boutique-muted); font-size: 0.88rem; }
+.acct_actions { display: grid; gap: 0.65rem; margin-top: 0.4rem; &.is_inline { margin-top: 0.25rem; } }
+.acct_loading { display: grid; place-items: center; align-content: center; gap: 0.75rem; min-height: 11rem; color: var(--boutique-muted); font-size: 0.9rem; }
 
-.acct_steps { margin: 0 0 1.25rem; padding-left: 1.2rem; color: var(--boutique-muted); font-size: 0.92rem; line-height: 1.6; strong { color: var(--boutique-text); } }
-.acct_actions { display: grid; gap: 0.65rem; margin-top: 0.5rem; }
-
-.acct_loading { display: grid; place-items: center; gap: 0.75rem; min-height: 14rem; color: var(--boutique-muted); }
-
-.acct_profile {
-  display: grid; gap: 0.15rem; margin: 0 0 1.25rem; padding: 1rem 1.1rem; border-radius: 0.9rem;
-  background: rgba(201, 168, 76, 0.06); border: 1px solid var(--boutique-border);
-  dt { font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--boutique-muted); margin-top: 0.6rem; &:first-child { margin-top: 0; } }
-  dd { margin: 0; font-size: 1rem; color: var(--boutique-text); word-break: break-word; }
+// verify-email steps
+.acct_steps {
+  list-style: none; counter-reset: step; margin: 0 0 1.3rem; padding: 0; display: grid; gap: 0.55rem; font-size: 0.88rem; line-height: 1.45; color: var(--boutique-muted);
+  li { counter-increment: step; display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.7rem 0.85rem; border-radius: 0.8rem; background: rgba(201, 168, 76, 0.06); border: 1px solid var(--boutique-border); }
+  li::before { content: counter(step); flex: none; width: 1.45rem; height: 1.45rem; display: grid; place-items: center; border-radius: 50%; font-size: 0.74rem; font-weight: 700; color: #1a1208; background: $gold-gradient; }
+  li > div { flex: 1; min-width: 0; }
+  strong { color: var(--boutique-text); font-weight: 600; }
+  span { opacity: 0.85; }
 }
-.acct_badge { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.5rem; padding: 0.1rem 0.55rem; border-radius: 999px;
-  font-size: 0.72rem; font-weight: 600; color: #1a1208; background: var(--boutique-gold); vertical-align: middle; }
-.acct_section_title { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--boutique-text); }
-.acct_divider { border: 0; border-top: 1px solid var(--boutique-border); margin: 1.5rem 0; opacity: 1; }
+
+// ───────────────────────────── Stage behind the modal on /login, /signup … ─────────────────────────────
+.acct_stage {
+  position: relative; min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; overflow: hidden; color: var(--boutique-text);
+  background: radial-gradient(70% 55% at 50% 38%, rgba(201, 168, 76, 0.13), transparent 70%), var(--boutique-bg);
+  &::before { content: ""; position: absolute; inset: 0; opacity: 0.5; pointer-events: none;
+    background-image: linear-gradient(rgba(201, 168, 76, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(201, 168, 76, 0.05) 1px, transparent 1px);
+    background-size: 56px 56px; mask-image: radial-gradient(circle at 50% 45%, #000, transparent 72%); -webkit-mask-image: radial-gradient(circle at 50% 45%, #000, transparent 72%); }
+}
+.acct_stage_inner { position: relative; display: grid; gap: 0.5rem; text-align: center; padding: 0 1.5rem; }
+.acct_stage_kicker { font-family: var(--font-display); font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 700; color: var(--boutique-gold-text); letter-spacing: 0.04em; }
+.acct_stage_line { font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--boutique-muted); }
+
+// ───────────────────────────── Account page shell + locked state ─────────────────────────────
+.acct_page {
+  background: var(--boutique-bg); color: var(--boutique-text); min-height: 75vh;
+  padding-top: 7rem; padding-bottom: 4rem;
+  @media (max-width: 575px) { padding-top: 6rem; padding-bottom: 3rem; }
+}
+.acct_card {
+  max-width: 30rem; margin: 0 auto; padding: 2rem 1.75rem; border-radius: 1.5rem;
+  background: linear-gradient(165deg, var(--boutique-surface), var(--boutique-panel-bg-end, var(--boutique-surface)));
+  border: 1px solid var(--boutique-modal-border, var(--boutique-border)); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  @media (max-width: 575px) { padding: 1.5rem 1.15rem; border-radius: 1.15rem; }
+}
+.acct_locked {
+  text-align: center;
+  .acct_title { font-size: clamp(1.4rem, 4vw, 1.7rem); }
+  .acct_lead { margin-bottom: 1.4rem; }
+}
+.acct_locked_icon { display: inline-grid; place-items: center; width: 4rem; height: 4rem; margin-bottom: 0.9rem; border-radius: 50%; color: var(--boutique-gold-text);
+  border: 1px solid var(--boutique-modal-border, var(--boutique-border)); background: radial-gradient(circle at 50% 35%, rgba(201, 168, 76, 0.2), rgba(201, 168, 76, 0.04) 70%); }
+
+// ───────────────────────────── My Account ─────────────────────────────
+.acct_account .container { max-width: 62rem; }
+
+.acct_hero {
+  position: relative; overflow: hidden; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.6rem; margin-bottom: 1.5rem; padding: 2rem 2.2rem;
+  border-radius: 1.6rem; border: 1px solid var(--boutique-modal-border, var(--boutique-border));
+  background:
+    radial-gradient(90% 140% at 0% 0%, rgba(201, 168, 76, 0.2), transparent 60%),
+    linear-gradient(165deg, var(--boutique-surface), var(--boutique-panel-bg-end, var(--boutique-surface)));
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  &::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, transparent, var(--boutique-gold), transparent); }
+  @media (max-width: 899.98px) { grid-template-columns: auto 1fr; padding: 1.6rem 1.5rem; .acct_hero_actions { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; } }
+  @media (max-width: 575.98px) { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 1.1rem; padding: 1.5rem 1.1rem; .acct_hero_actions { width: 100%; flex-direction: column; } }
+}
+.acct_avatar {
+  width: 5.6rem; height: 5.6rem; border-radius: 50%; display: grid; place-items: center; padding: 4px; background: $gold-gradient; box-shadow: 0 0 0 6px rgba(201, 168, 76, 0.1), 0 14px 34px rgba(0, 0, 0, 0.35);
+  span { width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; background: var(--boutique-bg); color: var(--boutique-gold-text); font-family: var(--font-display); font-size: 1.9rem; font-weight: 700; letter-spacing: 0.04em; }
+  @media (max-width: 575.98px) { width: 4.8rem; height: 4.8rem; span { font-size: 1.6rem; } }
+}
+.acct_hero_text { min-width: 0; .acct_eyebrow { margin-bottom: 0.2rem; } }
+.acct_hello { font-family: var(--font-display); font-size: clamp(1.7rem, 4.5vw, 2.35rem); font-weight: 700; line-height: 1.15; margin: 0 0 0.45rem; color: var(--boutique-text); em { font-style: normal; color: var(--boutique-gold-text); } }
+.acct_hero_sub { color: var(--boutique-muted); font-size: 0.93rem; line-height: 1.55; margin: 0 0 0.8rem; max-width: 30rem; }
+.acct_hero_actions { display: flex; flex-direction: column; gap: 0.6rem; min-width: 12.5rem; .acct_btn { width: 100%; } }
+
+.acct_badge {
+  display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.22rem 0.75rem; border-radius: 999px; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.03em;
+  color: #1a1208; background: $gold-gradient; vertical-align: middle;
+  &.is_soft { margin-left: 0.4rem; color: var(--boutique-gold-text); background: rgba(201, 168, 76, 0.12); border: 1px solid var(--boutique-border); padding: 0.1rem 0.55rem; font-size: 0.7rem; }
+}
+
+.acct_grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.5rem; align-items: start; @media (max-width: 899.98px) { grid-template-columns: 1fr; } }
+.acct_panel {
+  padding: 1.5rem; border-radius: 1.3rem; border: 1px solid var(--boutique-border);
+  background: linear-gradient(165deg, var(--boutique-surface), var(--boutique-panel-bg-end, var(--boutique-surface)));
+  display: grid; gap: 1.1rem; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.2);
+  @media (max-width: 575.98px) { padding: 1.2rem 1rem; }
+}
+.acct_panel_head {
+  display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+  h2 { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--boutique-text); }
+  p { margin: 0.1rem 0 0; font-size: 0.8rem; color: var(--boutique-muted); }
+  > div { flex: 1; min-width: 8rem; }
+}
+.acct_panel_icon { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 0.8rem; color: var(--boutique-gold-text); background: rgba(201, 168, 76, 0.1); border: 1px solid var(--boutique-border); flex: none; }
+.acct_rows {
+  margin: 0; display: grid; gap: 0.7rem;
+  > div { padding: 0.8rem 1rem; border-radius: 0.9rem; background: rgba(201, 168, 76, 0.05); border: 1px solid var(--boutique-border); }
+  dt { display: flex; align-items: center; gap: 0.45rem; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--boutique-muted); font-weight: 600; svg { color: var(--boutique-gold-text); } }
+  dd { margin: 0.3rem 0 0; font-size: 1rem; color: var(--boutique-text); word-break: break-word; }
+}
+.acct_hint_text { margin: -0.4rem 0 0; font-size: 0.8rem; color: var(--boutique-muted); text-align: center; }

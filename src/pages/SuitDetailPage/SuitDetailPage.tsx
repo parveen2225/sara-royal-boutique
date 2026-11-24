@@ -16,6 +16,7 @@ import TryOnPanel, { SparkleIcon } from "@/components/tryOn/TryOnPanel";
 import { fetchTryOnConfig, type TryOnConfig } from "@/lib/tryOnApi";
 import "@/components/tryOn/tryOn.scss";
 import "@/components/shop/shop.scss";
+import "./suitDetail.scss";
 
 type State = { id: string; suit?: PublicSuitDetail; status: "ok" | "notfound" | "error" };
 
@@ -82,7 +83,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   const waDisabled = !suit.inStock || (settings.ready && !settings.whatsappNumber);
 
   return (
-    <div className="boutique_page shop_page">
+    <div className="boutique_page shop_page shop_detail_page">
       <Container>
         <nav className="shop_crumbs" aria-label="Breadcrumb"><Link href="/">Home</Link><span>›</span><Link href="/collections">Collections</Link><span>›</span>{suit.name}</nav>
         <Row className="g-4 g-lg-5">

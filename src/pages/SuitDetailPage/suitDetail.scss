@@ -1,0 +1,4 @@
+// Suit detail page only. The Bootstrap row uses a 3rem gutter (g-lg-5), whose negative margins stick out past the container's
+// padding and added ~8px of horizontal scroll at 992-1599px. `clip` (unlike `hidden`) creates no scroll container, so sticky
+// elements keep working. Separate file on purpose: shop.scss is shared with Collections.
+.shop_detail_page { overflow-x: clip; }

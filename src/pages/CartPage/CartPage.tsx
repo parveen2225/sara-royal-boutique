@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Col, Container, Row } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import QuantityStepper from "@/components/shop/QuantityStepper";
 import ShoppingBagIcon from "@/components/shop/ShoppingBagIcon";
 import { cartStore } from "@/lib/cartStore";
@@ -13,7 +13,9 @@ import { validateCartOnServer } from "@/lib/shopApi";
 import { formatInrPaise } from "@/lib/money";
 import { buildOrderMessage, buildWhatsAppUrl } from "@/lib/suitWhatsapp";
 import { suitPublicUrl } from "@/lib/siteUrl";
+import { BoutiqueWhatsAppIcon } from "@/assets/icons/svgIcon";
 import "@/components/shop/shop.scss";
+import "./cart.scss";
 
 const ISSUE_TEXT: Record<CartIssue, string> = {
   not_found: "This suit no longer exists. Please remove it.",
@@ -21,6 +23,16 @@ const ISSUE_TEXT: Record<CartIssue, string> = {
   out_of_stock: "Out of stock. Please remove it to continue.",
   insufficient_stock: "Not enough stock for your quantity; we reduced it.",
 };
+
+const TrashIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12.2A1.8 1.8 0 008.8 21h6.4a1.8 1.8 0 001.8-1.8L18 7M9 7V4.8A.8.8 0 019.8 4h4.4a.8.8 0 01.8.8V7" /></svg>
+);
+const CheckDot = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M8.2 12.4l2.5 2.5 5-5.3" /></svg>
+);
+const AlertDot = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.4v.1" /></svg>
+);
 
 export default function CartPage() {
   const { items, count, subtotalPaise } = useCart();
@@ -110,46 +122,75 @@ export default function CartPage() {
   }
 
   return (
-    <div className="boutique_page shop_page">
+    <div className="boutique_page shop_page cart_page">
       <Container>
-        <header className="shop_hero" style={{ textAlign: "left", padding: "0 0 1rem" }}><h1>Your Cart <small className="text-muted" style={{ fontSize: "1rem" }}>({count} {count === 1 ? "item" : "items"})</small></h1></header>
+        <header className="cart_head">
+          <div>
+            <p className="shop_eyebrow">Sara Royal Boutique</p>
+            <h1>Your Cart</h1>
+          </div>
+          <span className="cart_count" aria-label={`${count} ${count === 1 ? "item" : "items"} in your cart`}>{count} {count === 1 ? "item" : "items"}</span>
+        </header>
         {error && <div className="shop_error" role="alert">{error}</div>}
         {notes.length > 0 && <div className="shop_notice" role="status"><strong>Updated:</strong> {notes.join(" · ")}</div>}
-        <Row className="g-4">
-          <Col lg={8}>
-            {items.map((i) => (
-              <div key={i.id} className={`shop_cart_line ${issues[i.id] ? "has_issue" : ""}`}>
-                <div className="shop_cart_img">{i.image && <Image src={i.image} alt={i.name} fill sizes="84px" style={{ objectFit: "cover" }} />}</div>
-                <div className="shop_cart_info">
-                  <h3><Link href={`/suits/${i.id}`}>{i.name}</Link></h3>
-                  <p className="shop_card_meta">{i.sku} · {formatInrPaise(i.unitPricePaise)} each</p>
-                  {issues[i.id] && <p className="shop_issue" role="alert">{ISSUE_TEXT[issues[i.id]]}</p>}
-                  <div className="shop_cart_row">
-                    {i.maxQuantity > 0 ? <QuantityStepper value={i.quantity} max={i.maxQuantity} onChange={(n) => cartStore.setQuantity(i.id, n)} label={`Quantity of ${i.name}`} /> : <span className="shop_stock_out">Unavailable</span>}
-                    <strong>{formatInrPaise(lineTotalPaise(i))}</strong>
-                    <button type="button" className="shop_link_btn" onClick={() => cartStore.remove(i.id)} aria-label={`Remove ${i.name}`}>Remove</button>
+
+        <div className="cart_layout">
+          <section aria-label="Cart items">
+            <ul className="cart_list">
+              {items.map((i) => (
+                <li key={i.id} className={`cart_item ${issues[i.id] ? "has_issue" : ""}`}>
+                  <Link href={`/suits/${i.id}`} className="cart_img" tabIndex={-1} aria-hidden="true">
+                    {i.image && <Image src={i.image} alt="" fill sizes="(max-width: 767px) 96px, 120px" />}
+                  </Link>
+                  <div className="cart_info">
+                    <h3 className="cart_name"><Link href={`/suits/${i.id}`}>{i.name}</Link></h3>
+                    <p className="cart_meta"><span className="cart_sku">{i.sku}</span><span className="cart_unit"><strong>{formatInrPaise(i.unitPricePaise)}</strong> each</span></p>
+                    {issues[i.id] && <p className="cart_issue" role="alert"><AlertDot /><span>{ISSUE_TEXT[issues[i.id]]}</span></p>}
+                    {i.maxQuantity > 0 ? <QuantityStepper value={i.quantity} max={i.maxQuantity} onChange={(n) => cartStore.setQuantity(i.id, n)} label={`Quantity of ${i.name}`} /> : <span className="cart_unavailable">Unavailable</span>}
+                  </div>
+                  <div className="cart_side">
+                    <div className="cart_line_total"><span>Subtotal</span><strong>{formatInrPaise(lineTotalPaise(i))}</strong></div>
+                    <button type="button" className="cart_remove" onClick={() => cartStore.remove(i.id)} aria-label={`Remove ${i.name}`}><TrashIcon /> Remove</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="cart_footer">
+              {confirmClear ? (
+                <div className="cart_confirm" role="group" aria-label="Confirm clearing the cart">
+                  <p>Remove all {count} {count === 1 ? "item" : "items"} from your cart?</p>
+                  <div className="cart_confirm_actions">
+                    <button type="button" className="cart_btn_danger" onClick={() => { cartStore.clear(); setConfirmClear(false); setIssues({}); }}>Yes, clear cart</button>
+                    <button type="button" className="cart_btn_ghost" onClick={() => setConfirmClear(false)}>Keep items</button>
                   </div>
                 </div>
-              </div>
-            ))}
-            <div className="mt-3">
-              {confirmClear ? (
-                <span>Remove everything? <button type="button" className="shop_link_btn" onClick={() => { cartStore.clear(); setConfirmClear(false); setIssues({}); }}>Yes, clear cart</button> · <button type="button" className="shop_link_btn" style={{ color: "inherit" }} onClick={() => setConfirmClear(false)}>Cancel</button></span>
               ) : (
-                <button type="button" className="shop_link_btn" onClick={() => setConfirmClear(true)}>Clear cart</button>
+                <button type="button" className="cart_remove cart_clear" onClick={() => setConfirmClear(true)}><TrashIcon /> Clear cart</button>
               )}
             </div>
-          </Col>
-          <Col lg={4}>
-            <aside className="shop_summary" aria-label="Order summary">
-              <div className="shop_summary_row"><span>Products total</span><span className="shop_total">{formatInrPaise(subtotalPaise)}</span></div>
-              <small>Shipping charges are not included. We confirm them on WhatsApp for your PIN code. Pay by Cash on Delivery or Prepaid UPI. Nothing is ordered until you send the message and we confirm.</small>
-              <button type="button" className="shop_btn shop_btn_wa shop_btn_block" onClick={checkout} disabled={checking || hasIssues || (settings.ready && !settings.whatsappNumber)}>{checking ? "Checking stock…" : "WhatsApp Checkout"}</button>
-              {settings.ready && !settings.whatsappNumber && <p className="text-muted small mt-2 mb-0">WhatsApp ordering is not available right now.</p>}
-              <Link href="/collections" className="shop_btn shop_btn_block mt-2">Continue shopping</Link>
-            </aside>
-          </Col>
-        </Row>
+          </section>
+
+          <aside className="cart_summary" aria-label="Order summary">
+            <h2>Order summary</h2>
+            <dl className="cart_rows">
+              <div className="cart_row"><dt>Items</dt><dd>{count}</dd></div>
+              <div className="cart_row"><dt>Products subtotal</dt><dd>{formatInrPaise(subtotalPaise)}</dd></div>
+              <div className="cart_row is_note"><dt>Shipping</dt><dd>Confirmed on WhatsApp</dd></div>
+              <div className="cart_row is_total"><dt>Total <small>(excl. shipping)</small></dt><dd className="shop_total">{formatInrPaise(subtotalPaise)}</dd></div>
+            </dl>
+            <p className="cart_fineprint">Shipping charges are not included in this total.</p>
+            <button type="button" className="cart_cta cart_cta_wa" onClick={checkout} disabled={checking || hasIssues || (settings.ready && !settings.whatsappNumber)}>
+              <BoutiqueWhatsAppIcon width={20} height={20} />{checking ? "Checking stock…" : "WhatsApp Checkout"}
+            </button>
+            {settings.ready && !settings.whatsappNumber && <p className="cart_wa_unavailable">WhatsApp ordering is not available right now.</p>}
+            <Link href="/collections" className="cart_cta cart_cta_secondary">Continue shopping</Link>
+            <ul className="cart_howto" aria-label="How ordering works">
+              <li><CheckDot /><span><strong>Shipping</strong> is confirmed on WhatsApp for your PIN code.</span></li>
+              <li><CheckDot /><span>Pay by <strong>Cash on Delivery</strong> or <strong>Prepaid UPI</strong>.</span></li>
+              <li><CheckDot /><span><strong>Nothing is ordered</strong> until you send the message and we confirm.</span></li>
+            </ul>
+          </aside>
+        </div>
       </Container>
     </div>
   );

@@ -63,6 +63,9 @@ $playfair:
   --boutique-gold: #c9a84c;
   --boutique-gold-light: #e8d4a0;
   --boutique-gold-dark: #8b6914;
+  // Gold used AS TEXT on this theme's surfaces (>= 4.5:1 on ivory, white and beige panels). The brand gold above is only
+  // 2.1:1 on ivory, so it stays for fills, borders and large decoration.
+  --boutique-gold-text: #7a5a10;
   --boutique-border: rgba(201, 168, 76, 0.3);
   --boutique-input-bg: #f5edd8;
   --boutique-shadow: rgba(139, 105, 20, 0.12);
@@ -141,6 +144,7 @@ $playfair:
   --boutique-gold: #c9a84c;
   --boutique-gold-light: #e8d4a0;
   --boutique-gold-dark: #8b6914;
+  --boutique-gold-text: #c9a84c; // 8:1 on the dark surfaces
   --boutique-border: rgba(201, 168, 76, 0.2);
   --boutique-input-bg: #0a1220;
   --boutique-shadow: rgba(0, 0, 0, 0.5);

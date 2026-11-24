@@ -4,6 +4,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import Header from "@/components/common/header/Header";
 import Footer from "@/components/common/footer/Footer";
+import { AuthLauncherProvider } from "@/components/account/AuthLauncher";
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;
@@ -18,11 +19,12 @@ const ConditionalLayout: React.FC<ConditionalLayoutProps> = ({ children }) => {
   const isAdmin = pathname?.startsWith("/admin");
 
   return (
-    <>
+    // The launcher is inert (and loads nothing) until the account icon is clicked; admin pages never use it.
+    <AuthLauncherProvider>
       {!isAdmin && <Header />}
       {children}
       {!isAdmin && <Footer />}
-    </>
+    </AuthLauncherProvider>
   );
 };
 

@@ -2,8 +2,9 @@
 // Verifying ID tokens needs only the PROJECT ID (Google's public signing keys are fetched by the SDK): no service-account
 // key exists in this project, so there is no admin credential to leak. Customer identity = the verified Firebase UID.
 // This is unrelated to the admin login (admin_session cookie + JWT_SECRET), which never accepts these tokens.
-import { getApps, initializeApp, type App } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
+// The Admin SDK is loaded lazily, only when a token actually has to be checked: requests without a token always get a
+// clean 401, and if the SDK cannot load on the host the failure is caught by the route (503 + logged error name).
+import type { App } from "firebase-admin/app";
 
 export type VerifiedCustomer = { uid: string; email: string; name: string; emailVerified: boolean; provider: string };
 export class CustomerAuthError extends Error {
@@ -28,10 +29,11 @@ export function setCustomerTokenVerifierForTests(v: Verifier | null) {
   testVerifier = v;
 }
 
-function verifier(): Verifier {
+async function verifier(): Promise<Verifier> {
   if (testVerifier && process.env.NODE_ENV === "test") return testVerifier;
   const projectId = customerProjectId();
   if (!projectId) throw new CustomerAuthError(503, "Customer accounts are not available right now.");
+  const [{ getApps, initializeApp }, { getAuth }] = await Promise.all([import("firebase-admin/app"), import("firebase-admin/auth")]);
   const app: App = getApps().find((a) => a.name === APP_NAME) ?? initializeApp({ projectId }, APP_NAME);
   return (token) => getAuth(app).verifyIdToken(token) as Promise<Decoded>;
 }
@@ -48,7 +50,7 @@ const bearer = (header: string | null) => {
 export async function requireVerifiedCustomer(headers: Headers): Promise<VerifiedCustomer> {
   const token = bearer(headers.get("authorization"));
   if (!token) throw new CustomerAuthError(401, "Please log in.");
-  const verify = verifier();
+  const verify = await verifier();
   let d: Decoded;
   try {
     d = await verify(token);

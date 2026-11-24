@@ -105,7 +105,7 @@ test("static: admin login, admin session and admin middleware are untouched", ()
 test("static: Firebase confined to customer-account code; Admin SDK server-only; no service-account key; no password storage or logging", () => {
   const files = walk(path.join(root, "src"));
   const rel = (f) => path.relative(root, f).split(path.sep).join("/");
-  const importsFirebase = files.filter((f) => /from ["']firebase(-admin)?\//.test(fs.readFileSync(f, "utf8"))).map(rel).sort();
+  const importsFirebase = files.filter((f) => /(from |import\()["']firebase(-admin)?\//.test(fs.readFileSync(f, "utf8"))).map(rel).sort();
   assert.deepEqual(importsFirebase, [
     "src/components/account/AuthProvider.tsx",
     "src/lib/customerAuth/firebaseClient.ts",

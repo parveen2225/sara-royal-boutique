@@ -12,7 +12,7 @@ const host = (uri.match(/@([^/?]+)/)?.[1] ?? uri.match(/\/\/([^/?]+)/)?.[1] ?? "
 console.log(`${dry ? "[dry run] " : ""}Target cluster host: ${host}`);
 
 const { default: mongoose } = await import("mongoose");
-const names = ["UnstitchedSuit", "SuitCategory", "SiteSettings", "AuditLog", "StockMovement", "SuitOrder", "SuitReturn", "SuitRefund", "Invoice", "UploadedAsset", "Counter", "TryOnJob", "TryOnAsset", "Admin"];
+const names = ["UnstitchedSuit", "SuitCategory", "SiteSettings", "AuditLog", "StockMovement", "SuitOrder", "SuitReturn", "SuitRefund", "Invoice", "UploadedAsset", "Counter", "TryOnJob", "TryOnAsset", "TryOnUsage", "Customer", "Admin"];
 const models = await Promise.all(names.map(async (n) => (await import(`../src/models/${n}.${n === "Admin" ? "js" : "ts"}`)).default));
 // autoCreate:false: merely loading a model must not create its collection (so --dry-run really changes nothing).
 // createIndexes() below creates a collection implicitly when it creates the first index on it.

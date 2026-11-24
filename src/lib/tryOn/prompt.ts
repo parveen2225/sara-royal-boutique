@@ -11,5 +11,6 @@ export function buildTryOnPrompt(style: TryOnStyle, suit: { name: string; fabric
     "Keep the customer's face, identity, skin tone, hair, body proportions, pose, background and lighting unchanged.",
     "Use the fabric's exact colours, print, pattern, border and embroidery from Image 2; do not invent new motifs or change colours.",
     "Natural garment fit and drape, modest and respectful styling, photorealistic, no text, no watermark.",
+    "Show the full outfit from head to feet in one portrait photo; return the image only.",
   ].filter(Boolean).join(" ");
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { TRYON_LIMITS, tryOnSettings } from "@/lib/tryOn/config";
-import { getTryOnProvider } from "@/lib/tryOn/providers";
+import { PROVIDER_LABEL, getTryOnProvider } from "@/lib/tryOn/providers";
 import { TRYON_CONSENT_VERSION, TRYON_DISCLAIMER, TRYON_STYLES } from "@/lib/tryOn/styles";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +13,7 @@ export async function GET() {
     data: {
       enabled: Boolean(provider),
       mode: provider ? (provider.isLive ? "live" : "mock") : "off",
+      processor: provider?.isLive ? PROVIDER_LABEL[provider.id] ?? null : null, // named in the privacy notice
       styles: TRYON_STYLES.map(({ key, label, description, needsReference }) => ({ key, label, description, needsReference: Boolean(needsReference) })),
       maxImageBytes: TRYON_LIMITS.maxInputBytes,
       acceptedTypes: TRYON_LIMITS.acceptedTypes,

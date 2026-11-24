@@ -19,16 +19,37 @@ export const TRYON_LIMITS = {
 
 export function tryOnSettings() {
   return {
-    provider: (process.env.TRYON_PROVIDER ?? "").trim().toLowerCase(), // "" | "off" = disabled, "mock" = local mock
+    provider: (process.env.TRYON_PROVIDER ?? "").trim().toLowerCase(), // "" | "off" = disabled, "mock" = local mock, "gemini" = live
     timeoutMs: int("TRYON_TIMEOUT_MS", 90_000, 5_000, 280_000),
     resultTtlMinutes: int("TRYON_RESULT_TTL_MINUTES", 60, 5, 24 * 60),
     inputTtlMinutes: int("TRYON_INPUT_TTL_MINUTES", 30, 5, 120), // hard ceiling; inputs are normally deleted right after generation
     dailyPerClient: int("TRYON_DAILY_LIMIT_PER_CLIENT", 5, 1, 100),
     dailyTotal: int("TRYON_DAILY_LIMIT_TOTAL", 100, 1, 100_000),
+    monthlyTotal: int("TRYON_MONTHLY_LIMIT_TOTAL", 300, 1, 1_000_000), // per provider: every generation attempt counts (cost cap)
     burstPer10Min: int("TRYON_BURST_LIMIT", 4, 1, 1000), // per IP, per server instance
     mockDelayMs: int("TRYON_MOCK_DELAY_MS", 2500, 0, 60_000),
     mockTestHooks: process.env.TRYON_MOCK_TEST_HOOKS === "true",
   };
+}
+
+const pick = <T extends string>(raw: string | undefined, allowed: readonly T[], fallback: T): T =>
+  (allowed as readonly string[]).includes((raw ?? "").trim()) ? ((raw ?? "").trim() as T) : fallback;
+
+/** Google Gemini image model settings (the API key itself is read only inside providers/gemini.ts). */
+export function geminiSettings() {
+  const model = (process.env.TRYON_GEMINI_MODEL ?? "").trim();
+  return {
+    model: /^[a-z0-9][a-z0-9.\-]{2,80}$/.test(model) ? model : "gemini-nano-banana-2.1",
+    imageSize: pick(process.env.TRYON_GEMINI_IMAGE_SIZE, ["1K", "2K"] as const, "1K"), // 4K is never used (cost)
+    aspectRatio: pick(process.env.TRYON_GEMINI_ASPECT_RATIO, ["2:3", "3:4", "4:5", "9:16"] as const, "2:3"), // portrait, full length
+    thinkingLevel: pick(process.env.TRYON_GEMINI_THINKING_LEVEL, ["", "minimal", "medium", "high"] as const, ""), // "" = model default
+  };
+}
+
+/** Calendar periods for the usage counters, in India Standard Time (UTC+5:30, no DST). */
+export function quotaPeriods(now = Date.now()) {
+  const ist = new Date(now + 330 * 60_000).toISOString();
+  return { day: ist.slice(0, 10), month: ist.slice(0, 7) };
 }
 
 export const JOB_TTL_MS = 24 * 60 * 60 * 1000; // job metadata (no images) kept a day for rate limiting, then deleted

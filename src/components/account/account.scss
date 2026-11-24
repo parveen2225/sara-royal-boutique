@@ -1,0 +1,104 @@
+// Customer account pages (signup, login, forgot password, verify email, my account).
+// Uses the site's theme variables (gold / ivory / navy, light + dark). Scoped under .acct_* so no other page changes.
+
+.acct_page {
+  background: var(--boutique-bg); color: var(--boutique-text); min-height: 75vh;
+  padding-top: 7rem; padding-bottom: 4rem;
+  @media (max-width: 575px) { padding-top: 6rem; padding-bottom: 3rem; }
+}
+
+.acct_card {
+  max-width: 30rem; margin: 0 auto; padding: 2rem 1.75rem;
+  background: var(--boutique-card-bg, var(--boutique-surface)); border: 1px solid var(--boutique-border);
+  border-radius: 1.25rem; box-shadow: var(--boutique-card-shadow, none);
+  @media (max-width: 575px) { padding: 1.5rem 1.15rem; border-radius: 1rem; }
+  &.is_wide { max-width: 40rem; }
+}
+
+.acct_eyebrow { font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--boutique-gold); font-weight: 600; margin: 0 0 0.4rem; }
+.acct_title { font-family: var(--font-display); font-size: clamp(1.55rem, 4vw, 1.9rem); font-weight: 700; color: var(--boutique-text); margin: 0 0 0.5rem; }
+.acct_lead { color: var(--boutique-muted); font-size: 0.95rem; line-height: 1.55; margin: 0 0 1.5rem; }
+
+.acct_form { display: grid; gap: 1rem; }
+
+.acct_field {
+  display: grid; gap: 0.35rem;
+  label { font-size: 0.86rem; font-weight: 600; color: var(--boutique-text); }
+  .acct_input_wrap { position: relative; }
+  input {
+    width: 100%; min-height: 46px; padding: 0.7rem 0.95rem; border-radius: 0.75rem; font-size: 1rem; // 16px: no iOS zoom
+    background: var(--boutique-input-bg); color: var(--boutique-text); border: 1px solid var(--boutique-border);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    &::placeholder { color: var(--boutique-muted); opacity: 0.8; }
+    &:focus { outline: none; border-color: var(--boutique-gold); box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.22); }
+    &[aria-invalid="true"] { border-color: #e5484d; }
+    &:disabled { opacity: 0.6; }
+  }
+  &.has_toggle input { padding-right: 3.1rem; }
+  .acct_toggle {
+    position: absolute; top: 50%; right: 0.35rem; transform: translateY(-50%); width: 2.6rem; height: 2.6rem;
+    display: grid; place-items: center; border: 0; border-radius: 0.6rem; background: transparent; color: var(--boutique-muted); cursor: pointer;
+    &:hover { color: var(--boutique-gold); }
+    &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 1px; }
+  }
+  .acct_error { color: #ff8b98; font-size: 0.82rem; margin: 0; }
+  .acct_hint { color: var(--boutique-muted); font-size: 0.8rem; margin: 0; }
+}
+.theme-light .acct_field .acct_error { color: #c62828; }
+
+.acct_rules {
+  list-style: none; padding: 0; margin: 0.15rem 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.75rem;
+  font-size: 0.78rem; color: var(--boutique-muted);
+  li { display: flex; align-items: center; gap: 0.35rem; }
+  li::before { content: "○"; font-size: 0.7rem; }
+  li.is_met { color: var(--boutique-gold); }
+  li.is_met::before { content: "●"; }
+  @media (max-width: 380px) { grid-template-columns: 1fr; }
+}
+
+.acct_btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 46px; padding: 0.7rem 1.4rem;
+  border-radius: 999px; border: 1px solid var(--boutique-gold); font-weight: 600; font-size: 0.95rem; cursor: pointer;
+  background: transparent; color: var(--boutique-gold); text-decoration: none; transition: all 0.2s ease;
+  &:hover:not(:disabled) { background: var(--boutique-gold); color: #1a1208; }
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 3px; }
+  &.is_solid { background: linear-gradient(135deg, var(--boutique-gold-light), var(--boutique-gold)); color: #1a1208; border-color: transparent;
+    &:hover:not(:disabled) { filter: brightness(1.06); } }
+  &.is_block { width: 100%; }
+  &.is_link { border: 0; min-height: auto; padding: 0; background: none; color: var(--boutique-gold); text-decoration: underline; font-weight: 500;
+    &:hover:not(:disabled) { background: none; color: var(--boutique-gold-light); } }
+}
+
+.acct_spinner { width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: acct_spin 0.7s linear infinite; }
+@keyframes acct_spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .acct_spinner { animation-duration: 2s; } }
+
+.acct_notice {
+  border-radius: 0.75rem; padding: 0.8rem 0.95rem; font-size: 0.9rem; line-height: 1.5; margin: 0 0 1rem;
+  border: 1px solid var(--boutique-border); background: rgba(201, 168, 76, 0.08); color: var(--boutique-text);
+  &.is_error { border-color: rgba(229, 72, 77, 0.5); background: rgba(229, 72, 77, 0.1); }
+  &.is_success { border-color: rgba(201, 168, 76, 0.55); }
+  p { margin: 0; } p + p { margin-top: 0.35rem; }
+}
+
+.acct_row { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; font-size: 0.88rem; }
+.acct_foot { margin: 1.4rem 0 0; text-align: center; color: var(--boutique-muted); font-size: 0.9rem;
+  a { color: var(--boutique-gold); font-weight: 600; } }
+.acct_link { color: var(--boutique-gold); font-size: 0.88rem; &:hover { color: var(--boutique-gold-light); } }
+
+.acct_steps { margin: 0 0 1.25rem; padding-left: 1.2rem; color: var(--boutique-muted); font-size: 0.92rem; line-height: 1.6; strong { color: var(--boutique-text); } }
+.acct_actions { display: grid; gap: 0.65rem; margin-top: 0.5rem; }
+
+.acct_loading { display: grid; place-items: center; gap: 0.75rem; min-height: 14rem; color: var(--boutique-muted); }
+
+.acct_profile {
+  display: grid; gap: 0.15rem; margin: 0 0 1.25rem; padding: 1rem 1.1rem; border-radius: 0.9rem;
+  background: rgba(201, 168, 76, 0.06); border: 1px solid var(--boutique-border);
+  dt { font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--boutique-muted); margin-top: 0.6rem; &:first-child { margin-top: 0; } }
+  dd { margin: 0; font-size: 1rem; color: var(--boutique-text); word-break: break-word; }
+}
+.acct_badge { display: inline-flex; align-items: center; gap: 0.3rem; margin-left: 0.5rem; padding: 0.1rem 0.55rem; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 600; color: #1a1208; background: var(--boutique-gold); vertical-align: middle; }
+.acct_section_title { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.75rem; color: var(--boutique-text); }
+.acct_divider { border: 0; border-top: 1px solid var(--boutique-border); margin: 1.5rem 0; opacity: 1; }

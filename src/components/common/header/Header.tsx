@@ -9,6 +9,7 @@ import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { useTheme } from "@/components/theme/ThemeProvider";
 import { useCart } from "@/lib/useShop";
 import ShoppingBagIcon from "@/components/shop/ShoppingBagIcon";
+import { isAccountLinkHiddenOn, isCustomerAuthConfigured } from "@/lib/customerAuth/publicConfig";
 import {
   BoutiqueWhatsAppIcon,
   BoutiqueInstagramIcon,
@@ -41,6 +42,8 @@ const Header: React.FC = () => {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
   const { count: cartCount } = useCart();
+  // Customer account link: only once Firebase is configured, and never on Collections / About (they stay unchanged).
+  const showAccount = isCustomerAuthConfigured() && !isAccountLinkHiddenOn(pathname);
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const [prevPathname, setPrevPathname] = useState(pathname);
 
@@ -131,6 +134,17 @@ const Header: React.FC = () => {
               <ShoppingBagIcon size={20} />
               {cartCount > 0 && <span className="header_cart_badge" aria-hidden="true">{cartCount > 99 ? "99+" : cartCount}</span>}
             </Link>
+            {showAccount && (
+              <Link
+                href="/my-account"
+                className={`header_cart_btn header_account_btn ${/^\/(my-account|login|signup|verify-email|forgot-password)/.test(pathname ?? "") ? "is_active" : ""}`}
+                aria-label="My account"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+                </svg>
+              </Link>
+            )}
             <CommonButton
               role="link"
               to={getWhatsAppUrl()}

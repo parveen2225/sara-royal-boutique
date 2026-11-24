@@ -195,7 +195,7 @@ export default function TryOnPanel({ show, onClose, config, suit, shopping }: Pr
                 <section className="tryon_privacy" aria-labelledby={`${uid}-privacy`}>
                   <h3 id={`${uid}-privacy`} className="tryon_h">3. Your privacy</h3>
                   <ul>
-                    <li>{live ? "Your photo is sent securely to our AI image service only to create this preview." : "Test mode: your photo is processed only on our own server; no AI service is used yet."}</li>
+                    <li>{live ? (config.processor ? `Your photo is sent securely to ${config.processor}, our AI image service, only to create this preview. Google does not use it to improve its products.` : "Your photo is sent securely to our AI image service only to create this preview.") : "Test mode: your photo is processed only on our own server; no AI service is used yet."}</li>
                     <li>It is never published, never added to our galleries and never used to train AI by us.</li>
                     <li>Your photo is deleted as soon as the preview is ready; the preview itself is deleted within {config.resultRetentionMinutes} minutes, or immediately when you close this window.</li>
                   </ul>

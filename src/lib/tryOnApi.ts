@@ -2,7 +2,7 @@
 
 export type TryOnStyleOption = { key: string; label: string; description: string; needsReference: boolean };
 export type TryOnConfig = {
-  enabled: boolean; mode: "live" | "mock" | "off"; styles: TryOnStyleOption[]; maxImageBytes: number; acceptedTypes: string[];
+  enabled: boolean; mode: "live" | "mock" | "off"; processor?: string | null; styles: TryOnStyleOption[]; maxImageBytes: number; acceptedTypes: string[];
   minPersonSide: number; resultRetentionMinutes: number; dailyLimit: number; disclaimer: string; consentVersion: string;
 };
 export type TryOnJobStatus = {

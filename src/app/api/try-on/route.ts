@@ -8,7 +8,7 @@ import { TRYON_LIMITS, tryOnSettings } from "@/lib/tryOn/config";
 import { TryOnInputError, normalizeCustomerImage } from "@/lib/tryOn/image";
 import { getTryOnProvider } from "@/lib/tryOn/providers";
 import { TRYON_CONSENT_VERSION, styleByKey } from "@/lib/tryOn/styles";
-import { TryOnLimitError, clientHashOf, createJob, enforceLimits, processJob, sweepExpired } from "@/lib/tryOn/service";
+import { TryOnLimitError, clientHashOf, createJob, processJob, sweepExpired } from "@/lib/tryOn/service";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     await connectMongo();
     await sweepExpired();
     const clientHash = clientHashOf(ip);
-    await enforceLimits(clientHash);
+    // createJob enforces one active job per client and atomically reserves the daily/monthly caps.
     const created = await createJob({ suitId, style, person: personImg, reference: refImg, clientHash, testOutcome: req.headers.get("x-tryon-mock-outcome") ?? undefined });
     if (!created) return jsonError("This suit is not available for try-on.", 404);
     inBackground(() => processJob(created.jobId));

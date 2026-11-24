@@ -2,8 +2,9 @@ import connectMongo from "@/lib/mongodb";
 import UnstitchedSuit from "@/models/UnstitchedSuit";
 import TryOnJob from "@/models/TryOnJob";
 import TryOnAsset from "@/models/TryOnAsset";
+import TryOnUsage from "@/models/TryOnUsage";
 import { isCloudinaryImageUrl } from "@/lib/cloudinaryUrl";
-import { JOB_TTL_MS, hmac, newAccessToken, safeEqual, sha256, signedResultPath, tryOnSettings } from "./config";
+import { JOB_TTL_MS, hmac, newAccessToken, quotaPeriods, safeEqual, sha256, signedResultPath, tryOnSettings } from "./config";
 import { reencode, storedBytes, type NormalizedImage } from "./image";
 import { buildTryOnPrompt } from "./prompt";
 import { getTryOnProvider } from "./providers";
@@ -18,7 +19,7 @@ const MAX_FABRIC_BYTES = 10 * 1024 * 1024;
 export class TryOnLimitError extends Error {}
 
 type JobDoc = {
-  _id: { toString(): string }; status: string; suitId: unknown; suitName: string; style: string; provider: string; hasReference: boolean;
+  _id: { toString(): string }; status: string; clientHash: string; suitId: unknown; suitName: string; style: string; provider: string; hasReference: boolean;
   tokenHash: string; attempts: number; startedAt: Date | null; finishedAt: Date | null; errorCode: string; resultExpiresAt: Date | null;
   testOutcome: string; createdAt: Date; expiresAt: Date;
 };
@@ -31,18 +32,57 @@ export async function sweepExpired(now = new Date()) {
   await TryOnJob.deleteMany({ expiresAt: { $lte: now } });
 }
 
-export async function enforceLimits(clientHash: string, now = Date.now()) {
-  const s = tryOnSettings();
-  const since = new Date(now - 24 * 60 * MIN);
-  const [mine, active, total] = await Promise.all([
-    TryOnJob.countDocuments({ clientHash, createdAt: { $gte: since } }),
-    TryOnJob.countDocuments({ clientHash, status: { $in: ["queued", "processing"] } }),
-    TryOnJob.countDocuments({ createdAt: { $gte: since } }),
-  ]);
-  if (active > 0) throw new TryOnLimitError("Your previous preview is still being created. Please wait for it to finish.");
-  if (mine >= s.dailyPerClient) throw new TryOnLimitError(`You have reached today's limit of ${s.dailyPerClient} previews. Please try again tomorrow.`);
-  if (total >= s.dailyTotal) throw new TryOnLimitError("AI Try-On has reached today's limit. Please try again tomorrow.");
+const DAY_MS = 24 * 60 * MIN;
+const isDuplicateKey = (e: unknown) => (e as { code?: number } | null)?.code === 11000;
+
+/** Counter keys for one request: per client per day, all clients per day, per provider per month (IST periods). */
+export function usageKeys(clientHash: string, provider: string, now = Date.now()) {
+  const p = quotaPeriods(now);
+  return { client: `client:${clientHash}:${p.day}`, day: `day:${p.day}`, month: `month:${provider}:${p.month}` };
 }
+
+/**
+ * Atomically takes one unit of a counter if it is below `limit`. Safe under any concurrency: the increment is a single
+ * conditional update, so two simultaneous requests can never both take the last unit.
+ */
+export async function reserveUsage(key: string, limit: number, ttlMs: number, now = Date.now()): Promise<boolean> {
+  try {
+    await TryOnUsage.updateOne({ _id: key }, { $setOnInsert: { count: 0, expiresAt: new Date(now + ttlMs) } }, { upsert: true });
+  } catch (e) {
+    if (!isDuplicateKey(e)) throw e; // another request created the counter at the same moment: fine
+  }
+  const r = await TryOnUsage.updateOne({ _id: key, count: { $lt: limit } }, { $inc: { count: 1 } });
+  return r.modifiedCount === 1;
+}
+
+export async function releaseUsage(keys: string[]) {
+  for (const key of keys) await TryOnUsage.updateOne({ _id: key, count: { $gt: 0 } }, { $inc: { count: -1 } }).catch(() => undefined);
+}
+
+/**
+ * Reserves today's per-client and global units and this month's provider unit, all or nothing.
+ * Returns the reserved keys (released again if the job cannot be created).
+ */
+export async function reserveQuota(clientHash: string, provider: string, now = Date.now()): Promise<string[]> {
+  const s = tryOnSettings();
+  const k = usageKeys(clientHash, provider, now);
+  const plan: [string, number, number, string][] = [
+    [k.client, s.dailyPerClient, 2 * DAY_MS, `You have reached today's limit of ${s.dailyPerClient} previews. Please try again tomorrow.`],
+    [k.day, s.dailyTotal, 2 * DAY_MS, "AI Try-On has reached today's limit. Please try again tomorrow."],
+    [k.month, s.monthlyTotal, 40 * DAY_MS, "AI Try-On has reached this month's limit. Please try again next month."],
+  ];
+  const taken: string[] = [];
+  for (const [key, limit, ttl, message] of plan) {
+    if (!(await reserveUsage(key, limit, ttl, now))) {
+      await releaseUsage(taken);
+      throw new TryOnLimitError(message);
+    }
+    taken.push(key);
+  }
+  return taken;
+}
+
+const ACTIVE_MESSAGE = "Your previous preview is still being created. Please wait for it to finish.";
 
 export async function createJob(args: { suitId: string; style: TryOnStyle; person: NormalizedImage; reference: NormalizedImage | null; clientHash: string; testOutcome?: string }) {
   const s = tryOnSettings();
@@ -51,20 +91,37 @@ export async function createJob(args: { suitId: string; style: TryOnStyle; perso
   const suit = await UnstitchedSuit.findOne({ _id: args.suitId, status: "published" }).select("name").lean<{ _id: unknown; name: string }>();
   if (!suit) return null;
   const now = Date.now();
+
+  // One active job per client. Jobs abandoned past the timeout (e.g. the server restarted mid-job) stop blocking.
+  const stale = { clientHash: args.clientHash, status: { $in: ["queued", "processing"] }, createdAt: { $lt: new Date(now - s.timeoutMs - 2 * MIN) } };
+  await TryOnJob.updateMany(stale, { $set: { status: "failed", errorCode: "timeout", finishedAt: new Date(now) }, $unset: { active: 1 } });
+  if (await TryOnJob.exists({ clientHash: args.clientHash, status: { $in: ["queued", "processing"] } })) throw new TryOnLimitError(ACTIVE_MESSAGE);
+
+  const reserved = await reserveQuota(args.clientHash, provider.id, now);
   const token = newAccessToken();
-  const job = await TryOnJob.create({
-    suitId: suit._id, suitName: suit.name, style: args.style.key, provider: provider.id, hasReference: Boolean(args.reference),
-    consentAt: new Date(now), consentVersion: TRYON_CONSENT_VERSION, clientHash: args.clientHash, tokenHash: sha256(token),
-    testOutcome: s.mockTestHooks && provider.id === "mock" ? args.testOutcome || process.env.TRYON_MOCK_FORCE_OUTCOME || "" : "",
-    expiresAt: new Date(now + JOB_TTL_MS),
-  });
+  let job: { _id: unknown };
+  try {
+    job = await TryOnJob.create({
+      suitId: suit._id, suitName: suit.name, style: args.style.key, provider: provider.id, hasReference: Boolean(args.reference),
+      consentAt: new Date(now), consentVersion: TRYON_CONSENT_VERSION, clientHash: args.clientHash, tokenHash: sha256(token),
+      active: true, // unique per client while active (race-proof backstop for the check above)
+      testOutcome: s.mockTestHooks && provider.id === "mock" ? args.testOutcome || process.env.TRYON_MOCK_FORCE_OUTCOME || "" : "",
+      expiresAt: new Date(now + JOB_TTL_MS),
+    });
+  } catch (e) {
+    await releaseUsage(reserved);
+    if (isDuplicateKey(e)) throw new TryOnLimitError(ACTIVE_MESSAGE);
+    throw e;
+  }
   const inputExpiry = new Date(now + s.inputTtlMinutes * MIN);
   const assets = [{ jobId: job._id, kind: "person", contentType: args.person.contentType, width: args.person.width, height: args.person.height, bytes: args.person.bytes, expiresAt: inputExpiry }];
   if (args.reference) assets.push({ jobId: job._id, kind: "reference", contentType: args.reference.contentType, width: args.reference.width, height: args.reference.height, bytes: args.reference.bytes, expiresAt: inputExpiry });
   try {
     await TryOnAsset.insertMany(assets);
   } catch (e) {
+    await TryOnAsset.deleteMany({ jobId: job._id });
     await TryOnJob.deleteOne({ _id: job._id });
+    await releaseUsage(reserved);
     throw e;
   }
   return { jobId: String(job._id), token };
@@ -93,11 +150,11 @@ export async function processJob(jobId: string) {
   const job = await TryOnJob.findOneAndUpdate(
     { _id: jobId, status: "queued" },
     { $set: { status: "processing", startedAt: new Date() }, $inc: { attempts: 1 } },
-    { new: true },
+    { returnDocument: "after" },
   ).lean<JobDoc>();
   if (!job) return;
   const fail = async (code: ProviderErrorCode | "fabric_unavailable") => {
-    await TryOnJob.updateOne({ _id: job._id, status: "processing" }, { $set: { status: "failed", errorCode: code, finishedAt: new Date() } });
+    await TryOnJob.updateOne({ _id: job._id, status: "processing" }, { $set: { status: "failed", errorCode: code, finishedAt: new Date() }, $unset: { active: 1 } });
   };
   try {
     const provider = getTryOnProvider();
@@ -131,11 +188,13 @@ export async function processJob(jobId: string) {
         const result = await reencode(out.bytes);
         const resultExpiresAt = new Date(Date.now() + s.resultTtlMinutes * MIN);
         await TryOnAsset.create({ jobId: job._id, kind: "result", contentType: result.contentType, width: result.width, height: result.height, bytes: result.bytes, expiresAt: resultExpiresAt });
-        await TryOnJob.updateOne({ _id: job._id, status: "processing" }, { $set: { status: "succeeded", finishedAt: new Date(), resultExpiresAt } });
+        await TryOnJob.updateOne({ _id: job._id, status: "processing" }, { $set: { status: "succeeded", finishedAt: new Date(), resultExpiresAt }, $unset: { active: 1 } });
         return;
       } catch (e) {
         const err = e instanceof TryOnProviderError ? e : new TryOnProviderError(isAbort(e) ? "timeout" : "unknown", "provider error");
-        if (err.retryable && attempt < 2 && deadline - Date.now() > 5_000 && err.code !== "timeout") continue;
+        // A retry is another (billable) generation: it needs its own unit of this month's cap.
+        if (err.retryable && attempt < 2 && deadline - Date.now() > 5_000 && err.code !== "timeout"
+          && (await reserveUsage(usageKeys(job.clientHash, provider.id).month, s.monthlyTotal, 40 * DAY_MS))) continue;
         return await fail(err.code);
       }
     }
@@ -161,7 +220,7 @@ export async function loadJobForClient(jobId: string, token: string | null) {
 export async function reconcile(job: JobDoc, now = Date.now()) {
   const s = tryOnSettings();
   if (job.status === "processing" && job.startedAt && now - job.startedAt.getTime() > s.timeoutMs + 30_000) {
-    await TryOnJob.updateOne({ _id: job._id, status: "processing" }, { $set: { status: "failed", errorCode: "timeout", finishedAt: new Date(now) } });
+    await TryOnJob.updateOne({ _id: job._id, status: "processing" }, { $set: { status: "failed", errorCode: "timeout", finishedAt: new Date(now) }, $unset: { active: 1 } });
     await deleteInputs(job._id);
     return { ...job, status: "failed", errorCode: "timeout" };
   }
@@ -185,5 +244,5 @@ export function publicJob(job: JobDoc & { status: string }) {
 
 export async function deleteJob(jobId: string) {
   await TryOnAsset.deleteMany({ jobId });
-  await TryOnJob.updateOne({ _id: jobId }, { $set: { status: "deleted", errorCode: "" } });
+  await TryOnJob.updateOne({ _id: jobId }, { $set: { status: "deleted", errorCode: "" }, $unset: { active: 1 } });
 }

@@ -15,6 +15,9 @@ const schema = new Schema(
     clientHash: { type: String, required: true }, // HMAC of the client IP (rate limits only)
     tokenHash: { type: String, required: true }, // SHA-256 of the access token handed to the customer
     attempts: { type: Number, default: 0 },
+    // true while queued/processing: a partial UNIQUE index allows only one active job per client, even under
+    // concurrent requests. Cleared ($unset) whenever the job finishes, fails, times out or is deleted.
+    active: { type: Boolean },
     startedAt: { type: Date, default: null },
     finishedAt: { type: Date, default: null },
     errorCode: { type: String, default: "" },
@@ -27,5 +30,6 @@ const schema = new Schema(
 schema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 schema.index({ clientHash: 1, createdAt: -1 });
 schema.index({ createdAt: -1 });
+schema.index({ clientHash: 1 }, { unique: true, partialFilterExpression: { active: true }, name: "one_active_job_per_client" });
 
 export default mongoose.models.TryOnJob || mongoose.model("TryOnJob", schema);

@@ -65,9 +65,9 @@ test("route files export only HTTP handlers and route config (Next.js rejects an
 test("Cloudinary cleanup: every model that stores images is covered by the 'is this image still used?' check", () => {
   const modelsDir = path.resolve(import.meta.dirname, "../src/models");
   const refs = fs.readFileSync(path.resolve(import.meta.dirname, "../src/lib/assetRefs.ts"), "utf8");
-  // the invoice keeps its own logo BYTES; UploadedAsset is the tracking table itself; TryOnJob/TryOnAsset hold private, temporary
+  // the invoice keeps its own logo BYTES; UploadedAsset is the tracking table itself; TryOnUsage holds only counters; TryOnJob/TryOnAsset hold private, temporary
   // try-on image BYTES in MongoDB (never Cloudinary URLs) and expire on their own.
-  const notImages = new Set(["Invoice", "UploadedAsset", "TryOnJob", "TryOnAsset"]);
+  const notImages = new Set(["Invoice", "UploadedAsset", "TryOnJob", "TryOnAsset", "TryOnUsage"]);
   const missing = [];
   for (const f of fs.readdirSync(modelsDir)) {
     const name = f.replace(/\.(ts|js)$/, "");

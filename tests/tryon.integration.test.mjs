@@ -240,10 +240,13 @@ test("abuse limits: one active job per client, daily per-client cap, burst limit
   const b = await post({ suitId: id }, { ipAddr: me });
   assert.equal(b.status, 429);
   assert.match(b.body.message, /still being created/);
-  // two more finished jobs today for this client -> 3 in total = the daily cap
-  await Job.updateMany({}, { $set: { status: "failed" } });
+  // the refused request did not use up a daily unit; two more previews today -> 3 in total = the daily cap
+  await Job.updateMany({}, { $set: { status: "failed" }, $unset: { active: 1 } });
   const hash = (await Job.findOne({ _id: a.body.data.id }).lean()).clientHash;
-  for (let i = 0; i < 2; i++) await Job.create({ suitId: suit._id, suitName: "x", style: "default", provider: "mock", consentAt: new Date(), consentVersion: "v", clientHash: hash, tokenHash: "h" + i, status: "succeeded", expiresAt: new Date(Date.now() + 3600_000) });
+  const key = S.usageKeys(hash, "mock").client;
+  const Usage = (await import("../src/models/TryOnUsage.ts")).default;
+  assert.equal((await Usage.findById(key).lean()).count, 1);
+  await Usage.updateOne({ _id: key }, { $inc: { count: 2 } });
   const { resetRateLimit } = await import("../src/lib/rateLimit.ts");
   resetRateLimit(`tryon:${me}`); // isolate the DAILY cap from the short burst limiter
   const capped = await post({ suitId: id }, { ipAddr: me });

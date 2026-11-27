@@ -78,3 +78,36 @@
 .admin_timeline { list-style: none; padding: 0; margin: 0; li { padding: 0.4rem 0 0.4rem 1rem; border-left: 2px solid var(--border-color); font-size: 0.85rem; } }
 .admin_two_col { display: grid; gap: 1rem; grid-template-columns: 1fr; @media (min-width: 992px) { grid-template-columns: 1fr 1fr; } }
 .admin_card_pad { padding: 1rem 1.1rem; }
+
+// ---- stock: Edit Suit panel + Adjust stock dialog ----------------------------------------------------------------------------
+// Uses the admin design tokens (--ad-*), with fallbacks for screens outside .admin_root.
+.admin_stock_panel {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.25rem; padding: 1rem 1.1rem;
+  .admin_stock_panel_main { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+  .admin_stock_panel_label { color: var(--ad-muted, #94a3b8); font-size: 0.85rem; font-weight: 500; }
+  .admin_stock_panel_value { font-size: 1.75rem; line-height: 1; font-weight: 700; color: var(--ad-text, inherit); font-variant-numeric: tabular-nums; }
+  .admin_stock_panel_hint { flex: 1 1 260px; margin: 0; color: var(--ad-muted, #94a3b8); font-size: 0.85rem; line-height: 1.5; }
+  @media (max-width: 575px) { > .admin_primary_btn { width: 100%; justify-content: center; } }
+}
+
+.commonModal.modal.admin_stock_modal {
+  .admin_stock_suit { margin: -6px 0 14px; color: var(--ad-muted, #94a3b8); font-size: 0.9rem; strong { color: var(--ad-text, inherit); } span { white-space: nowrap; } }
+  .admin_stock_summary { display: flex; align-items: stretch; gap: 0.6rem; margin-bottom: 1rem; }
+  .admin_stock_arrow { align-self: center; color: var(--ad-faint, #74767f); font-size: 1.2rem; }
+  .admin_stock_box {
+    flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; padding: 0.75rem 0.85rem;
+    border-radius: var(--ad-radius-sm, 10px); border: 1px solid var(--ad-border-strong, rgba(255, 255, 255, 0.13)); background: var(--ad-surface-2, transparent);
+    &.is_updated.has_change { border-color: rgba(201, 168, 76, 0.45); background: var(--ad-gold-soft, rgba(201, 168, 76, 0.12)); }
+    &.is_invalid { border-color: var(--ad-red, #f08a84); }
+  }
+  .admin_stock_box_label { font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ad-muted, #94a3b8); }
+  .admin_stock_box_value { font-size: 1.6rem; line-height: 1.1; font-weight: 700; color: var(--ad-text, inherit); font-variant-numeric: tabular-nums; }
+  .admin_stock_box_hint { font-size: 0.78rem; color: var(--ad-muted, #94a3b8); font-variant-numeric: tabular-nums; }
+  .admin_stock_problem { margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--ad-red, #f08a84); }
+  .admin_stock_history {
+    margin-top: 1rem; border-top: 1px solid var(--ad-border, rgba(255, 255, 255, 0.07)); padding-top: 0.75rem;
+    summary { cursor: pointer; color: var(--ad-muted, #94a3b8); font-size: 0.85rem; }
+    .admin_stock_history_scroll { overflow-x: auto; }
+    .admin_history_table { min-width: 460px; }
+  }
+}

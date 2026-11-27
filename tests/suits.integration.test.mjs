@@ -245,6 +245,28 @@ test("stock: set / adjust with history; never negative; reasons required", async
   assert.deepEqual(hist.body.data.map((m) => m.resultingQty), [8, 7, 10]); // newest first
 });
 
+test("stock: admin add/remove keeps published status, records 'restock', and never changes stock without its audit row", async () => {
+  const t = await owner();
+  const s = (await create(t, base({ stock: 5, fabricImages: [u(1)], status: "published" }))).body.data;
+  assert.equal(s.status, "published");
+  const add = await stock(t, s.id, { mode: "adjust", quantity: 4, reason: "restock", note: "supplier delivery" });
+  assert.deepEqual([add.status, add.body.data.previousQty, add.body.data.change, add.body.data.stock, add.body.data.stockState], [200, 5, 4, 9, "in_stock"]);
+  const empty = await stock(t, s.id, { mode: "adjust", quantity: -9, reason: "correction" });
+  assert.deepEqual([empty.body.data.stock, empty.body.data.stockState], [0, "out_of_stock"]);
+  assert.equal((await get(t, s.id)).body.data.status, "published"); // stock changes never touch status
+  assert.equal((await Movement.findOne({ suitId: s.id, reason: "restock" }).lean()).note, "supplier delivery");
+  // the audit row fails to save -> the stock change is rolled back (no silent, unaudited change; a retry cannot double-apply)
+  const origCreate = Movement.create;
+  Movement.create = async () => { throw new Error("simulated audit insert failure"); };
+  const origErr = console.error; console.error = () => {};
+  try {
+    assert.equal((await stock(t, s.id, { mode: "adjust", quantity: 3, reason: "restock" })).status, 500);
+    assert.equal((await stock(t, s.id, { mode: "set", quantity: 7, reason: "correction" })).status, 500);
+  } finally { Movement.create = origCreate; console.error = origErr; }
+  assert.equal((await Suit.findById(s.id).lean()).stock, 0);
+  assert.equal(await Movement.countDocuments({ suitId: s.id }), 3); // initial + restock + correction
+});
+
 test("stock: stock labels by quantity (admin low-stock warning band)", async () => {
   const t = await owner();
   const s = (await create(t, base())).body.data;

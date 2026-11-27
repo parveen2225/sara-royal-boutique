@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-export const STOCK_REASONS = ["initial", "order_confirmed", "order_cancelled", "return_restock", "exchange", "damaged", "correction", "other"] as const;
+export const STOCK_REASONS = ["initial", "order_confirmed", "order_cancelled", "return_restock", "exchange", "damaged", "correction", "other", "restock"] as const;
 
 // One immutable row per stock change: previous quantity, change, resulting quantity, who and why.
 const movementSchema = new Schema(

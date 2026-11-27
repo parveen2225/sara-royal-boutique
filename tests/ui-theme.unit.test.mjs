@@ -74,7 +74,9 @@ test("scope: restricted pages and shared files are byte-for-byte unchanged (git)
     "src/lib/suitWhatsapp.ts", "src/lib/cartCore.ts", "src/lib/cartStore.ts", "src/lib/money.ts", "src/lib/shopApi.ts", "src/lib/useShop.ts",
     "src/lib/tryOn", "src/components/tryOn", "src/app/api/admin", "src/app/api/customer", "src/app/api/try-on", "src/app/api/suits", "src/app/api/suit-cart", "src/app/api/suit-categories", "src/app/api/products", "src/app/api/settings", "src/app/api/auth/me", "src/app/api/auth/logout", "src/app/api/auth/change-password", "src/models", "middleware.ts", "src/lib/auth/guard.ts", "src/lib/auth/edgeJwt.ts", "src/lib/auth/permissions.ts", "src/app/admin", "src/lib/customerAuth",
   ].filter((p) => fs.existsSync(path.join(root, p)));
-  const changed = execFileSync("git", ["status", "--porcelain", "--", ...protectedPaths], { cwd: root, encoding: "utf8" }).trim();
+  // Admin stock management (requested change): the Edit / list suit pages, the stock route and the StockMovement reason list.
+  const allowed = ["src/app/admin/suits/[id]/edit/page.tsx", "src/app/admin/suits/page.tsx", "src/app/api/admin/suits/[id]/stock/route.ts", "src/models/StockMovement.ts"];
+  const changed = execFileSync("git", ["status", "--porcelain", "--", ...protectedPaths, ...allowed.map((f) => `:(exclude,literal)${f}`)], { cwd: root, encoding: "utf8" }).trim();
   assert.equal(changed, "", `protected files changed:\n${changed}`);
 });
 
@@ -149,10 +151,10 @@ test("footer overflow fix is opt-in: every page except Collections and About get
   assert.match(read("src/components/common/layout/ConditionalLayout.tsx"), /<Footer clipX=\{headerToneFor\(pathname\) !== undefined\} \/>/);
   const footer = read("src/components/common/footer/Footer.tsx");
   assert.match(footer, /\{ clipX = false \}/); assert.match(footer, /\$\{clipX \? " is_clip_x" : ""\}/);
-  const diff = execFileSync("git", ["diff", "-U0", "--", "src/components/common/footer/Footer.scss"], { cwd: root, encoding: "utf8" });
-  const added = diff.split("\n").filter((l) => l.startsWith("+") && !l.startsWith("+++")); const removed = diff.split("\n").filter((l) => l.startsWith("-") && !l.startsWith("---"));
-  assert.equal(removed.length, 0, "no existing footer rule was modified or removed");
-  assert.ok(added.some((l) => /\.boutique_footer\.is_clip_x \{ overflow-x: clip; \}/.test(l)));
+  // content check (the change is committed now, so a git diff is empty): the opt-in class is the only footer-level clip
+  const scss = read("src/components/common/footer/Footer.scss");
+  assert.match(scss, /\.boutique_footer\.is_clip_x \{ overflow-x: clip; \}/);
+  assert.doesNotMatch(scss.replace(/\.boutique_footer\.is_clip_x \{ overflow-x: clip; \}/, ""), /\.boutique_footer\s*\{[^}]*overflow-x/, "the base footer rule itself does not clip");
 });
 
 // ---------- loader centring / phone-width regressions

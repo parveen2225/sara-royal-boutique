@@ -200,7 +200,7 @@ function SuitsInner() {
         ))}
       </CommonTable>
 
-      <StockModal suit={stockSuit} onClose={() => setStockSuit(null)} onChanged={() => { setNotice("Stock updated."); load(); }} />
+      <StockModal suit={stockSuit} onClose={() => setStockSuit(null)} onChanged={(r) => { setNotice(`Stock updated: ${stockSuit?.sku ?? ""} ${r.previousQty} → ${r.stock}.`); load(); }} />
       <AdminDeleteConfirmModal
         show={!!deleteSuit}
         heading="Permanently delete suit"

@@ -3,10 +3,10 @@
 import { use, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import SuitForm from "@/components/admin/suits/SuitForm";
-import StockModal from "@/components/admin/suits/StockModal";
+import StockModal, { STOCK_STATE_LABEL } from "@/components/admin/suits/StockModal";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { useCurrentAdmin } from "@/lib/admin/useCurrentAdmin";
-import { errorMessage, formatInr, suitsApi, type AdminSuit, type SuitCategory } from "@/lib/api/suitsApi";
+import { errorMessage, formatInr, suitsApi, type AdminSuit, type StockChangeResult, type SuitCategory } from "@/lib/api/suitsApi";
 import "@/components/admin/suits/suits.scss";
 import PageHeader from "@/components/admin/ui/PageHeader";
 
@@ -52,6 +52,12 @@ export default function EditSuitPage({ params }: { params: Promise<{ id: string 
     }
   };
 
+  const onStockChanged = (r: StockChangeResult) => {
+    setError("");
+    setSuit((cur) => (cur ? { ...cur, stock: r.stock, stockState: r.stockState } : cur)); // no form re-seed: unsaved edits stay
+    setNotice(`Stock updated: ${r.previousQty} → ${r.stock}.`);
+  };
+
   return (
     <section>
       <PageHeader title={suit.name} subtitle={<>SKU <strong>{suit.sku}</strong></>} actions={<CommonButton role="link" to="/admin/suits" className="admin_outline_btn">All suits</CommonButton>} />
@@ -62,7 +68,7 @@ export default function EditSuitPage({ params }: { params: Promise<{ id: string 
         <div className="d-flex flex-wrap gap-3 align-items-center justify-content-between">
           <div>
             <span className={`admin_pill ${suit.status}`}>{suit.status}</span>{" "}
-            <span className={`admin_pill ${suit.stockState}`}>{suit.stock} in stock</span>{" "}
+
             {suit.discountPercent > 0 && <span className="admin_old_price">{formatInr(suit.originalPrice)}</span>}
             <strong>{formatInr(suit.salePrice)}</strong>{suit.discountPercent > 0 && <small className="text-muted"> ({suit.discountPercent}% off)</small>}
           </div>
@@ -71,9 +77,24 @@ export default function EditSuitPage({ params }: { params: Promise<{ id: string 
             {suit.status === "published" && <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => changeStatus("draft", "moved to Draft")}>Unpublish</CommonButton>}
             {suit.status !== "archived" && <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => changeStatus("archived", "archived")}>Archive</CommonButton>}
             {suit.status === "archived" && <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => changeStatus("draft", "restored to Draft")}>Restore to Draft</CommonButton>}
-            {user?.permissions.stock && <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => setStockOpen(true)}>Adjust stock</CommonButton>}
           </div>
         </div>
+      </div>
+
+      {/* Stock is changed only through the stock action (atomic, audited), never by the product form below. */}
+      <div className="admin_card mb-3 admin_stock_panel" aria-label="Stock">
+        <div className="admin_stock_panel_main">
+          <span className="admin_stock_panel_label">Current stock</span>
+          <strong className="admin_stock_panel_value" data-testid="suit-stock-qty">{suit.stock}</strong>
+          <span className={`admin_pill ${suit.stockState}`}>{STOCK_STATE_LABEL[suit.stockState]}</span>
+        </div>
+        <p className="admin_stock_panel_hint">
+          {suit.stock > 0 ? `${suit.stock} ${suit.stock === 1 ? "piece" : "pieces"} available to customers.` : "Customers see this suit as Out of Stock and cannot order it."}
+          {" "}Publishing status is not affected by stock changes.
+        </p>
+        {user?.permissions.stock
+          ? <CommonButton className="admin_primary_btn admin_sm_btn" onClick={() => setStockOpen(true)} aria-haspopup="dialog">Adjust stock</CommonButton>
+          : <span className="text-muted small">You do not have permission to change stock.</span>}
       </div>
 
       <SuitForm
@@ -89,7 +110,7 @@ export default function EditSuitPage({ params }: { params: Promise<{ id: string 
         }}
       />
 
-      <StockModal suit={stockOpen ? suit : null} onClose={() => setStockOpen(false)} onChanged={() => { setNotice("Stock updated."); load(); }} />
+      <StockModal suit={stockOpen ? suit : null} onClose={() => setStockOpen(false)} onChanged={onStockChanged} />
     </section>
   );
 }

@@ -30,6 +30,7 @@ export type AdminSuit = {
 };
 
 export type SuitCategory = { id: string; name: string; slug: string; description: string; active: boolean; displayOrder: number; suitCount: number };
+export type StockChangeResult = { id: string; previousQty: number; change: number; stock: number; stockState: StockState };
 export type StockMovementRow = { id: string; previousQty: number; change: number; resultingQty: number; reason: string; note: string; actorEmail: string; createdAt: string };
 export type SuitListResult = { items: AdminSuit[]; total: number; page: number; limit: number; pages: number };
 export type SuitListQuery = { q?: string; status?: string; category?: string; stock?: string; sort?: string; page?: number; limit?: number };
@@ -51,7 +52,9 @@ export const suitsApi = {
   update: async (id: string, body: Record<string, unknown>) => (await apiJson<AdminSuit>(`${BASE}/${id}`, { method: "PUT", body: json(body) })).data,
   setStatus: async (id: string, status: SuitStatus) => (await apiJson(`${BASE}/${id}/status`, { method: "POST", body: json({ status }) })).data,
   setStock: async (id: string, body: { mode: "set" | "adjust"; quantity: number; reason: string; note?: string }) =>
-    (await apiJson<{ stock: number; stockState: StockState }>(`${BASE}/${id}/stock`, { method: "POST", body: json(body) })).data,
+    (await apiJson<StockChangeResult>(`${BASE}/${id}/stock`, { method: "POST", body: json(body) })).data,
+  /** Live stock for one suit (no page loader): the stock dialog reads it on open. */
+  stockLevel: async (id: string) => (await apiJson<AdminSuit>(`${BASE}/${id}`, { skipLoader: true })).data,
   stockHistory: async (id: string) => (await apiJson<StockMovementRow[]>(`${BASE}/${id}/stock`, { skipLoader: true })).data,
   remove: async (id: string) => (await apiJson(`${BASE}/${id}?confirm=true`, { method: "DELETE" })).data,
 

@@ -407,7 +407,7 @@ input[type="date"].form-control {
   .admin_stat { padding: 18px; }
   .admin_stat_value { background: none; -webkit-text-fill-color: currentColor; color: #fff; font-size: 28px; }
   .admin_stat_label { text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ad-muted); }
-  .admin_stat_icon_wrap { background: var(--ad-gold-soft); }
+  // .admin_stat_icon_wrap { background: var(--ad-gold-soft); }
   .admin_tab_btn { border-color: var(--ad-border-strong); color: var(--ad-muted); &.is_active { background: var(--ad-gold-soft); color: #fff; border-color: rgba(201, 168, 76, 0.4); } }
   .admin_img_tile { border-color: var(--ad-border-strong); background: var(--ad-surface-2); }
   .admin_chip_check { border-color: var(--ad-border-strong); background: var(--ad-surface-2); &.is_on { border-color: rgba(201, 168, 76, 0.5); background: var(--ad-gold-soft); } input { accent-color: var(--ad-gold); } }

@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <div className="boutique_page">
+    <div className="boutique_page home_page">
       <HeroSection banner={banner} />
       <SuitsRail id="featured-suits" label="✦ Handpicked" title="Featured Unstitched Suits" subtitle="Premium fabrics chosen by our boutique." query={{ featured: true, limit: 4 }} />
       <SuitsRail id="new-arrivals" label="✦ Just In" title="New Arrivals" subtitle="The latest unstitched suits in our collection." query={{ sort: "newest", limit: 4 }} />

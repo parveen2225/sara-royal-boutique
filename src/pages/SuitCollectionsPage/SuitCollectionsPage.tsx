@@ -94,14 +94,14 @@ export default function SuitCollectionsPage() {
           </select>
         </div>
 
-        {categories.length > 0 && (
+        {/* {categories.length > 0 && (
           <div className="shop_chips" aria-label="Filter by category">
             <button type="button" className={`shop_chip ${category === "" ? "is_on" : ""}`} onClick={() => push({ category: "", page: 1 })}>All</button>
             {categories.map((c) => (
               <button key={c.id} type="button" className={`shop_chip ${category === c.slug ? "is_on" : ""}`} onClick={() => push({ category: c.slug, page: 1 })}>{c.name}</button>
             ))}
           </div>
-        )}
+        )} */}
 
         {error && <div className="shop_error" role="alert">{error} <button type="button" className="shop_link_btn" onClick={() => setResult({ key: "" })}>Try again</button></div>}
 

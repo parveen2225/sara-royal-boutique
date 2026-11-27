@@ -35,6 +35,11 @@ const tokenFor = (a) => signAdminToken({ id: String(a._id), email: a.email, role
 const doLogin = async (email, password = PW, ipAddr = ip()) => json(await login(await makeReq("/api/auth/login", { method: "POST", body: { email, password }, ip: ipAddr })));
 const post = async (route, url, token, body) => json(await route.POST(await makeReq(url, { method: "POST", token, body })));
 
+
+// Runs fn with console.error captured, returning the result and the log lines (the route logs configuration problems).
+const withMutedErrors = async (fn) => { const logs = []; const orig = console.error; console.error = (...a) => logs.push(a.map(String).join(" ")); try { const r = await fn(); r.logs = logs; return r; } finally { console.error = orig; } };
+const withEnv = async (vars, fn) => { const saved = Object.fromEntries(Object.keys(vars).map((k) => [k, process.env[k]])); Object.assign(process.env, vars); try { return await fn(); } finally { for (const [k, v] of Object.entries(saved)) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } } };
+
 // ---------------- login
 test("login: owner and staff can sign in; httpOnly cookie is set; password hash never returned", async () => {
   const owner = await mk({ role: "owner" });
@@ -285,7 +290,9 @@ test("missing JWT_SECRET fails closed (no hardcoded fallback)", async () => {
   try {
     assert.throws(() => signAdminToken({ id: "1", email: "x", role: "owner" }), /JWT_SECRET/);
     const a = await mk();
-    assert.equal((await doLogin(a.email)).status, 500); // refuses to mint a token
+    const r = await withMutedErrors(() => doLogin(a.email));
+    assert.equal(r.status, 503); // refuses to mint a token, and says so uniformly (see the production tests below)
+    assert.ok(!/admin_session=/.test(r.res.headers.get("set-cookie") ?? ""));
   } finally {
     process.env.JWT_SECRET = saved;
   }
@@ -303,4 +310,60 @@ test("production requires a JWT_SECRET of at least 32 characters", async () => {
     process.env.JWT_SECRET = savedSecret;
     process.env.NODE_ENV = savedEnv;
   }
+});
+
+// ---------------- production configuration (the live-site "Login failed" 500)
+test("production with a too-short JWT_SECRET: every login attempt gets the same 503 (no 401/500 oracle), no cookie, actionable log without secrets", async () => {
+  const a = await mk();
+  await withEnv({ NODE_ENV: "production", JWT_SECRET: "fifteen-chars-x" }, async () => {
+    const good = await withMutedErrors(() => doLogin(a.email, PW));
+    const wrong = await withMutedErrors(() => doLogin(a.email, "definitely-wrong-password"));
+    const unknown = await withMutedErrors(() => doLogin("nobody@test.local", "whatever-password-1"));
+    for (const r of [good, wrong, unknown]) {
+      assert.equal(r.status, 503);
+      assert.equal(r.body.message, "Admin login is temporarily unavailable. Please contact the site developer.");
+      assert.ok(!/admin_session=/.test(r.res.headers.get("set-cookie") ?? ""), "no session cookie");
+    }
+    assert.deepEqual(good.body, wrong.body, "correct and wrong passwords are indistinguishable");
+    const log = good.logs.join("\n");
+    assert.match(log, /JWT_SECRET must be at least 32 characters in production/, "the log tells the operator what to fix");
+    for (const secretish of [PW, a.email, "fifteen-chars-x", "$2a$", "$2b$"]) assert.ok(!log.includes(secretish) && !JSON.stringify(good.body).includes(secretish), `never leaks ${secretish}`);
+  });
+  // malformed input is still a plain 400 and is not rate-limit-consuming
+  await withEnv({ NODE_ENV: "production", JWT_SECRET: "fifteen-chars-x" }, async () => assert.equal((await withMutedErrors(() => doLogin("", ""))).status, 400));
+});
+
+test("production with a proper (32+ char) JWT_SECRET: login works, wrong password is 401 (not 500), cookie is HttpOnly + Secure + SameSite", async () => {
+  const a = await mk();
+  await withEnv({ NODE_ENV: "production", JWT_SECRET: crypto.randomBytes(32).toString("hex") }, async () => {
+    const ok = await doLogin(a.email, PW);
+    assert.equal(ok.status, 200);
+    const cookie = ok.res.headers.get("set-cookie");
+    assert.match(cookie, /admin_session=/); assert.match(cookie, /HttpOnly/i); assert.match(cookie, /Secure/i); assert.match(cookie, /SameSite=lax/i); assert.match(cookie, /Max-Age=604800/);
+    assert.equal((await doLogin(a.email, "wrong-password-123")).status, 401);
+    assert.equal((await doLogin("nobody@test.local", "whatever-password-1")).status, 401);
+    assert.equal((await doLogin("", "")).status, 400);
+    const loggedOut = await json(await logout());
+    assert.match(loggedOut.res.headers.get("set-cookie"), /admin_session=;|admin_session=""|Max-Age=0/i);
+    assert.match(loggedOut.res.headers.get("set-cookie"), /Secure/i);
+  });
+});
+
+test("unexpected backend failures after the password check are logged server-side but only a generic 500 reaches the client", async () => {
+  const a = await mk();
+  const orig = Admin.updateOne; Admin.updateOne = async () => { throw new Error("simulated Atlas outage: mongodb+srv://user:hunter2@cluster/db"); };
+  try {
+    const r = await withMutedErrors(() => doLogin(a.email, PW));
+    assert.equal(r.status, 500); assert.deepEqual(r.body, { message: "Login failed" });
+    assert.ok(!JSON.stringify(r.body).includes("hunter2") && !/admin_session=/.test(r.res.headers.get("set-cookie") ?? ""));
+    assert.match(r.logs.join(" "), /\[API \/auth\/login\]/, "logged for the operator");
+  } finally { Admin.updateOne = orig; }
+});
+
+test("adminAuthConfigProblem reports the rule, never the secret value", async () => {
+  const { adminAuthConfigProblem } = await import("../src/lib/auth/session.ts");
+  await withEnv({ NODE_ENV: "production", JWT_SECRET: "super-secret-value" }, async () => { const m = adminAuthConfigProblem(); assert.match(m, /at least 32/); assert.ok(!m.includes("super-secret-value")); });
+  await withEnv({ NODE_ENV: "production", JWT_SECRET: "x".repeat(32) }, async () => assert.equal(adminAuthConfigProblem(), null));
+  await withEnv({ NODE_ENV: "development", JWT_SECRET: "short" }, async () => assert.equal(adminAuthConfigProblem(), null)); // dev keeps working locally
+  await withEnv({ JWT_SECRET: "" }, async () => assert.match(adminAuthConfigProblem(), /JWT_SECRET is not set/));
 });

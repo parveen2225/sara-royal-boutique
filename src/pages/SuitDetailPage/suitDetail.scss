@@ -2,3 +2,12 @@
 // padding and added ~8px of horizontal scroll at 992-1599px. `clip` (unlike `hidden`) creates no scroll container, so sticky
 // elements keep working. Separate file on purpose: shop.scss is shared with Collections.
 .shop_detail_page { overflow-x: clip; }
+
+// Typography for this page only (the rules these override live in shop.scss, which Collections also uses, so they stay untouched).
+// Title 24px -> 36px, description / specs 15px -> 17px, SKU 13px -> 14px.
+.shop_detail_page {
+  .shop_title { font-size: clamp(1.5rem, 1.15rem + 1.3vw, 2.25rem); line-height: 1.2; text-wrap: balance; }
+  .shop_sku { font-size: var(--type-small); }
+  .shop_specs { font-size: var(--type-body); }
+  .shop_desc { font-size: var(--type-body); line-height: var(--lh-body); }
+}

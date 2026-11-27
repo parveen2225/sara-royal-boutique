@@ -22,6 +22,21 @@ const getSecret = (): string => {
   return secret;
 };
 
+/**
+ * Why admin sessions cannot be issued on this server (or null when they can). The text names the variable and the rule,
+ * never its value, so it is safe to write to server logs. The login route calls this BEFORE it looks at any credentials:
+ * a misconfigured server then answers every attempt the same way, instead of "401 for a wrong password, 500 for the right
+ * one", which would tell an attacker when a guess is correct.
+ */
+export const adminAuthConfigProblem = (): string | null => {
+  try {
+    getSecret();
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : "Admin session secret is not usable.";
+  }
+};
+
 export const signAdminToken = (payload: Omit<AdminTokenPayload, "iat" | "exp">): string =>
   jwt.sign({ ...payload, iatMs: Date.now() }, getSecret(), { expiresIn: "7d", algorithm: "HS256" });
 

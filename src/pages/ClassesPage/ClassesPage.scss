@@ -34,7 +34,7 @@
     justify-content: center;
     gap: 0.55rem;
     padding: 0.9rem 2rem;
-    font-size: 0.8rem;
+    font-size: var(--type-btn);
     font-weight: 800;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -76,7 +76,7 @@
 
   .classes_section_label {
     display: inline-block;
-    font-size: 0.72rem;
+    font-size: var(--type-eyebrow);
     font-weight: 600;
     letter-spacing: 0.25em;
     text-transform: uppercase;
@@ -96,7 +96,7 @@
 
   .classes_section_title {
     font-family: $playfair;
-    font-size: clamp(1.85rem, 4vw, 2.75rem);
+    font-size: var(--type-h2);
     font-weight: 700;
     color: var(--boutique-text);
     margin: 0 0 0.75rem;
@@ -111,7 +111,7 @@
   .classes_section_sub {
     max-width: 36rem;
     margin: 0 auto;
-    font-size: 1rem;
+    font-size: var(--type-lead);
     line-height: 1.75;
     color: var(--boutique-muted);
   }
@@ -207,7 +207,7 @@
       gap: 0.5rem;
       margin-bottom: 1.25rem;
       padding: 0.35rem 1rem;
-      font-size: 0.68rem;
+      font-size: var(--type-eyebrow);
       font-weight: 700;
       letter-spacing: 0.32em;
       text-transform: uppercase;
@@ -228,7 +228,7 @@
 
     &_title_line {
       font-family: $playfair;
-      font-size: clamp(3.25rem, 9vw, 6.5rem);
+      font-size: clamp(2.25rem, 1.3rem + 3.9vw, 4rem);
       font-weight: 700;
       color: #fff;
       letter-spacing: -0.02em;
@@ -236,7 +236,7 @@
 
     &_title_accent {
       font-family: $playfair;
-      font-size: clamp(3.25rem, 9vw, 6.5rem);
+      font-size: clamp(2.25rem, 1.3rem + 3.9vw, 4rem);
       font-weight: 700;
       background: var(--boutiqueGoldGradient);
       -webkit-background-clip: text;
@@ -249,7 +249,7 @@
     &_lead {
       max-width: 34rem;
       margin: 0 0 1.5rem;
-      font-size: 1.05rem;
+      font-size: var(--type-lead);
       line-height: 1.8;
       color: rgba(240, 230, 204, 0.72);
 
@@ -267,7 +267,7 @@
       padding: 0.5rem 1.5rem;
       background: var(--boutiqueGoldGradient);
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: var(--type-eyebrow);
       font-weight: 900;
       letter-spacing: 0.28em;
       text-transform: uppercase;
@@ -372,7 +372,7 @@
     &_stat_label {
       display: block;
       margin-top: 0.15rem;
-      font-size: 0.62rem;
+      font-size: var(--type-micro);
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -411,7 +411,7 @@
     &_text {
       max-width: 34rem;
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--type-body);
       line-height: 1.85;
       color: var(--boutique-muted);
 
@@ -450,7 +450,7 @@
     }
 
     &_highlight_label {
-      font-size: 0.92rem;
+      font-size: var(--type-body);
       font-weight: 600;
       color: var(--boutique-text);
       line-height: 1.4;
@@ -522,14 +522,14 @@
     &_card_title {
       margin: 0 0 0.35rem;
       font-family: $playfair;
-      font-size: 1.1rem;
+      font-size: var(--type-card-title);
       font-weight: 700;
       color: var(--boutique-text);
     }
 
     &_card_sub {
       margin: 0;
-      font-size: 0.82rem;
+      font-size: var(--type-small);
       line-height: 1.5;
       color: var(--boutique-muted);
     }
@@ -669,7 +669,7 @@
     }
 
     &_label {
-      font-size: 0.72rem;
+      font-size: var(--type-eyebrow);
       font-weight: 800;
       letter-spacing: 0.22em;
       text-transform: uppercase;
@@ -742,7 +742,7 @@
 
     .classes_feature_label {
       margin: 0;
-      font-size: 0.78rem;
+      font-size: var(--type-small);
       font-weight: 600;
       line-height: 1.45;
       color: var(--boutique-text);
@@ -803,7 +803,7 @@
     &_eyebrow {
       display: inline-block;
       margin-bottom: 0.75rem;
-      font-size: 0.68rem;
+      font-size: var(--type-eyebrow);
       font-weight: 800;
       letter-spacing: 0.28em;
       text-transform: uppercase;
@@ -813,7 +813,7 @@
     &_title {
       margin: 0 0 0.75rem;
       font-family: $playfair;
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: var(--type-h2);
       font-weight: 700;
       color: #fff;
       line-height: 1.05;
@@ -822,7 +822,7 @@
     &_sub {
       max-width: 26rem;
       margin: 0 0 1.5rem;
-      font-size: 1rem;
+      font-size: var(--type-lead);
       line-height: 1.7;
       color: rgba(240, 230, 204, 0.72);
 
@@ -865,7 +865,7 @@
 
     &_contact_label {
       margin: 0 0 0.3rem;
-      font-size: 0.65rem;
+      font-size: var(--type-micro);
       font-weight: 800;
       letter-spacing: 0.2em;
       text-transform: uppercase;
@@ -894,14 +894,14 @@
 
     &_contact_note {
       margin: 0.25rem 0 0;
-      font-size: 0.78rem;
+      font-size: var(--type-small);
       color: var(--boutique-muted);
     }
 
     &_motto {
       margin: 2.5rem 0 0;
       text-align: center;
-      font-size: 0.72rem;
+      font-size: var(--type-eyebrow);
       font-weight: 700;
       letter-spacing: 0.3em;
       text-transform: uppercase;

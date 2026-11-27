@@ -41,3 +41,19 @@
     transform: translateY(0);
   }
 }
+
+// ProductCard's category badge shrinks to 0.4rem (6.4px, unreadable) on phones. ProductCard.scss is shared with the Collections page,
+// so the readable size is applied here, scoped to this homepage section only.
+@media (max-width: 767px) {
+  .section_collections .product_card_category { font-size: 0.65rem; }
+  // Their "Order On WhatsApp" button was 10px / 32px tall on phones: a readable size and a proper touch target.
+  .section_collections .product_card .common_btn { font-size: var(--type-small); min-height: 2.75rem; padding: 0.5rem 0.75rem; }
+}
+
+// Shared ProductCard labels render at 10.4-10.7px; the homepage section raises them to the 11px floor (ProductCard.scss itself is
+// shared with the Collections page, so it is not touched).
+.section_collections {
+  .product_card_category,
+  .product_card_view,
+  .product_card_price_label { font-size: var(--type-micro); }
+}

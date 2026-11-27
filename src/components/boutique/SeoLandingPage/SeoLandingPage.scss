@@ -45,7 +45,7 @@
 
         h1 {
           font-family: $playfair;
-          font-size: clamp(2.2rem, 5.5vw, 4.25rem);
+          font-size: var(--type-hero);
           font-weight: 700;
           line-height: 1.08;
           color: var(--ivory-text);
@@ -55,7 +55,7 @@
         p {
           max-width: 620px;
           color: rgba(240, 230, 204, 0.82);
-          font-size: clamp(1rem, 1.8vw, 1.12rem);
+          font-size: var(--type-lead);
           line-height: 1.8;
           margin-bottom: 1.5rem;
         }
@@ -111,13 +111,13 @@
 
       &_title {
         font-family: $playfair;
-        font-size: clamp(1.4rem, 2.5vw, 2rem);
+        font-size: var(--type-h3);
         color: var(--boutique-text);
         margin-bottom: 0.5rem;
       }
 
       &_sub {
-        font-size: 1rem;
+        font-size: var(--type-lead);
         color: var(--boutique-muted);
         line-height: 1.65;
         margin: 0;
@@ -143,16 +143,20 @@
 
     h3 {
       font-family: $playfair;
-      font-size: 1.15rem;
+      font-size: var(--type-card-title);
       color: var(--boutique-text);
       margin-bottom: 0.65rem;
     }
 
     p {
-      font-size: 0.92rem;
+      font-size: var(--type-body);
       line-height: 1.7;
       color: var(--boutique-muted);
       margin: 0;
     }
   }
 }
+
+// Light theme: this hero is a dark photo in BOTH themes, but its eyebrow label has no colour of its own and inherited the
+// light theme's dark text colour (dark brown on near-black, ~1:1). Light gold stays readable on the photo.
+.theme-light .seo_landing_page .seo_page_hero .section_label { color: var(--boutique-gold-light); }

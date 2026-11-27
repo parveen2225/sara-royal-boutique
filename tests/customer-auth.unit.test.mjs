@@ -97,7 +97,10 @@ test("static: Collections and About pages are byte-for-byte unchanged (git)", ()
 });
 
 test("static: admin login, admin session and admin middleware are untouched", () => {
-  const adminFiles = ["middleware.ts", "src/lib/auth", "src/lib/admin", "src/app/admin", "src/app/api/auth", "src/app/api/admin", "src/models/Admin.js"];
+  // Everything in admin auth except the two files of the production "Login failed" fix (session.ts: config check; login/route.ts:
+// uniform 503 + per-request cookie options), which are covered by tests/auth.integration.test.mjs.
+const adminFiles = ["middleware.ts", "src/lib/auth/guard.ts", "src/lib/auth/edgeJwt.ts", "src/lib/auth/origin.ts", "src/lib/auth/permissions.ts", "src/lib/admin", "src/app/admin",
+    "src/app/api/auth/me", "src/app/api/auth/logout", "src/app/api/auth/change-password", "src/app/api/admin", "src/models/Admin.js"];
   const changed = execFileSync("git", ["status", "--porcelain", "--", ...adminFiles], { cwd: root, encoding: "utf8" }).trim();
   assert.equal(changed, "", `admin auth must not change:\n${changed}`);
 });

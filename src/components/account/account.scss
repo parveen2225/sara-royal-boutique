@@ -127,8 +127,9 @@ $gold-gradient: linear-gradient(135deg, var(--boutique-gold-light), var(--boutiq
 }
 
 // A text-style button that behaves like a link (switches views inside the modal).
+// The padding enlarges the tap area to ~40px (WCAG target size) and the equal negative margin keeps the layout exactly where it was.
 .acct_inline {
-  display: inline; padding: 0; border: 0; background: none; font: inherit; font-size: 0.88rem; color: var(--boutique-gold-text); cursor: pointer; text-decoration: none;
+  display: inline-block; padding: 0.6rem 0.4rem; margin: -0.6rem -0.4rem; border: 0; background: none; font: inherit; font-size: 0.88rem; color: var(--boutique-gold-text); cursor: pointer; text-decoration: none;
   transition: color 0.2s ease;
   &:hover:not(:disabled) { color: var(--boutique-gold-text); text-decoration: underline; text-underline-offset: 3px; }
   &:disabled { opacity: 0.55; cursor: not-allowed; }

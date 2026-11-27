@@ -55,7 +55,7 @@
 
       h1 {
         font-family: $playfair;
-        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-size: var(--type-hero);
         font-weight: 700;
         line-height: 1.05;
         color: var(--ivory-text);
@@ -65,7 +65,7 @@
       p {
         max-width: 620px;
         color: rgba(240, 230, 204, 0.8);
-        font-size: clamp(1rem, 1.8vw, 1.15rem);
+        font-size: var(--type-lead);
         line-height: 1.8;
         margin: 0;
       }
@@ -95,3 +95,7 @@
     border-top: 0;
   }
 }
+
+// Light theme: this hero is a dark photo in BOTH themes, but its eyebrow label has no colour of its own and inherited the
+// light theme's dark text colour (dark brown on near-black, ~1:1). Light gold stays readable on the photo.
+.theme-light .services_page .services_page_hero .section_label { color: var(--boutique-gold-light); }

@@ -4,18 +4,19 @@ import connectMongo, { isMongoConfigured } from "@/lib/mongodb";
 import Admin from "@/models/Admin";
 import { ADMIN_COOKIE_NAME } from "@/lib/admin/constants";
 import { jsonError, jsonMessage } from "@/lib/api/utils";
-import { signAdminToken } from "@/lib/auth/session";
+import { adminAuthConfigProblem, signAdminToken } from "@/lib/auth/session";
 import { isOwnerRole } from "@/lib/auth/permissions";
 import { clientIp, rateLimit, resetRateLimit } from "@/lib/rateLimit";
 import { isEmail } from "@/lib/validation";
 
-const COOKIE_OPTIONS = {
+// Evaluated per request (not at import time) so the Secure flag always follows the runtime environment.
+const cookieOptions = () => ({
   httpOnly: true,
   sameSite: "lax" as const,
   secure: process.env.NODE_ENV === "production",
   path: "/",
   maxAge: 60 * 60 * 24 * 7,
-};
+});
 
 // Compared against when the email is unknown so response time does not reveal which emails exist.
 const DUMMY_HASH = "$2a$10$CwTycUXWue0Thq9StjUM0uJ8.4t3yS8Zr1b5C7p8pXf0yQmV0m2eK";
@@ -33,6 +34,14 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password || password.length > 200 || !isEmail(email)) {
       return jsonError("Email and password are required", 400);
+    }
+
+    // Fail closed and uniformly when the server cannot issue sessions (e.g. JWT_SECRET missing or too short in production):
+    // the same answer for every request, before any credential is examined, and an actionable line in the server log.
+    const configProblem = adminAuthConfigProblem();
+    if (configProblem) {
+      console.error("[API /auth/login] Admin login is misconfigured:", configProblem); // names the setting, never a value
+      return jsonError("Admin login is temporarily unavailable. Please contact the site developer.", 503);
     }
 
     // Two limits: per IP+email, and per email alone (so rotating or spoofing X-Forwarded-For cannot brute-force one account).
@@ -81,7 +90,7 @@ export async function POST(req: NextRequest) {
       user: { id: admin._id.toString(), name: admin.name, email: admin.email, role },
       token,
     });
-    res.cookies.set(ADMIN_COOKIE_NAME, token, COOKIE_OPTIONS);
+    res.cookies.set(ADMIN_COOKIE_NAME, token, cookieOptions());
     return res;
   } catch (error) {
     console.error("[API /auth/login]", error instanceof Error ? error.message : error);

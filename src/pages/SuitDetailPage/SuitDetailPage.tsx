@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Col, Container, Row } from "react-bootstrap";
@@ -11,12 +11,18 @@ import { cartStore } from "@/lib/cartStore";
 import { useCart, useShopSettings } from "@/lib/useShop";
 import { buildOrderMessage, buildWhatsAppUrl } from "@/lib/suitWhatsapp";
 import { suitPublicUrl } from "@/lib/siteUrl";
+import SuitImageLightbox from "@/components/shop/SuitImageLightbox";
 import ShareProductButton from "@/components/shop/ShareProductButton";
 import TryOnPanel, { SparkleIcon } from "@/components/tryOn/TryOnPanel";
 import { fetchTryOnConfig, type TryOnConfig } from "@/lib/tryOnApi";
 import "@/components/tryOn/tryOn.scss";
 import "@/components/shop/shop.scss";
+import "@/components/shop/suitImageLightbox.scss";
 import "./suitDetail.scss";
+
+const ZoomIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="M20 20l-4.2-4.2M11 8.5v5M8.5 11h5" /></svg>
+);
 
 type State = { id: string; suit?: PublicSuitDetail; status: "ok" | "notfound" | "error" };
 
@@ -50,6 +56,8 @@ export default function SuitDetailPage({ id }: { id: string }) {
 
 function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   const [active, setActive] = useState(0);
+  const [preview, setPreview] = useState<number | null>(null); // open reference photo (index), null = closed
+  const previewOpener = useRef<HTMLElement | null>(null); // the thumbnail that opened it: focus goes back there on close (Safari does not focus buttons on click)
   const [qty, setQty] = useState(1);
   const [message, setMessage] = useState("");
   const cart = useCart();
@@ -107,11 +115,14 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
                 <p>Examples of how this fabric can look once stitched. These photos show styling only, not the unstitched fabric you will receive.</p>
                 <div className="shop_thumbs">
                   {suit.referenceImages.map((src, i) => (
-                    <a key={src} href={src} target="_blank" rel="noopener noreferrer" className="shop_thumb" aria-label={`Open stitched reference ${i + 1}`}>
+                    // a button, not a link: the photo previews on this page (SuitImageLightbox) instead of navigating away
+                    <button key={src} type="button" className="shop_thumb shop_ref_thumb" onClick={(e) => { previewOpener.current = e.currentTarget; setPreview(i); }} aria-haspopup="dialog" aria-label={`Preview stitched reference ${i + 1} of ${suit.referenceImages.length}`}>
                       <Image src={src} alt={`Stitched reference ${i + 1}`} fill sizes="72px" style={{ objectFit: "cover" }} />
-                    </a>
+                      <span className="shop_ref_zoom" aria-hidden="true"><ZoomIcon /></span>
+                    </button>
                   ))}
                 </div>
+                <SuitImageLightbox images={suit.referenceImages} index={preview} label={`${suit.name} stitched reference`} onIndexChange={setPreview} onClose={() => { setPreview(null); requestAnimationFrame(() => previewOpener.current?.focus({ preventScroll: true })); }} />
               </section>
             )}
           </Col>

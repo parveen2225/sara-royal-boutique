@@ -155,7 +155,7 @@
         }
 
         &_label {
-          font-size: 0.58rem;
+          font-size: var(--type-micro);
           font-weight: 800;
           letter-spacing: 0.14em;
           text-transform: uppercase;
@@ -176,7 +176,7 @@
 
     &_title {
       font-family: $playfair;
-      font-size: clamp(2.25rem, 5vw, 3.75rem);
+      font-size: var(--type-hero);
       font-weight: 700;
       color: var(--boutique-text);
       margin: 0 0 1rem;
@@ -192,7 +192,7 @@
     }
 
     &_desc {
-      font-size: 1rem;
+      font-size: var(--type-lead);
       line-height: 1.85;
       color: var(--boutique-muted);
       margin: 0 0 1.5rem;
@@ -213,7 +213,7 @@
       background: rgba(201, 168, 76, 0.1);
       border: 1px solid rgba(201, 168, 76, 0.28);
       border-radius: 999px;
-      font-size: 0.68rem;
+      font-size: var(--type-micro);
       font-weight: 800;
       letter-spacing: 0.28em;
       text-transform: uppercase;
@@ -291,7 +291,7 @@
       padding: 0.85rem 1.75rem;
       background: transparent;
       color: var(--gold);
-      font-size: 0.78rem;
+      font-size: var(--type-btn);
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;

@@ -151,7 +151,7 @@
     }
 
     .about_years_text {
-      font-size: 0.62rem;
+      font-size: var(--type-micro);
       font-weight: 700;
       letter-spacing: 0.07em;
       text-transform: uppercase;
@@ -199,7 +199,7 @@
     }
 
     .about_msme_label {
-      font-size: 0.6rem;
+      font-size: var(--type-micro);
       font-weight: 700;
       letter-spacing: 0.15em;
       text-transform: uppercase;
@@ -228,7 +228,7 @@
 
   .about_heading {
     font-family: $playfair;
-    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-size: var(--type-h2);
     font-weight: 700;
     color: var(--boutique-text);
     margin: 0.75rem 0 1.5rem;
@@ -245,7 +245,7 @@
   }
 
   .about_desc {
-    font-size: 1rem;
+    font-size: var(--type-lead);
     line-height: 1.85;
     color: var(--boutique-muted);
     margin-bottom: 1rem;
@@ -291,7 +291,7 @@
     }
 
     .about_stat_label {
-      font-size: 0.68rem;
+      font-size: var(--type-micro);
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;

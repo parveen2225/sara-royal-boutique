@@ -38,7 +38,7 @@
 
     &_label {
       display: block;
-      font-size: 0.72rem;
+      font-size: var(--type-eyebrow);
       font-weight: 600;
       letter-spacing: 0.25em;
       text-transform: uppercase;
@@ -48,7 +48,7 @@
 
     &_title {
       font-family: $playfair;
-      font-size: clamp(2rem, 6vw, 4rem);
+      font-size: var(--type-hero);
       font-weight: 700;
       color: var(--ivory-text);
       margin-bottom: 0.75rem;
@@ -56,7 +56,7 @@
     }
 
     &_sub {
-      font-size: 1.05rem;
+      font-size: var(--type-lead);
       color: rgba(240, 230, 204, 0.72);
       max-width: 560px;
       margin: 0 auto;
@@ -67,7 +67,7 @@
   .contact_section {
     &_label {
       display: inline-block;
-      font-size: 0.72rem;
+      font-size: var(--type-eyebrow);
       font-weight: 600;
       letter-spacing: 0.25em;
       text-transform: uppercase;
@@ -87,7 +87,7 @@
 
     &_title {
       font-family: $playfair;
-      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-size: var(--type-h2);
       font-weight: 700;
       color: var(--boutique-text);
       margin-bottom: 1rem;
@@ -140,7 +140,7 @@
       }
 
       .rating_text {
-        font-size: 0.8rem;
+        font-size: var(--type-small);
         color: var(--boutique-muted);
       }
     }
@@ -190,7 +190,7 @@
     }
 
     &_label {
-      font-size: 0.72rem;
+      font-size: var(--type-eyebrow);
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -237,7 +237,7 @@
     padding: 0.875rem 2rem;
     background: var(--boutiqueGoldGradient);
     color: var(--navy-black);
-    font-size: 0.875rem;
+    font-size: var(--type-btn);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -292,7 +292,7 @@
 
     .hours_title {
       font-family: $playfair;
-      font-size: 1.1rem;
+      font-size: var(--type-card-title);
       font-weight: 600;
       color: var(--boutique-text);
       margin-bottom: 1rem;
@@ -334,3 +334,7 @@
     }
   }
 }
+
+// The Bootstrap row below uses a 3rem gutter (g-5), whose negative margins stuck out ~8px past the container and added horizontal
+// scroll at 768-1280px. `clip` (unlike `hidden`) creates no scroll container, so sticky elements keep working.
+.contact_page { overflow-x: clip; }

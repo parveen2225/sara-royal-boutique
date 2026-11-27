@@ -108,7 +108,7 @@
 
   .reel_card_title {
     font-family: $playfair;
-    font-size: 0.95rem;
+    font-size: var(--type-body);
     font-weight: 600;
     // Always sits on the dark photo scrim in .reel_card_body, so the text
     // must stay a fixed light tone in both themes, not the reactive
@@ -124,7 +124,7 @@
   }
 
   .reel_card_cta {
-    font-size: 0.68rem;
+    font-size: var(--type-micro);
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -140,17 +140,24 @@
     }
   }
 
+  // minmax(0, 1fr), not 1fr: a plain 1fr track cannot shrink below its item's minimum width, and each skeleton card's
+  // aspect-ratio + min-height forces ~219px, so two columns were wider than a phone. While the reels loaded, that pushed the whole
+  // page to ~473px, which makes mobile browsers widen the layout viewport and left the fixed loader logo off-centre.
   .reels_skeleton_row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1.25rem;
 
     @media (max-width: 991px) {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   .reel_skeleton_card {
+    // A grid item with an aspect-ratio does not stretch: it derives its width from min-height (340px x 9/14 = 219px) and overflowed
+    // the track. An explicit width makes it follow the column.
+    width: 100%;
+    min-width: 0;
     aspect-ratio: 9 / 14;
     min-height: 340px;
     max-height: 420px;

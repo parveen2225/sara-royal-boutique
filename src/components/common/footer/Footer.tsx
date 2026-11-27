@@ -20,11 +20,11 @@ const FOOTER_LINKS = [
 const INSTAGRAM_URL = "https://www.instagram.com/sararoyalboutique";
 const GOOGLE_REVIEW_URL = "https://g.page/r/CW8_ymiprhnvEBM/review";
 
-const Footer: React.FC = () => {
+const Footer: React.FC<{ clipX?: boolean }> = ({ clipX = false }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="boutique_footer">
+    <footer className={`boutique_footer${clipX ? " is_clip_x" : ""}`}>
       <Container>
         <Row className="boutique_footer_main g-4 g-lg-5">
 

@@ -30,18 +30,18 @@
 
   .cta_banner_text {
     flex: 1;
-    min-width: 280px;
+    min-width: min(280px, 100%); // a fixed 280px was wider than the banner's content box on 320px phones
 
     .cta_banner_title {
       font-family: $playfair;
-      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-size: var(--type-h3);
       font-weight: 700;
       color: var(--ivory-text);
       margin-bottom: 0.75rem;
     }
 
     .cta_banner_sub {
-      font-size: 1rem;
+      font-size: var(--type-lead);
       color: rgba(240, 230, 204, 0.65);
       line-height: 1.65;
       margin: 0;

@@ -1,5 +1,24 @@
 @use "../assets/theme/_var.scss" as *;
 
+// Fluid typography tokens (see assets/theme/_typography.scss for the mixins that use them). Theme independent.
+// Each value is clamp(min, preferred, max): it grows smoothly with the viewport, so there are no jumps between breakpoints.
+:root {
+  --type-hero: clamp(1.875rem, 1.1rem + 3.2vw, 3.75rem);       // 30px -> 60px
+  --type-h2: clamp(1.625rem, 1.05rem + 1.9vw, 2.75rem);        // 26px -> 44px
+  --type-h3: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);          // 20px -> 28px
+  --type-card-title: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);  // 16px -> 18px
+  --type-lead: clamp(1rem, 0.95rem + 0.3vw, 1.1875rem);        // 16px -> 19px
+  --type-body: clamp(0.9375rem, 0.9rem + 0.18vw, 1.0625rem);   // 15px -> 17px
+  --type-small: clamp(0.8125rem, 0.78rem + 0.12vw, 0.875rem);  // 13px -> 14px
+  --type-btn: clamp(0.875rem, 0.85rem + 0.1vw, 1rem);          // 14px -> 16px
+  --type-eyebrow: clamp(0.75rem, 0.72rem + 0.1vw, 0.8125rem);  // 12px -> 13px
+  --type-micro: 0.6875rem;                                     // 11px floor for badges / tiny labels
+  --lh-display: 1.12;
+  --lh-heading: 1.2;
+  --lh-lead: 1.6;
+  --lh-body: 1.65;
+}
+
 * {
   &:focus,
   &:focus-visible {

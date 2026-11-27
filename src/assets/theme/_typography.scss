@@ -1,0 +1,18 @@
+// Responsive typography scale. The fluid values live in globals.scss as CSS custom properties (--type-*), so they can be
+// used from SCSS and from plain CSS, and a single place controls the whole scale. These mixins only apply them (they emit
+// nothing by themselves), so importing this file never adds CSS to a page.
+//
+// Targets (px at 390 / 768 / 1440):  hero 30 / 42 / 60   h2 26 / 31 / 44   h3 20 / 22 / 28   body 15 / 15 / 17
+//                                    lead 16 / 17 / 19   small 13 / 13 / 14   button 14 / 14 / 16   eyebrow 12 / 12 / 13
+// Use the smallest token that fits: nothing should render below --type-micro (11px).
+
+@mixin type-hero { font-size: var(--type-hero); line-height: var(--lh-display); letter-spacing: 0.005em; }
+@mixin type-h2 { font-size: var(--type-h2); line-height: var(--lh-heading); }
+@mixin type-h3 { font-size: var(--type-h3); line-height: var(--lh-heading); }
+@mixin type-card-title { font-size: var(--type-card-title); line-height: 1.3; }
+@mixin type-lead { font-size: var(--type-lead); line-height: var(--lh-lead); }
+@mixin type-body { font-size: var(--type-body); line-height: var(--lh-body); }
+@mixin type-small { font-size: var(--type-small); line-height: 1.5; }
+@mixin type-btn { font-size: var(--type-btn); line-height: 1.2; }
+@mixin type-eyebrow { font-size: var(--type-eyebrow); line-height: 1.3; }
+@mixin type-micro { font-size: var(--type-micro); line-height: 1.3; }

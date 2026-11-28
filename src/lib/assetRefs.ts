@@ -19,7 +19,7 @@ type Q = { countDocuments: (f: Record<string, unknown>) => Promise<number> };
  * `excludeSuitId` ignores one suit (the one being edited or deleted).
  */
 export async function isUrlReferenced(url: string, opts: { excludeSuitId?: string } = {}): Promise<boolean> {
-  const suitFilter: Record<string, unknown> = { $or: [{ "fabricImages.url": url }, { "referenceImages.url": url }] };
+  const suitFilter: Record<string, unknown> = { $or: [{ "fabricImages.url": url }, { "referenceImages.url": url }, { "variants.images.url": url }] };
   if (opts.excludeSuitId) suitFilter._id = { $ne: opts.excludeSuitId };
   const checks: [Q, Record<string, unknown>][] = [
     [UnstitchedSuit as unknown as Q, suitFilter],

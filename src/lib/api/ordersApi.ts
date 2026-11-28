@@ -3,7 +3,7 @@
 import { apiJson } from "@/lib/api/client";
 
 export type OrderStatus = "confirmed" | "packed" | "shipped" | "delivered" | "cancelled";
-export type OrderLine = { suitId: string; sku: string; name: string; unitPricePaise: number; quantity: number; lineTotalPaise: number; returnedQuantity?: number };
+export type OrderLine = { suitId: string; variantId?: string | null; sku: string; name: string; unitPricePaise: number; quantity: number; lineTotalPaise: number; returnedQuantity?: number };
 export type Order = {
   id: string; orderId: string;
   customer: { name: string; phone: string; address: string; pincode: string };
@@ -19,7 +19,9 @@ export type Order = {
 };
 export type OrderDetail = Order & { stockMovements: { sku: string; previousQty: number; change: number; resultingQty: number; reason: string; at: string }[] };
 export type OrderList = { items: Order[]; total: number; page: number; limit: number; pages: number };
-export type OrderSuit = { id: string; sku: string; name: string; salePricePaise: number; stock: number; status: string; cover: string };
+/** One pickable row: a suit, or one image variant of a suit (then `sku` is the variant code and `stock` its stock). */
+export type OrderSuit = { id: string; variantId?: string; sku: string; name: string; salePricePaise: number; stock: number; status: string; cover: string };
+export const orderSuitKey = (s: { id?: string; suitId?: string; variantId?: string | null }) => `${s.id ?? s.suitId}:${s.variantId ?? ""}`;
 export type OrderQuery = { q?: string; status?: string; payment?: string; method?: string; from?: string; to?: string; sort?: string; page?: number; limit?: number };
 
 const j = (b: unknown) => JSON.stringify(b);

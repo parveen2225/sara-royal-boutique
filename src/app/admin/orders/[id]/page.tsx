@@ -133,7 +133,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         <h6>Items</h6>
         <table className="admin_history_table">
           <thead><tr><th>Suit</th><th>SKU</th><th>Unit price</th><th>Qty</th><th>Line total</th></tr></thead>
-          <tbody>{o.items.map((i) => <tr key={i.suitId}><td>{i.name}</td><td>{i.sku}</td><td>{formatInrPaise(i.unitPricePaise)}</td><td>{i.quantity}</td><td>{formatInrPaise(i.lineTotalPaise)}</td></tr>)}</tbody>
+          <tbody>{o.items.map((i) => <tr key={`${i.suitId}:${i.variantId ?? ""}`}><td>{i.name}</td><td>{i.sku}</td><td>{formatInrPaise(i.unitPricePaise)}</td><td>{i.quantity}</td><td>{formatInrPaise(i.lineTotalPaise)}</td></tr>)}</tbody>
         </table>
         <dl className="admin_kv mt-3">
           <dt>Products</dt><dd>{formatInrPaise(o.subtotalPaise)}</dd>

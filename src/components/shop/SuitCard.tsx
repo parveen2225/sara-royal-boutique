@@ -38,6 +38,7 @@ export default function SuitCard({ suit }: { suit: PublicSuitListItem }) {
     return () => clearTimeout(t);
   }, [feedback]);
   const href = `/suits/${suit.id}`;
+  const variantCount = suit.variantCount ?? 0;
   return (
     <article className={`shop_card ${suit.inStock ? "" : "is_out"}`}>
       <Link href={href} className="shop_card_media" aria-label={suit.name}>
@@ -51,14 +52,21 @@ export default function SuitCard({ suit }: { suit: PublicSuitListItem }) {
       </Link>
       <div className="shop_card_body">
         <h3 className="shop_card_title"><Link href={href}>{suit.name}</Link></h3>
-        <p className="shop_card_meta">{suit.sku}{suit.fabric ? ` · ${suit.fabric}` : ""}</p>
+        <p className="shop_card_meta">{suit.sku}{suit.fabric ? ` · ${suit.fabric}` : ""}{variantCount > 0 ? ` · ${variantCount} designs` : ""}</p>
         <SuitPrice {...suit} />
         <div className="shop_card_actions">
-          <button type="button" className="shop_btn shop_btn_solid shop_card_btn" onClick={() => setFeedback(addOne(suit))} disabled={!suit.inStock}
-            aria-label={suit.inStock ? `Add ${suit.name} to cart` : `${suit.name} is out of stock`}>
-            {suit.inStock && <ShoppingBagIcon size={16} strokeWidth={1.8} />}
-            {suit.inStock ? "Add to Cart" : "Out of Stock"}
-          </button>
+          {variantCount > 0 && suit.inStock ? (
+            // Each design has its own stock, so the customer picks one on the suit page first.
+            <Link href={href} className="shop_btn shop_btn_solid shop_card_btn" aria-label={`Choose a design of ${suit.name}`}>
+              <ShoppingBagIcon size={16} strokeWidth={1.8} />Choose Design
+            </Link>
+          ) : (
+            <button type="button" className="shop_btn shop_btn_solid shop_card_btn" onClick={() => setFeedback(addOne(suit))} disabled={!suit.inStock}
+              aria-label={suit.inStock ? `Add ${suit.name} to cart` : `${suit.name} is out of stock`}>
+              {suit.inStock && <ShoppingBagIcon size={16} strokeWidth={1.8} />}
+              {suit.inStock ? "Add to Cart" : "Out of Stock"}
+            </button>
+          )}
           <Link href={href} className="shop_btn shop_card_btn" aria-label={`View details of ${suit.name}`}>View Details</Link>
         </div>
         <p className={`shop_card_feedback ${feedback ? `is_${feedback.tone}` : ""}`} role="status" aria-live="polite">

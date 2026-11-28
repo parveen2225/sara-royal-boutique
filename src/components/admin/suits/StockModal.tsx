@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Col, Form, Row } from "react-bootstrap";
 import CommonModal from "@/components/common/Modal/CommonModal";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
-import { errorMessage, suitsApi, type StockChangeResult, type StockMovementRow, type StockState } from "@/lib/api/suitsApi";
+import { errorMessage, suitsApi, type AdminVariant, type StockChangeResult, type StockMovementRow, type StockState } from "@/lib/api/suitsApi";
 import "./suits.scss";
 
-type SuitInfo = { id: string; sku: string; name: string; stock: number };
-type Props = { suit: SuitInfo | null; onClose: () => void; onChanged: (result: StockChangeResult) => void };
+type SuitInfo = { id: string; sku: string; name: string; stock: number; variants?: AdminVariant[] };
+/** `variantId`: for a suit with image variants, the variant to start with (each variant has its own stock). */
+type Props = { suit: SuitInfo | null; variantId?: string | null; onClose: () => void; onChanged: (result: StockChangeResult) => void };
 
 const MAX_STOCK = 100000; // same limit as the server (src/lib/suitInput.ts)
 const LOW_STOCK_MAX = 3;
@@ -20,8 +22,8 @@ const REASON_LABEL: Record<string, string> = {
 };
 
 /** Mounts a fresh dialog (fresh form state) every time a suit is opened. */
-export default function StockModal({ suit, onClose, onChanged }: Props) {
-  return suit ? <StockDialog key={suit.id} suit={suit} onClose={onClose} onChanged={onChanged} /> : null;
+export default function StockModal({ suit, variantId, onClose, onChanged }: Props) {
+  return suit ? <StockDialog key={suit.id} suit={suit} variantId={variantId} onClose={onClose} onChanged={onChanged} /> : null;
 }
 
 /** "" or a whole number 0..MAX_STOCK; anything else is invalid (null). */
@@ -33,9 +35,13 @@ const parseQty = (v: string): number | null => {
   return n <= MAX_STOCK ? n : null;
 };
 
-function StockDialog({ suit, onClose, onChanged }: Omit<Props, "suit"> & { suit: SuitInfo }) {
+function StockDialog({ suit, variantId: startVariant, onClose, onChanged }: Omit<Props, "suit"> & { suit: SuitInfo }) {
   // The page may have been open for a while (orders also change stock), so the dialog reads the live quantity first.
-  const [current, setCurrent] = useState(suit.stock);
+  const [total, setTotal] = useState(suit.stock);
+  const [variants, setVariants] = useState<AdminVariant[]>(suit.variants ?? []);
+  const [variantId, setVariantId] = useState<string | null>(() => (suit.variants?.length ? (suit.variants.find((v) => v.id === startVariant) ?? suit.variants[0]).id : null));
+  const variant = variants.find((v) => v.id === variantId) ?? null;
+  const current = variant ? variant.stock : total;
   const [fresh, setFresh] = useState(false);
   const [add, setAdd] = useState("");
   const [remove, setRemove] = useState("");
@@ -48,7 +54,14 @@ function StockDialog({ suit, onClose, onChanged }: Omit<Props, "suit"> & { suit:
 
   const refresh = (cancelled = () => false) =>
     Promise.all([
-      suitsApi.stockLevel(suit.id).then((s) => { if (!cancelled()) { setCurrent(s.stock); setFresh(true); } }).catch(() => undefined),
+      suitsApi.stockLevel(suit.id).then((s) => {
+        if (cancelled()) return;
+        setTotal(s.stock);
+        const live = s.variants ?? [];
+        setVariants(live);
+        setVariantId((cur) => (live.length ? (live.find((v) => v.id === cur) ?? live[0]).id : null));
+        setFresh(true);
+      }).catch(() => undefined),
       suitsApi.stockHistory(suit.id).then((h) => !cancelled() && setHistory(h)).catch(() => !cancelled() && setHistory([])),
     ]);
 
@@ -74,6 +87,12 @@ function StockDialog({ suit, onClose, onChanged }: Omit<Props, "suit"> & { suit:
               : "";
   const canSave = !saving && !problem && net !== 0;
 
+  const pickVariant = (id: string) => {
+    if (id === variantId || saving) return;
+    setVariantId(id);
+    setAdd(""); setRemove(""); setError(""); // quantities typed for one variant never carry over to another
+  };
+
   const save = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (inFlight.current) return;
@@ -87,7 +106,7 @@ function StockDialog({ suit, onClose, onChanged }: Omit<Props, "suit"> & { suit:
     try {
       // One relative, atomic change on the server ($inc with a "never below zero" guard), so it can never overwrite an
       // order or another admin's change that happened after this dialog opened.
-      const result = await suitsApi.setStock(suit.id, { mode: "adjust", quantity: net, reason: finalReason, note: note.trim() });
+      const result = await suitsApi.setStock(suit.id, { mode: "adjust", quantity: net, reason: finalReason, note: note.trim(), ...(variantId ? { variantId } : {}) });
       onChanged(result);
       onClose();
     } catch (err) {
@@ -104,10 +123,24 @@ function StockDialog({ suit, onClose, onChanged }: Omit<Props, "suit"> & { suit:
       <p className="admin_stock_suit"><strong>{suit.name}</strong> <span>SKU {suit.sku}</span></p>
       {error && <div className="admin_error_banner" role="alert">{error}</div>}
 
+      {variants.length > 0 && (
+        <div className="admin_stock_variants">
+          <span className="admin_stock_box_label" id="stk-variant-label">Variant <small>(total stock {total})</small></span>
+          <div className="admin_stock_variant_list" role="group" aria-labelledby="stk-variant-label">
+            {variants.map((v) => (
+              <button key={v.id} type="button" className={`admin_stock_variant ${v.id === variantId ? "is_on" : ""}`} onClick={() => pickVariant(v.id)} aria-pressed={v.id === variantId} disabled={saving}>
+                {v.images[0] ? <Image src={v.images[0].url} alt="" width={44} height={52} unoptimized /> : <span className="admin_stock_variant_noimg" />}
+                <span className="admin_stock_variant_text"><strong>{v.code}</strong><small>{v.stock} in stock</small></span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <Form className="admin_form" onSubmit={save} noValidate>
         <div className="admin_stock_summary" aria-live="polite">
           <div className="admin_stock_box">
-            <span className="admin_stock_box_label">Current stock</span>
+            <span className="admin_stock_box_label">Current stock{variant ? ` · ${variant.code}` : ""}</span>
             <strong className="admin_stock_box_value">{current}</strong>
             <span className={`admin_pill ${stockStateOf(current)}`}>{STOCK_STATE_LABEL[stockStateOf(current)]}</span>
             {!fresh && <span className="admin_stock_box_hint">checking…</span>}
@@ -158,11 +191,11 @@ function StockDialog({ suit, onClose, onChanged }: Omit<Props, "suit"> & { suit:
           <summary>Recent stock changes ({Math.min(history.length, 8)})</summary>
           <div className="admin_stock_history_scroll">
             <table className="admin_history_table">
-              <thead><tr><th>When</th><th>Before</th><th>Change</th><th>After</th><th>Reason</th><th>By</th></tr></thead>
+              <thead><tr><th>When</th>{variants.length > 0 && <th>Item</th>}<th>Before</th><th>Change</th><th>After</th><th>Reason</th><th>By</th></tr></thead>
               <tbody>
                 {history.slice(0, 8).map((m) => (
                   <tr key={m.id}>
-                    <td>{new Date(m.createdAt).toLocaleString()}</td><td>{m.previousQty}</td><td>{m.change > 0 ? `+${m.change}` : m.change}</td><td>{m.resultingQty}</td>
+                    <td>{new Date(m.createdAt).toLocaleString()}</td>{variants.length > 0 && <td>{m.sku ?? ""}</td>}<td>{m.previousQty}</td><td>{m.change > 0 ? `+${m.change}` : m.change}</td><td>{m.resultingQty}</td>
                     <td>{REASON_LABEL[m.reason] ?? m.reason}{m.note ? ` · ${m.note}` : ""}</td><td>{m.actorEmail}</td>
                   </tr>
                 ))}

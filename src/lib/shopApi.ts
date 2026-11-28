@@ -8,9 +8,13 @@ export type PublicSuitListItem = {
   originalPricePaise: number; salePricePaise: number; discountPercent: number;
   inStock: boolean; maxQuantity: number; cover: string;
   categories: { id: string; name: string; slug: string }[]; featured: boolean;
+  variantCount?: number; // > 0: chosen on the suit page (each variant has its own stock)
 };
+/** Image variant: same design and price, its own photos and stock. */
+export type PublicSuitVariant = { id: string; code: string; images: string[]; cover: string; inStock: boolean; maxQuantity: number };
 export type PublicSuitDetail = PublicSuitListItem & {
   description: string; details: string; fabricImages: string[]; referenceImages: string[];
+  variants?: PublicSuitVariant[];
   related: PublicSuitListItem[];
 };
 export type SuitList = { items: PublicSuitListItem[]; total: number; page: number; limit: number; pages: number };
@@ -32,7 +36,7 @@ export const suitQueryString = (q: SuitQuery) => {
 export const fetchSuits = async (q: SuitQuery) => (await apiJson<SuitList>(`/api/suits?${suitQueryString(q)}`, { skipLoader: true })).data;
 export const fetchSuit = async (id: string) => (await apiJson<PublicSuitDetail>(`/api/suits/${encodeURIComponent(id)}`, { skipLoader: true })).data;
 export const fetchSuitCategories = async () => (await apiJson<PublicCategory[]>("/api/suit-categories", { skipLoader: true })).data;
-export const validateCartOnServer = async (items: { id: string; quantity: number }[]) =>
+export const validateCartOnServer = async (items: { id: string; variantId?: string; quantity: number }[]) =>
   (await apiJson<CartValidation>("/api/suit-cart/validate", { method: "POST", body: JSON.stringify({ items }), skipLoader: true })).data;
 
 let settingsPromise: Promise<{ whatsappNumber: string | null; boutiqueName: string }> | null = null;

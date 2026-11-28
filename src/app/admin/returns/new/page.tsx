@@ -6,7 +6,7 @@ import { Col, Form, Row } from "react-bootstrap";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import ImageListEditor from "@/components/admin/suits/ImageListEditor";
 import { errorMessage, type SuitImage } from "@/lib/api/suitsApi";
-import { ordersApi, type Order } from "@/lib/api/ordersApi";
+import { orderSuitKey, ordersApi, type Order } from "@/lib/api/ordersApi";
 import { returnsApi } from "@/lib/api/returnsApi";
 import { formatInrPaise } from "@/lib/money";
 import "@/components/admin/suits/suits.scss";
@@ -44,7 +44,8 @@ function NewReturn() {
 
   const days = order?.deliveredAt ? daysBetween(ymd(new Date(order.deliveredAt)), requested) : 0;
   const outside = order ? days > 3 : false;
-  const chosen = order ? order.items.filter((i) => (qty[i.suitId] ?? 0) > 0) : [];
+  // one row per order line (suit + variant); two variants of the same suit are separate lines
+  const chosen = order ? order.items.filter((i) => (qty[orderSuitKey(i)] ?? 0) > 0) : [];
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +57,7 @@ function NewReturn() {
       const r = await returnsApi.create({
         orderId: order.id, type, reasonType, reasonNote: note, unusedUncutConfirmed: confirm, requestedAt: requested,
         exceptionNote: outside ? exception : "", photos: photos.map((p) => p.url),
-        items: chosen.map((i) => ({ suitId: i.suitId, quantity: qty[i.suitId] })),
+        items: chosen.map((i) => ({ suitId: i.suitId, ...(i.variantId ? { variantId: i.variantId } : {}), quantity: qty[orderSuitKey(i)] })),
       });
       router.push(`/admin/returns/${r.id}`);
     } catch (err) {
@@ -87,7 +88,7 @@ function NewReturn() {
                   <thead><tr><th>Suit</th><th>Ordered</th><th>Already returned</th><th style={{ width: 90 }}>Return qty</th></tr></thead>
                   <tbody>{order.items.map((i) => {
                     const left = i.quantity - (i.returnedQuantity ?? 0);
-                    return <tr key={i.suitId}><td>{i.name}<small className="d-block text-muted">{i.sku}</small></td><td>{i.quantity}</td><td>{i.returnedQuantity ?? 0}</td><td><Form.Control aria-label={`Return quantity for ${i.name}`} type="number" min={0} max={left} disabled={left <= 0} value={qty[i.suitId] ?? 0} onChange={(e) => setQty({ ...qty, [i.suitId]: Math.max(0, Math.min(Number(e.target.value) || 0, left)) })} /></td></tr>;
+                    return <tr key={orderSuitKey(i)}><td>{i.name}<small className="d-block text-muted">{i.sku}</small></td><td>{i.quantity}</td><td>{i.returnedQuantity ?? 0}</td><td><Form.Control aria-label={`Return quantity for ${i.name}`} type="number" min={0} max={left} disabled={left <= 0} value={qty[orderSuitKey(i)] ?? 0} onChange={(e) => setQty({ ...qty, [orderSuitKey(i)]: Math.max(0, Math.min(Number(e.target.value) || 0, left)) })} /></td></tr>;
                   })}</tbody>
                 </table>
               )}

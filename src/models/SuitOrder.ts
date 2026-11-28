@@ -10,6 +10,7 @@ export const PAYMENT_STATUSES = ["pending", "paid"] as const;
 const lineSchema = new Schema(
   {
     suitId: { type: Schema.Types.ObjectId, ref: "UnstitchedSuit", required: true },
+    variantId: { type: Schema.Types.ObjectId }, // the suit variant the stock came from (sku is then its code, e.g. SR-0005-V2)
     sku: { type: String, required: true },
     name: { type: String, required: true },
     unitPricePaise: { type: Number, required: true, min: 0, validate: Number.isInteger },

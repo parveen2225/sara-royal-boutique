@@ -8,7 +8,7 @@ export type ReturnInput = {
   reasonType: "preference" | "wrong_item" | "defective";
   reasonNote: string;
   unusedUncutConfirmed: boolean;
-  items: { suitId: string; quantity: number }[];
+  items: { suitId: string; variantId?: string; quantity: number }[];
   photos: { url: string; publicId: string }[];
   requestedAt?: Date;
   exceptionNote: string;
@@ -38,13 +38,15 @@ export function parseReturnInput(body: Record<string, unknown>): Res<ReturnInput
   const rawItems = body.items;
   if (!Array.isArray(rawItems) || rawItems.length < 1 || rawItems.length > 50) return fail("Select the suit(s) being returned.");
   const seen = new Set<string>();
-  const items: { suitId: string; quantity: number }[] = [];
+  const items: { suitId: string; variantId?: string; quantity: number }[] = [];
   for (const r of rawItems) {
-    const row = (r ?? {}) as { suitId?: unknown; quantity?: unknown };
-    if (!isObjectId(row.suitId) || seen.has(row.suitId)) return fail("A returned item is invalid or repeated.");
+    const row = (r ?? {}) as { suitId?: unknown; variantId?: unknown; quantity?: unknown };
+    const variantId = row.variantId === undefined || row.variantId === null || row.variantId === "" ? undefined : row.variantId;
+    const key = `${row.suitId}:${variantId ?? ""}`;
+    if (!isObjectId(row.suitId) || (variantId !== undefined && !isObjectId(variantId)) || seen.has(key)) return fail("A returned item is invalid or repeated.");
     if (typeof row.quantity !== "number" || !Number.isInteger(row.quantity) || row.quantity < 1 || row.quantity > 999) return fail("Returned quantities must be whole numbers.");
-    seen.add(row.suitId);
-    items.push({ suitId: row.suitId, quantity: row.quantity });
+    seen.add(key);
+    items.push({ suitId: row.suitId, ...(variantId ? { variantId } : {}), quantity: row.quantity });
   }
   const photos = parsePhotos(body.photos ?? []);
   if (!photos.ok) return fail(photos.message);

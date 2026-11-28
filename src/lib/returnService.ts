@@ -9,6 +9,8 @@ import { cleanText, isObjectId } from "@/lib/validation";
 import { daysBetweenYmd, parsePhotos, type ReturnInput } from "@/lib/returnInput";
 import { parseCourier } from "@/lib/orderInput";
 import type { AuthUser } from "@/lib/auth/permissions";
+import { findVariant, hasVariants, restoreTarget, stockIncOp, trackedQty, trackedSku } from "@/lib/variantStock";
+import { Types } from "mongoose";
 
 export class ReturnError extends Error {
   constructor(public status: number, message: string) { super(message); }
@@ -19,19 +21,24 @@ type Doc = any;
 const hist = (action: string, a: Pick<Actor, "id" | "email">, note = "") => ({ at: new Date(), action, byId: a.id, byEmail: a.email, note });
 export const formatReturnId = (year: number, seq: number) => `SRR-${year}-${String(seq).padStart(4, "0")}`;
 
-async function reserve(ctx: AtomicCtx, orderRef: string, lineQty: number, suitId: string, qty: number) {
+/** An order line is one suit + (optional) variant; lines without a variant have none stored (matched by null). */
+const lineKey = (suitId: unknown, variantId?: unknown) => `${String(suitId)}:${variantId ? String(variantId) : ""}`;
+const lineMatch = (suitId: unknown, variantId?: unknown) => ({ suitId: new Types.ObjectId(String(suitId)), variantId: variantId ? new Types.ObjectId(String(variantId)) : null });
+const lineFilter = (suitId: unknown, variantId?: unknown) => { const m = lineMatch(suitId, variantId); return { "el.suitId": m.suitId, "el.variantId": m.variantId }; };
+
+async function reserve(ctx: AtomicCtx, orderRef: string, lineQty: number, suitId: string, variantId: string | undefined, qty: number) {
   const res = await SuitOrder.updateOne(
-    { _id: orderRef, items: { $elemMatch: { suitId, returnedQuantity: { $lte: lineQty - qty } } } },
+    { _id: orderRef, items: { $elemMatch: { ...lineMatch(suitId, variantId), returnedQuantity: { $lte: lineQty - qty } } } },
     { $inc: { "items.$[el].returnedQuantity": qty } },
-    { session: ctx.session ?? undefined, arrayFilters: [{ "el.suitId": suitId }] },
+    { session: ctx.session ?? undefined, arrayFilters: [lineFilter(suitId, variantId)] },
   );
   if (res.modifiedCount !== 1) throw new ReturnError(409, "More units are being returned than were ordered (including other return requests).");
-  ctx.onUndo(async () => { await SuitOrder.updateOne({ _id: orderRef }, { $inc: { "items.$[el].returnedQuantity": -qty } }, { arrayFilters: [{ "el.suitId": suitId }] }); });
+  ctx.onUndo(async () => { await SuitOrder.updateOne({ _id: orderRef }, { $inc: { "items.$[el].returnedQuantity": -qty } }, { arrayFilters: [lineFilter(suitId, variantId)] }); });
 }
-async function release(ctx: AtomicCtx, orderRef: string, items: { suitId: unknown; quantity: number }[]) {
+async function release(ctx: AtomicCtx, orderRef: string, items: { suitId: unknown; variantId?: unknown; quantity: number }[]) {
   for (const i of items) {
-    await SuitOrder.updateOne({ _id: orderRef }, { $inc: { "items.$[el].returnedQuantity": -i.quantity } }, { session: ctx.session ?? undefined, arrayFilters: [{ "el.suitId": i.suitId }] });
-    ctx.onUndo(async () => { await SuitOrder.updateOne({ _id: orderRef }, { $inc: { "items.$[el].returnedQuantity": i.quantity } }, { arrayFilters: [{ "el.suitId": i.suitId }] }); });
+    await SuitOrder.updateOne({ _id: orderRef }, { $inc: { "items.$[el].returnedQuantity": -i.quantity } }, { session: ctx.session ?? undefined, arrayFilters: [lineFilter(i.suitId, i.variantId)] });
+    ctx.onUndo(async () => { await SuitOrder.updateOne({ _id: orderRef }, { $inc: { "items.$[el].returnedQuantity": i.quantity } }, { arrayFilters: [lineFilter(i.suitId, i.variantId)] }); });
   }
 }
 
@@ -45,9 +52,10 @@ export async function createReturn(input: ReturnInput, actor: Actor): Promise<Do
   const withinWindow = days <= RETURN_WINDOW_DAYS;
   if (!withinWindow && input.exceptionNote.length < 5) throw new ReturnError(400, `This request is ${days} days after delivery (standard window: ${RETURN_WINDOW_DAYS} days). Add a note explaining why you are accepting it as an exception.`);
 
-  const lines = new Map<string, Doc>((order.items as Doc[]).map((l) => [String(l.suitId), l]));
+  const lines = new Map<string, Doc>((order.items as Doc[]).map((l) => [lineKey(l.suitId, l.variantId), l]));
+  const lineOf = (it: { suitId: string; variantId?: string }) => lines.get(lineKey(it.suitId, it.variantId));
   for (const it of input.items) {
-    const line = lines.get(it.suitId);
+    const line = lineOf(it);
     if (!line) throw new ReturnError(400, "A selected suit is not part of this order.");
     const remaining = line.quantity - (line.returnedQuantity ?? 0);
     if (it.quantity > remaining) throw new ReturnError(409, `Only ${remaining} unit(s) of ${line.sku} can still be returned.`);
@@ -57,11 +65,11 @@ export async function createReturn(input: ReturnInput, actor: Actor): Promise<Do
   const paidBy = input.reasonType === "preference" ? "customer" : "boutique";
 
   return atomically(async (ctx) => {
-    for (const it of input.items) await reserve(ctx, input.orderRef, lines.get(it.suitId).quantity, it.suitId, it.quantity);
+    for (const it of input.items) await reserve(ctx, input.orderRef, lineOf(it).quantity, it.suitId, it.variantId, it.quantity);
     const [created] = await SuitReturn.create([{
       returnId, orderRef: order._id, orderId: order.orderId, type: input.type, reasonType: input.reasonType, reasonNote: input.reasonNote,
       unusedUncutConfirmed: input.unusedUncutConfirmed,
-      items: input.items.map((it) => { const l = lines.get(it.suitId); return { suitId: l.suitId, sku: l.sku, name: l.name, quantity: it.quantity, unitPricePaise: l.unitPricePaise }; }),
+      items: input.items.map((it) => { const l = lineOf(it); return { suitId: l.suitId, ...(l.variantId ? { variantId: l.variantId } : {}), sku: l.sku, name: l.name, quantity: it.quantity, unitPricePaise: l.unitPricePaise }; }),
       photos: input.photos, requestedAt, deliveredAtSnapshot: order.deliveredAt, withinWindow, exceptionNote: input.exceptionNote,
       returnShipping: { paidBy }, history: [hist("requested", actor, input.reasonNote)], createdById: actor.id, createdByEmail: actor.email,
     }], { session: ctx.session ?? undefined });
@@ -123,10 +131,16 @@ export async function returnAction(id: string, body: Record<string, unknown>, ac
         ctx.onUndo(async () => { await SuitReturn.updateOne({ _id: id }, { $set: { restocked: false }, $unset: { restockedAt: 1 }, $pop: { history: 1 } }); });
         const rows: Record<string, unknown>[] = [];
         for (const it of before.items as Doc[]) {
-          const after = await UnstitchedSuit.findOneAndUpdate({ _id: it.suitId }, { $inc: { stock: it.quantity } }, { session, returnDocument: "after" }).lean<Doc>();
-          if (!after) throw new ReturnError(409, `Suit ${it.sku} no longer exists, so stock cannot be restored.`);
-          ctx.onUndo(async () => { await UnstitchedSuit.updateOne({ _id: it.suitId }, { $inc: { stock: -it.quantity } }); });
-          rows.push({ suitId: it.suitId, sku: it.sku, previousQty: after.stock - it.quantity, change: it.quantity, resultingQty: after.stock, reason: "return_restock", note: "", refType: "return", refId: before.returnId, actorId: actor.id, actorEmail: actor.email });
+          const suit = await UnstitchedSuit.findById(it.suitId).select("sku stock variants").session(ctx.session ?? null).lean<Doc>();
+          if (!suit) throw new ReturnError(409, `Suit ${it.sku} no longer exists, so stock cannot be restored.`);
+          const variantId = restoreTarget(suit, it.variantId); // the returned variant (see restoreTarget for changed variants)
+          const op = stockIncOp(it.suitId, variantId, it.quantity);
+          const after = await UnstitchedSuit.findOneAndUpdate(op.filter, op.update, { ...op.options, session, returnDocument: "after" }).lean<Doc>();
+          if (!after) throw new ReturnError(409, `Stock for ${it.sku} changed meanwhile. Please try again.`);
+          const undo = stockIncOp(it.suitId, variantId, -it.quantity);
+          ctx.onUndo(async () => { await UnstitchedSuit.updateOne({ _id: it.suitId }, undo.update, undo.options); });
+          const resultingQty = trackedQty(after, variantId);
+          rows.push({ suitId: it.suitId, sku: trackedSku(after, variantId), ...(variantId ? { variantId } : {}), previousQty: resultingQty - it.quantity, change: it.quantity, resultingQty, reason: "return_restock", note: "", refType: "return", refId: before.returnId, actorId: actor.id, actorEmail: actor.email });
         }
         await StockMovement.insertMany(rows, { session });
         ctx.onUndo(async () => { await StockMovement.deleteMany({ refType: "return", refId: before.returnId, reason: "return_restock" }); });
@@ -139,13 +153,15 @@ export async function returnAction(id: string, body: Record<string, unknown>, ac
       if (ret.exchange?.fulfilled) throw conflict("The replacement has already been sent, so the resolution cannot change.");
       const $set: Record<string, unknown> = { resolution };
       if (resolution === "exchange") {
-        const ex = (body.exchange ?? {}) as { replacementSuitId?: unknown; quantity?: unknown };
+        const ex = (body.exchange ?? {}) as { replacementSuitId?: unknown; replacementVariantId?: unknown; quantity?: unknown };
         if (!isObjectId(ex.replacementSuitId)) throw new ReturnError(400, "Choose the replacement suit.");
         const qty = typeof ex.quantity === "number" && Number.isInteger(ex.quantity) && ex.quantity >= 1 && ex.quantity <= 999 ? ex.quantity : null;
         if (!qty) throw new ReturnError(400, "Replacement quantity must be a whole number.");
-        const suit = await UnstitchedSuit.findById(ex.replacementSuitId).select("sku name").lean<Doc>();
+        const suit = await UnstitchedSuit.findById(ex.replacementSuitId).select("sku name stock variants").lean<Doc>();
         if (!suit) throw new ReturnError(400, "Replacement suit not found.");
-        Object.assign($set, { "exchange.replacementSuitId": suit._id, "exchange.sku": suit.sku, "exchange.name": suit.name, "exchange.quantity": qty, "exchange.fulfilled": false });
+        const variant = findVariant(suit, ex.replacementVariantId);
+        if (hasVariants(suit) && !variant) throw new ReturnError(400, `Choose which variant of ${suit.sku} to send.`);
+        Object.assign($set, { "exchange.replacementSuitId": suit._id, "exchange.replacementVariantId": variant ? variant._id : null, "exchange.sku": variant ? variant.code : suit.sku, "exchange.name": suit.name, "exchange.quantity": qty, "exchange.fulfilled": false });
       }
       const r = await SuitReturn.findOneAndUpdate({ _id: id, "decision.status": "approved", "exchange.fulfilled": { $ne: true } }, { $set, $push: { history: hist(`resolution_${resolution}`, actor, note) } }, { returnDocument: "after" }).lean<Doc>();
       if (!r) throw conflict("The resolution could not be changed.");
@@ -163,10 +179,14 @@ export async function returnAction(id: string, body: Record<string, unknown>, ac
         if (!before) throw conflict("Choose the exchange resolution and a replacement first; the replacement can only be sent once.");
         ctx.onUndo(async () => { await SuitReturn.updateOne({ _id: id }, { $set: { "exchange.fulfilled": false }, $unset: { "exchange.fulfilledAt": 1 }, $pop: { history: 1 } }); });
         const ex = before.exchange as Doc;
-        const after = await UnstitchedSuit.findOneAndUpdate({ _id: ex.replacementSuitId, stock: { $gte: ex.quantity } }, { $inc: { stock: -ex.quantity } }, { session, returnDocument: "after" }).lean<Doc>();
+        const vid = ex.replacementVariantId ?? null;
+        const op = stockIncOp(ex.replacementSuitId, vid, -ex.quantity);
+        const after = await UnstitchedSuit.findOneAndUpdate(op.filter, op.update, { ...op.options, session, returnDocument: "after" }).lean<Doc>();
         if (!after) throw conflict(`Not enough stock of ${ex.sku} for the replacement.`);
-        ctx.onUndo(async () => { await UnstitchedSuit.updateOne({ _id: ex.replacementSuitId }, { $inc: { stock: ex.quantity } }); });
-        await StockMovement.create([{ suitId: ex.replacementSuitId, sku: ex.sku, previousQty: after.stock + ex.quantity, change: -ex.quantity, resultingQty: after.stock, reason: "exchange", note: "", refType: "return", refId: before.returnId, actorId: actor.id, actorEmail: actor.email }], { session });
+        const undo = stockIncOp(ex.replacementSuitId, vid, ex.quantity);
+        ctx.onUndo(async () => { await UnstitchedSuit.updateOne({ _id: ex.replacementSuitId }, undo.update, undo.options); });
+        const resultingQty = trackedQty(after, vid);
+        await StockMovement.create([{ suitId: ex.replacementSuitId, sku: ex.sku, ...(vid ? { variantId: vid } : {}), previousQty: resultingQty + ex.quantity, change: -ex.quantity, resultingQty, reason: "exchange", note: "", refType: "return", refId: before.returnId, actorId: actor.id, actorEmail: actor.email }], { session });
         ctx.onUndo(async () => { await StockMovement.deleteMany({ refType: "return", refId: before.returnId, reason: "exchange" }); });
       });
     }
@@ -200,11 +220,11 @@ export function serializeReturn(r: Doc) {
   return {
     id: String(r._id), returnId: r.returnId, orderRef: String(r.orderRef), orderId: r.orderId, type: r.type,
     reasonType: r.reasonType, reasonNote: r.reasonNote, unusedUncutConfirmed: r.unusedUncutConfirmed,
-    items: r.items.map((i: Doc) => ({ suitId: String(i.suitId), sku: i.sku, name: i.name, quantity: i.quantity, unitPricePaise: i.unitPricePaise })),
+    items: r.items.map((i: Doc) => ({ suitId: String(i.suitId), variantId: i.variantId ? String(i.variantId) : null, sku: i.sku, name: i.name, quantity: i.quantity, unitPricePaise: i.unitPricePaise })),
     photos: (r.photos ?? []).map((p: Doc) => p.url),
     requestedAt: r.requestedAt, deliveredAt: r.deliveredAtSnapshot, withinWindow: r.withinWindow, exceptionNote: r.exceptionNote,
     returnShipping: r.returnShipping, decision: r.decision, receipt: r.receipt, inspection: r.inspection, resolution: r.resolution,
-    exchange: r.exchange?.replacementSuitId ? { replacementSuitId: String(r.exchange.replacementSuitId), sku: r.exchange.sku, name: r.exchange.name, quantity: r.exchange.quantity, fulfilled: Boolean(r.exchange.fulfilled), fulfilledAt: r.exchange.fulfilledAt } : null,
+    exchange: r.exchange?.replacementSuitId ? { replacementSuitId: String(r.exchange.replacementSuitId), replacementVariantId: r.exchange.replacementVariantId ? String(r.exchange.replacementVariantId) : null, sku: r.exchange.sku, name: r.exchange.name, quantity: r.exchange.quantity, fulfilled: Boolean(r.exchange.fulfilled), fulfilledAt: r.exchange.fulfilledAt } : null,
     restocked: r.restocked, restockedAt: r.restockedAt, history: r.history, createdByEmail: r.createdByEmail, createdAt: r.createdAt,
   };
 }

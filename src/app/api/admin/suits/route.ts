@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
-import UnstitchedSuit, { nextSku } from "@/models/UnstitchedSuit";
+import { Types } from "mongoose";
+import UnstitchedSuit, { formatVariantCode, nextSku } from "@/models/UnstitchedSuit";
 import SuitCategory from "@/models/SuitCategory";
 import StockMovement from "@/models/StockMovement";
 import { jsonError, jsonOk } from "@/lib/api/utils";
@@ -83,6 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     const sku = await nextSku(); // after validation, so SKUs are not consumed by obviously bad requests
+    const variants = (data.variants ?? []).map((v, i) => ({ _id: new Types.ObjectId(), code: formatVariantCode(sku, i + 1), images: v.images, stock: v.stock ?? 0 }));
     const suit = await UnstitchedSuit.create({
       sku,
       name: data.name,
@@ -98,11 +100,17 @@ export async function POST(req: NextRequest) {
       referenceImages: data.referenceImages ?? [],
       featured: data.featured ?? false,
       status: data.status ?? "draft",
+      variants,
+      variantSeq: variants.length,
     });
-    if (suit.stock > 0) {
+    if (variants.length) {
+      // one opening-stock row per variant, so each variant's history starts from its own quantity
+      const rows = variants.filter((v) => v.stock > 0).map((v) => ({ suitId: suit._id, sku: v.code, variantId: v._id, previousQty: 0, change: v.stock, resultingQty: v.stock, reason: "initial", note: "Initial stock", actorId: auth.user.id, actorEmail: auth.user.email }));
+      if (rows.length) await StockMovement.insertMany(rows);
+    } else if (suit.stock > 0) {
       await StockMovement.create({ suitId: suit._id, sku: suit.sku, previousQty: 0, change: suit.stock, resultingQty: suit.stock, reason: "initial", note: "Initial stock", actorId: auth.user.id, actorEmail: auth.user.email });
     }
-    await logAudit(auth.user, "suit.created", { type: "suit", id: String(suit._id) }, `${suit.sku} ${suit.name}`, { status: suit.status });
+    await logAudit(auth.user, "suit.created", { type: "suit", id: String(suit._id) }, `${suit.sku} ${suit.name}`, { status: suit.status, ...(variants.length ? { variants: variants.length } : {}) });
     return jsonOk(serializeAdminSuit(suit.toObject() as never), { status: 201 });
   } catch (error) {
     if (error instanceof BadRequestError) return jsonError(error.message, 400);

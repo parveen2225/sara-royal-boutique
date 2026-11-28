@@ -8,10 +8,10 @@ import QuantityStepper from "@/components/shop/QuantityStepper";
 import ShoppingBagIcon from "@/components/shop/ShoppingBagIcon";
 import { cartStore } from "@/lib/cartStore";
 import { useCart, useShopSettings } from "@/lib/useShop";
-import { applyValidation, lineTotalPaise, type CartIssue } from "@/lib/cartCore";
+import { applyValidation, lineKey, lineTotalPaise, type CartIssue, type CartItem } from "@/lib/cartCore";
 import { validateCartOnServer } from "@/lib/shopApi";
 import { formatInrPaise } from "@/lib/money";
-import { buildOrderMessage, buildWhatsAppUrl } from "@/lib/suitWhatsapp";
+import { buildOrderMessage, buildWhatsAppUrl, variantPageUrl } from "@/lib/suitWhatsapp";
 import { suitPublicUrl } from "@/lib/siteUrl";
 import { BoutiqueWhatsAppIcon } from "@/assets/icons/svgIcon";
 import "@/components/shop/shop.scss";
@@ -34,6 +34,10 @@ const AlertDot = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.4v.1" /></svg>
 );
 
+// A line is a suit, or one image variant of a suit (its own stock); variant lines carry the variant to the server and WhatsApp.
+const toServer = (i: CartItem) => ({ id: i.id, ...(i.variantId ? { variantId: i.variantId } : {}), quantity: i.quantity });
+const itemHref = (i: CartItem) => (i.variantId ? `/suits/${i.id}?v=${encodeURIComponent(i.variantId)}` : `/suits/${i.id}`);
+
 export default function CartPage() {
   const { items, count, subtotalPaise } = useCart();
   const settings = useShopSettings();
@@ -44,19 +48,19 @@ export default function CartPage() {
   const [confirmClear, setConfirmClear] = useState(false);
 
   // Re-check prices, stock and availability whenever the cart page opens.
-  const idsKey = items.map((i) => `${i.id}:${i.quantity}`).join(",");
+  const idsKey = items.map((i) => `${lineKey(i)}:${i.quantity}`).join(",");
   const [checkedKey, setCheckedKey] = useState("");
   useEffect(() => {
     if (items.length === 0 || checkedKey === idsKey) return;
     let cancelled = false;
-    validateCartOnServer(items.map((i) => ({ id: i.id, quantity: i.quantity })))
+    validateCartOnServer(items.map(toServer))
       .then((v) => {
         if (cancelled) return;
         const r = applyValidation(cartStore.getSnapshot(), v.items);
         setIssues(r.issues);
         setNotes(r.changes);
         setError("");
-        setCheckedKey(r.items.map((i) => `${i.id}:${i.quantity}`).join(","));
+        setCheckedKey(r.items.map((i) => `${lineKey(i)}:${i.quantity}`).join(","));
         cartStore.replaceAll(r.items);
       })
       .catch(() => !cancelled && setError("We could not refresh prices and stock. Check your connection and try again."));
@@ -74,7 +78,7 @@ export default function CartPage() {
     const tab = window.open("", "_blank");
     setChecking(true);
     try {
-      const v = await validateCartOnServer(items.map((i) => ({ id: i.id, quantity: i.quantity })));
+      const v = await validateCartOnServer(items.map(toServer));
       const r = applyValidation(cartStore.getSnapshot(), v.items);
       cartStore.replaceAll(r.items);
       setIssues(r.issues);
@@ -84,7 +88,7 @@ export default function CartPage() {
         setError("Please review the highlighted items before checking out.");
         return;
       }
-      const text = buildOrderMessage(r.items.map((i) => ({ name: i.name, sku: i.sku, quantity: i.quantity, unitPricePaise: i.unitPricePaise, url: suitPublicUrl(i.id) })), settings.boutiqueName || undefined);
+      const text = buildOrderMessage(r.items.map((i) => ({ name: i.name, sku: i.sku, quantity: i.quantity, unitPricePaise: i.unitPricePaise, url: variantPageUrl(suitPublicUrl(i.id), i.variantId), ...(i.variantId ? { variant: i.variantCode || undefined, image: i.image } : {}) })), settings.boutiqueName || undefined);
       const url = buildWhatsAppUrl(settings.whatsappNumber, text);
       if (!url) throw new Error("bad number");
       if (tab) { tab.opener = null; tab.location.href = url; } else window.location.href = url;
@@ -137,23 +141,23 @@ export default function CartPage() {
         <div className="cart_layout">
           <section aria-label="Cart items">
             <ul className="cart_list">
-              {items.map((i) => (
-                <li key={i.id} className={`cart_item ${issues[i.id] ? "has_issue" : ""}`}>
-                  <Link href={`/suits/${i.id}`} className="cart_img" tabIndex={-1} aria-hidden="true">
+              {items.map((i) => { const key = lineKey(i); return (
+                <li key={key} className={`cart_item ${issues[key] ? "has_issue" : ""}`}>
+                  <Link href={itemHref(i)} className="cart_img" tabIndex={-1} aria-hidden="true">
                     {i.image && <Image src={i.image} alt="" fill sizes="(max-width: 767px) 96px, 120px" />}
                   </Link>
                   <div className="cart_info">
-                    <h3 className="cart_name"><Link href={`/suits/${i.id}`}>{i.name}</Link></h3>
-                    <p className="cart_meta"><span className="cart_sku">{i.sku}</span><span className="cart_unit"><strong>{formatInrPaise(i.unitPricePaise)}</strong> each</span></p>
-                    {issues[i.id] && <p className="cart_issue" role="alert"><AlertDot /><span>{ISSUE_TEXT[issues[i.id]]}</span></p>}
-                    {i.maxQuantity > 0 ? <QuantityStepper value={i.quantity} max={i.maxQuantity} onChange={(n) => cartStore.setQuantity(i.id, n)} label={`Quantity of ${i.name}`} /> : <span className="cart_unavailable">Unavailable</span>}
+                    <h3 className="cart_name"><Link href={itemHref(i)}>{i.name}</Link></h3>
+                    <p className="cart_meta"><span className="cart_sku">{i.variantId && i.variantCode ? `Design ${i.variantCode}` : i.sku}</span><span className="cart_unit"><strong>{formatInrPaise(i.unitPricePaise)}</strong> each</span></p>
+                    {issues[key] && <p className="cart_issue" role="alert"><AlertDot /><span>{ISSUE_TEXT[issues[key]]}</span></p>}
+                    {i.maxQuantity > 0 ? <QuantityStepper value={i.quantity} max={i.maxQuantity} onChange={(n) => cartStore.setQuantity(key, n)} label={`Quantity of ${i.name}`} /> : <span className="cart_unavailable">Unavailable</span>}
                   </div>
                   <div className="cart_side">
                     <div className="cart_line_total"><span>Subtotal</span><strong>{formatInrPaise(lineTotalPaise(i))}</strong></div>
-                    <button type="button" className="cart_remove" onClick={() => cartStore.remove(i.id)} aria-label={`Remove ${i.name}`}><TrashIcon /> Remove</button>
+                    <button type="button" className="cart_remove" onClick={() => cartStore.remove(key)} aria-label={`Remove ${i.name}${i.variantCode ? ` (${i.variantCode})` : ""}`}><TrashIcon /> Remove</button>
                   </div>
                 </li>
-              ))}
+              ); })}
             </ul>
             <div className="cart_footer">
               {confirmClear ? (

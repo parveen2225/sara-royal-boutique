@@ -12,12 +12,19 @@ import "./suits.scss";
 type Props = {
   categories: SuitCategory[];
   suit?: AdminSuit; // editing when present
-  canSetStock: boolean; // create only: initial stock needs the stock permission
+  canSetStock: boolean; // opening stock (of the suit on create, or of a new variant) needs the stock permission
   submitLabel: string;
   onSubmit: (body: Record<string, unknown>) => Promise<void>;
 };
 
 const MONEY = /^\d{1,9}(\.\d{1,2})?$/;
+const MAX_VARIANTS = 12;
+const MAX_VARIANT_IMAGES = 6;
+
+/** A variant row in the form. `id` = already saved (its stock then changes only through "Adjust stock"). */
+type VariantDraft = { key: string; id?: string; images: SuitImage[]; stock: string };
+let draftSeq = 0;
+const newDraft = (images: SuitImage[] = []): VariantDraft => ({ key: `new-${++draftSeq}`, images, stock: "0" });
 
 export default function SuitForm({ categories, suit, canSetStock, submitLabel, onSubmit }: Props) {
   const editing = Boolean(suit);
@@ -33,6 +40,7 @@ export default function SuitForm({ categories, suit, canSetStock, submitLabel, o
   const [fabricImages, setFabricImages] = useState<SuitImage[]>(suit?.fabricImages ?? []);
   const [referenceImages, setReferenceImages] = useState<SuitImage[]>(suit?.referenceImages ?? []);
   const [stock, setStock] = useState("0");
+  const [variants, setVariants] = useState<VariantDraft[]>(() => (suit?.variants ?? []).map((v) => ({ key: v.id, id: v.id, images: v.images, stock: "" })));
   const [publishNow, setPublishNow] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -50,6 +58,10 @@ export default function SuitForm({ categories, suit, canSetStock, submitLabel, o
     if (sale && !MONEY.test(sale)) return setError("Enter the sale price as a number (max 2 decimals).");
     if (sale && Number(sale) > Number(original)) return setError("Sale price cannot exceed the original price.");
     if (!editing && publishNow && fabricImages.length === 0) return setError("Add at least one fabric image before publishing.");
+    for (const [i, v] of variants.entries()) {
+      if (v.images.length === 0) return setError(`Variant ${i + 1} needs at least one image.`);
+      if (!v.id && canSetStock && !/^\d{1,6}$/.test(v.stock.trim() || "0")) return setError(`Variant ${i + 1}: opening stock must be a whole number, 0 or more.`);
+    }
 
     const body: Record<string, unknown> = {
       name, fabric, color, description, details, featured, categoryIds,
@@ -58,8 +70,16 @@ export default function SuitForm({ categories, suit, canSetStock, submitLabel, o
       fabricImages: fabricImages.map((i) => i.url),
       referenceImages: referenceImages.map((i) => i.url),
     };
+    // Variants are sent whenever the suit has (or had) any, as the full ordered list. Existing variants never send a
+    // stock number: their stock only changes through orders, returns and "Adjust stock".
+    if (variants.length > 0 || (suit?.variants.length ?? 0) > 0) {
+      body.variants = variants.map((v) => ({
+        ...(v.id ? { id: v.id } : canSetStock ? { stock: Number(v.stock.trim() || "0") } : {}),
+        images: v.images.map((i) => i.url),
+      }));
+    }
     if (!editing) {
-      if (canSetStock) {
+      if (canSetStock && variants.length === 0) {
         const n = Number(stock);
         if (!Number.isInteger(n) || n < 0) return setError("Stock must be a whole number, 0 or more.");
         body.stock = n;
@@ -75,6 +95,17 @@ export default function SuitForm({ categories, suit, canSetStock, submitLabel, o
       setSaving(false);
     }
   };
+
+  const liveStock = (id?: string) => suit?.variants.find((v) => v.id === id)?.stock ?? 0;
+  const updateVariant = (key: string, patch: Partial<VariantDraft>) => setVariants((cur) => cur.map((v) => (v.key === key ? { ...v, ...patch } : v)));
+  const moveVariant = (from: number, to: number) => setVariants((cur) => {
+    if (to < 0 || to >= cur.length) return cur;
+    const next = [...cur];
+    [next[from], next[to]] = [next[to], next[from]];
+    return next;
+  });
+  const openingTotal = variants.reduce((sum, v) => sum + (v.id ? liveStock(v.id) : Number(v.stock) || 0), 0);
+  const converting = editing && (suit?.variants.length ?? 0) === 0 && variants.length > 0 && (suit?.stock ?? 0) > 0;
 
   const toggleCategory = (id: string) => setCategoryIds((cur) => (cur.includes(id) ? cur.filter((c) => c !== id) : [...cur, id]));
   const shown = categories.filter((c) => c.active || categoryIds.includes(c.id));
@@ -116,7 +147,7 @@ export default function SuitForm({ categories, suit, canSetStock, submitLabel, o
             <Form.Control id="suit-sale" inputMode="decimal" value={sale} onChange={(e) => setSale(e.target.value)} placeholder="Leave empty for no sale" aria-describedby="suit-sale-hint" aria-invalid={error.includes("sale price") || error.startsWith("Sale price")} />
             <Form.Text id="suit-sale-hint" className="text-muted">{discount > 0 ? `${discount}% off will be shown` : "No discount badge"}</Form.Text>
           </Col>
-          {!editing && canSetStock && (
+          {!editing && canSetStock && variants.length === 0 && (
             <Col md={4}>
               <Form.Label htmlFor="suit-stock">Opening stock</Form.Label>
               <Form.Control id="suit-stock" type="number" min={0} step={1} value={stock} onChange={(e) => setStock(e.target.value)} />
@@ -169,6 +200,53 @@ export default function SuitForm({ categories, suit, canSetStock, submitLabel, o
           max={5}
           onChange={setReferenceImages}
         />
+      </FormSection>
+
+      <FormSection
+        title="Image variants (optional)"
+        description="Same design in other colours. Each variant has its own photos and stock, and customers choose one by tapping its photo. All variants use the price above; the fabric images above stay the cover on cards and listings."
+      >
+        {converting && (
+          <div className="admin_variant_notice" role="note">
+            This suit has <strong>{suit!.stock}</strong> in stock today. After saving with variants, stock is counted per variant: enter each variant’s opening stock below (their total replaces the current {suit!.stock}).
+          </div>
+        )}
+        {variants.length === 0 && <p className="text-muted small mb-2">No variants. Customers buy the suit as shown above.</p>}
+        <div className="admin_variant_list">
+          {variants.map((v, i) => {
+            const saved = v.id ? suit?.variants.find((x) => x.id === v.id) : undefined;
+            const stockLeft = v.id ? liveStock(v.id) : 0;
+            return (
+              <div className="admin_variant_card" key={v.key} data-testid="variant-card">
+                <div className="admin_variant_head">
+                  <strong>Variant {i + 1}</strong>
+                  {saved && <span className="admin_variant_code">{saved.code}</span>}
+                  <span className="admin_variant_tools">
+                    <button type="button" onClick={() => moveVariant(i, i - 1)} disabled={i === 0} aria-label={`Move variant ${i + 1} earlier`}>◀</button>
+                    <button type="button" onClick={() => moveVariant(i, i + 1)} disabled={i === variants.length - 1} aria-label={`Move variant ${i + 1} later`}>▶</button>
+                    <button type="button" className="is_danger" onClick={() => setVariants((cur) => cur.filter((x) => x.key !== v.key))} disabled={stockLeft > 0}
+                      title={stockLeft > 0 ? "Set this variant's stock to 0 with Adjust stock before removing it" : undefined}>Remove</button>
+                  </span>
+                </div>
+                <ImageListEditor label={`Variant ${i + 1} photos`} images={v.images} max={MAX_VARIANT_IMAGES} coverLabel="Thumbnail" onChange={(images) => updateVariant(v.key, { images })} />
+                {v.id ? (
+                  <p className="admin_variant_stock_note mb-0">Stock: <strong>{stockLeft}</strong>{stockLeft > 0 ? " · change it with “Adjust stock” above" : " · use “Adjust stock” above to add pieces"}</p>
+                ) : canSetStock ? (
+                  <div className="admin_variant_stock_input">
+                    <Form.Label htmlFor={`variant-stock-${v.key}`}>Opening stock</Form.Label>
+                    <Form.Control id={`variant-stock-${v.key}`} type="number" min={0} step={1} value={v.stock} onChange={(e) => updateVariant(v.key, { stock: e.target.value })} />
+                  </div>
+                ) : (
+                  <p className="admin_variant_stock_note mb-0">Starts with 0 in stock (you do not have permission to set stock).</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="d-flex flex-wrap align-items-center gap-3 mt-2">
+          <button type="button" className="admin_outline_btn admin_sm_btn" onClick={() => setVariants((cur) => [...cur, newDraft()])} disabled={variants.length >= MAX_VARIANTS}>+ Add variant</button>
+          {variants.length > 0 && <span className="text-muted small">{variants.length} of {MAX_VARIANTS} · total stock {openingTotal}</span>}
+        </div>
       </FormSection>
 
       <FormSection title="Visibility">

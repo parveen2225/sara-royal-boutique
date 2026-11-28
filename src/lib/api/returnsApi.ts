@@ -8,14 +8,14 @@ const qs = (q: object) => { const p = new URLSearchParams(); for (const [k, v] o
 export type ReturnRow = {
   id: string; returnId: string; orderRef: string; orderId: string; type: "return" | "exchange";
   reasonType: "preference" | "wrong_item" | "defective"; reasonNote: string; unusedUncutConfirmed: boolean;
-  items: { suitId: string; sku: string; name: string; quantity: number; unitPricePaise: number }[];
+  items: { suitId: string; variantId?: string | null; sku: string; name: string; quantity: number; unitPricePaise: number }[];
   photos: string[]; requestedAt: string; deliveredAt: string; withinWindow: boolean; exceptionNote: string;
   returnShipping: { courier?: string; trackingNumber?: string; trackingUrl?: string; paidBy: "boutique" | "customer" };
   decision: { status: "pending" | "approved" | "rejected"; byEmail?: string; at?: string; note?: string };
   receipt: { status: "not_received" | "received"; at?: string };
   inspection: { result: "pending" | "resellable" | "not_resellable"; note?: string };
   resolution: "none" | "refund" | "exchange" | "closed" | "rejected";
-  exchange: { replacementSuitId: string; sku: string; name: string; quantity: number; fulfilled: boolean } | null;
+  exchange: { replacementSuitId: string; replacementVariantId?: string | null; sku: string; name: string; quantity: number; fulfilled: boolean } | null;
   restocked: boolean; history: { at: string; action: string; byEmail: string; note: string }[]; createdAt: string;
 };
 export type ReturnDetail = ReturnRow & { stockMovements: { sku: string; change: number; resultingQty: number; reason: string }[]; refunds: RefundRow[] };

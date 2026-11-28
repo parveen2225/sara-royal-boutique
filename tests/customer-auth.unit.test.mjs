@@ -101,8 +101,13 @@ test("static: admin login, admin session and admin middleware are untouched", ()
 // uniform 503 + per-request cookie options), which are covered by tests/auth.integration.test.mjs.
 const adminFiles = ["middleware.ts", "src/lib/auth/guard.ts", "src/lib/auth/edgeJwt.ts", "src/lib/auth/origin.ts", "src/lib/auth/permissions.ts", "src/lib/admin", "src/app/admin",
     "src/app/api/auth/me", "src/app/api/auth/logout", "src/app/api/auth/change-password", "src/app/api/admin", "src/models/Admin.js"];
-  // Admin stock management (not auth): Edit / list suit pages, the stock route. Login, session and middleware stay covered.
-  const notAuth = ["src/app/admin/suits/[id]/edit/page.tsx", "src/app/admin/suits/page.tsx", "src/app/api/admin/suits/[id]/stock/route.ts"];
+  // Admin stock management and image variants (not auth): suit / order / return pages and their routes. Login, session and
+  // middleware stay covered.
+  const notAuth = [
+    "src/app/admin/suits/[id]/edit/page.tsx", "src/app/admin/suits/page.tsx", "src/app/api/admin/suits/[id]/stock/route.ts",
+    "src/app/api/admin/suits/route.ts", "src/app/api/admin/suits/[id]/route.ts", "src/app/api/admin/order-suits/route.ts",
+    "src/app/admin/orders/new/page.tsx", "src/app/admin/orders/[id]/page.tsx", "src/app/admin/returns/new/page.tsx", "src/app/admin/returns/[id]/page.tsx",
+  ];
   const changed = execFileSync("git", ["status", "--porcelain", "--", ...adminFiles, ...notAuth.map((f) => `:(exclude,literal)${f}`)], { cwd: root, encoding: "utf8" }).trim();
   assert.equal(changed, "", `admin auth must not change:\n${changed}`);
 });

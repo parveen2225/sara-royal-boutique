@@ -2,8 +2,15 @@
 // it never creates an order, never deducts stock and never clears the cart.
 import { formatInrPaise } from "./money";
 
-/** `url`: the public product page (https). WhatsApp may show a preview card for the first link in the message. */
-export type WaLine = { name: string; sku: string; quantity: number; unitPricePaise: number; url?: string };
+/**
+ * `url`: the public product page (https). WhatsApp may show a preview card for the first link in the message.
+ * `variant` / `image`: for a suit with image variants, the chosen variant's code (SR-0005-V2) and photo, so the
+ * boutique knows exactly which piece the customer means.
+ */
+export type WaLine = { name: string; sku: string; quantity: number; unitPricePaise: number; url?: string; variant?: string; image?: string };
+
+/** Product page link that opens with the chosen variant selected. */
+export const variantPageUrl = (pageUrl: string, variantId?: string) => (variantId ? `${pageUrl}${pageUrl.includes("?") ? "&" : "?"}v=${encodeURIComponent(variantId)}` : pageUrl);
 
 const safeLink = (url?: string) => {
   if (!url) return null;
@@ -23,6 +30,8 @@ export function buildOrderMessage(lines: WaLine[], boutiqueName = DEFAULT_BOUTIQ
     [
       `${i + 1}. ${l.name}`,
       `   SKU: ${l.sku}`,
+      ...(l.variant ? [`   Design: ${l.variant}`] : []),
+      ...(l.variant && safeLink(l.image) ? [`   Design photo: ${safeLink(l.image)}`] : []),
       `   Quantity: ${l.quantity}`,
       `   Price: ${formatInrPaise(l.unitPricePaise)} each`,
       `   Subtotal: ${formatInrPaise(l.unitPricePaise * l.quantity)}`,

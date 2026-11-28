@@ -6,6 +6,7 @@ export const RETURN_WINDOW_DAYS = 3; // standard window after the actual deliver
 const itemSchema = new Schema(
   {
     suitId: { type: Schema.Types.ObjectId, ref: "UnstitchedSuit", required: true },
+    variantId: { type: Schema.Types.ObjectId },
     sku: { type: String, required: true },
     name: { type: String, required: true },
     quantity: { type: Number, required: true, min: 1, validate: Number.isInteger },
@@ -44,6 +45,7 @@ const returnSchema = new Schema(
     resolution: { type: String, enum: ["none", "refund", "exchange", "closed", "rejected"], default: "none" },
     exchange: {
       replacementSuitId: { type: Schema.Types.ObjectId, ref: "UnstitchedSuit" },
+      replacementVariantId: { type: Schema.Types.ObjectId },
       sku: String,
       name: String,
       quantity: { type: Number, min: 1 },

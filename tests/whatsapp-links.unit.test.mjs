@@ -75,9 +75,10 @@ test("Open Graph: no photo means no og:image (no placeholder); unpublished/unkno
 test("suit page wires metadata; cart + Buy on WhatsApp pass product links; share is opt-in only", () => {
   const page = fs.readFileSync("src/app/suits/[id]/page.tsx", "utf8");
   assert.match(page, /export async function generateMetadata/);
-  assert.match(fs.readFileSync("src/pages/CartPage/CartPage.tsx", "utf8"), /url: suitPublicUrl\(i\.id\)/);
+  // the product link opens the chosen image variant (?v=…) when the line has one
+  assert.match(fs.readFileSync("src/pages/CartPage/CartPage.tsx", "utf8"), /url: variantPageUrl\(suitPublicUrl\(i\.id\), i\.variantId\)/);
   const detail = fs.readFileSync("src/pages/SuitDetailPage/SuitDetailPage.tsx", "utf8");
-  assert.match(detail, /url: suitPublicUrl\(suit\.id\)/);
+  assert.match(detail, /url: variantPageUrl\(suitPublicUrl\(suit\.id\), variant\?\.id\)/);
   assert.match(detail, /<ShareProductButton /);
   const share = fs.readFileSync("src/components/shop/ShareProductButton.tsx", "utf8");
   const calls = [...share.matchAll(/navigator\.share\(/g)].length;

@@ -6,6 +6,7 @@ type SuitDoc = {
   _id: unknown; sku: string; name: string; description?: string; details?: string; fabric?: string; color?: string;
   originalPricePaise: number; salePricePaise: number; stock: number; categoryIds?: unknown[];
   fabricImages?: Img[]; referenceImages?: Img[]; featured?: boolean; createdAt?: Date | string;
+  variants?: { _id: unknown; code: string; stock: number; images?: Img[] }[];
 };
 
 const activeCategories = (s: SuitDoc) =>
@@ -31,6 +32,7 @@ export function toPublicListItem(s: SuitDoc) {
     cover: s.fabricImages?.[0]?.url ?? "",
     categories: activeCategories(s),
     featured: Boolean(s.featured),
+    variantCount: s.variants?.length ?? 0, // > 0: the customer picks a variant on the suit page (each has its own stock)
   };
 }
 
@@ -41,6 +43,15 @@ export function toPublicDetail(s: SuitDoc) {
     details: s.details ?? "",
     fabricImages: (s.fabricImages ?? []).map((i) => i.url),
     referenceImages: (s.referenceImages ?? []).map((i) => i.url), // always labelled "stitched reference" by the clients
+    // Image variants (same design, other colours). Each has its own photos and stock; the price is the suit's.
+    variants: (s.variants ?? []).map((v) => ({
+      id: String(v._id),
+      code: v.code,
+      images: (v.images ?? []).map((i) => i.url),
+      cover: v.images?.[0]?.url ?? "",
+      inStock: v.stock > 0,
+      maxQuantity: Math.max(0, v.stock),
+    })),
     createdAt: s.createdAt,
   };
 }

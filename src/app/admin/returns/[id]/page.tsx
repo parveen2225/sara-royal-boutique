@@ -8,7 +8,7 @@ import CommonModal from "@/components/common/Modal/CommonModal";
 import ImageListEditor from "@/components/admin/suits/ImageListEditor";
 import { useCurrentAdmin } from "@/lib/admin/useCurrentAdmin";
 import { errorMessage } from "@/lib/api/suitsApi";
-import { ordersApi, type OrderSuit } from "@/lib/api/ordersApi";
+import { orderSuitKey, ordersApi, type OrderSuit } from "@/lib/api/ordersApi";
 import { refundsApi, returnsApi, type ReturnDetail } from "@/lib/api/returnsApi";
 import { formatInrPaise } from "@/lib/money";
 import "@/components/admin/suits/suits.scss";
@@ -96,7 +96,7 @@ export default function ReturnDetailPage({ params }: { params: Promise<{ id: str
         </div>
         <div className="admin_card admin_card_pad">
           <h6>Items</h6>
-          <table className="admin_history_table"><thead><tr><th>Suit</th><th>SKU</th><th>Qty</th><th>Value</th></tr></thead><tbody>{r.items.map((i) => <tr key={i.suitId}><td>{i.name}</td><td>{i.sku}</td><td>{i.quantity}</td><td>{formatInrPaise(i.unitPricePaise * i.quantity)}</td></tr>)}</tbody></table>
+          <table className="admin_history_table"><thead><tr><th>Suit</th><th>SKU</th><th>Qty</th><th>Value</th></tr></thead><tbody>{r.items.map((i) => <tr key={`${i.suitId}:${i.variantId ?? ""}`}><td>{i.name}</td><td>{i.sku}</td><td>{i.quantity}</td><td>{formatInrPaise(i.unitPricePaise * i.quantity)}</td></tr>)}</tbody></table>
           <dl className="admin_kv mt-3">
             <dt>Decision</dt><dd>{r.decision.status}{r.decision.byEmail ? ` by ${r.decision.byEmail}` : ""}{r.decision.note ? ` — ${r.decision.note}` : ""}</dd>
             <dt>Received</dt><dd>{r.receipt.status === "received" ? when(r.receipt.at) : "Not yet"}</dd>
@@ -130,7 +130,7 @@ export default function ReturnDetailPage({ params }: { params: Promise<{ id: str
             {dialog === "exchange" && (<>
               <Form.Label htmlFor="x-q">Replacement suit</Form.Label>
               <Form.Control id="x-q" placeholder="Search by name or SKU" value={f.q} onChange={(e) => setF({ ...f, q: e.target.value })} className="mb-2" />
-              {hits.length > 0 && f.q && <ul className="list-group mb-2">{hits.map((h) => <li key={h.id} className="list-group-item d-flex justify-content-between"><span>{h.name} <small className="text-muted">{h.sku} · {h.stock} in stock</small></span><CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => { setRepl(h); setHits([]); setF({ ...f, q: "" }); }}>Choose</CommonButton></li>)}</ul>}
+              {hits.length > 0 && f.q && <ul className="list-group mb-2">{hits.map((h) => <li key={orderSuitKey(h)} className="list-group-item d-flex justify-content-between"><span>{h.name} <small className="text-muted">{h.sku} · {h.stock} in stock</small></span><CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => { setRepl(h); setHits([]); setF({ ...f, q: "" }); }}>Choose</CommonButton></li>)}</ul>}
               {repl && <p className="small">Replacement: <strong>{repl.name}</strong> ({repl.sku}, {repl.stock} in stock)</p>}
               <Form.Label htmlFor="x-n">Quantity</Form.Label><Form.Control id="x-n" type="number" min={1} value={f.qty} onChange={(e) => setF({ ...f, qty: e.target.value })} className="mb-2" />
             </>)}
@@ -149,7 +149,7 @@ export default function ReturnDetailPage({ params }: { params: Promise<{ id: str
                 else if (dialog === "shipping") doAct({ action: "shipping", courier: f.courier, trackingNumber: f.tracking, trackingUrl: f.url }, "Return shipping saved.", true);
                 else if (dialog === "note") doAct({ action: "note", note: f.note }, "Note added.", true);
                 else if (dialog === "photos") doAct({ action: "photos", photos: newPhotos.map((p) => p.url) }, "Photos added.", true);
-                else if (dialog === "exchange") { if (!repl) return setDErr("Choose the replacement suit."); doAct({ action: "resolve", resolution: "exchange", exchange: { replacementSuitId: repl.id, quantity: Number(f.qty) }, note: f.note }, "Exchange set. Use “Send replacement” to dispatch it.", true); }
+                else if (dialog === "exchange") { if (!repl) return setDErr("Choose the replacement suit."); doAct({ action: "resolve", resolution: "exchange", exchange: { replacementSuitId: repl.id, ...(repl.variantId ? { replacementVariantId: repl.variantId } : {}), quantity: Number(f.qty) }, note: f.note }, "Exchange set. Use “Send replacement” to dispatch it.", true); }
                 else if (dialog === "refund") act(() => refundsApi.recommend({ orderId: r.orderRef, returnId: r.id, amount: f.amount, method: f.method, notes: f.note }), "Refund recommended. The Owner must approve it.", true);
               }}>{dialog === "reject" ? "Reject return" : "Save"}</CommonButton>
             </div>

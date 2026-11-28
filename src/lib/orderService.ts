@@ -7,13 +7,14 @@ import { istYear } from "@/lib/dates";
 import { cleanText } from "@/lib/validation";
 import { isAllowedTransition, parseCourier, parseEventDate, type ParsedOrder } from "@/lib/orderInput";
 import type { AuthUser } from "@/lib/auth/permissions";
+import { findVariant, hasVariants, restoreTarget, stockIncOp, trackedQty, trackedSku } from "@/lib/variantStock";
 
 export class OrderError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
 type Actor = Pick<AuthUser, "id" | "email">;
-type Line = { returnedQuantity?: number; suitId: unknown; sku: string; name: string; unitPricePaise: number; quantity: number; lineTotalPaise: number };
+type Line = { returnedQuantity?: number; suitId: unknown; variantId?: unknown; sku: string; name: string; unitPricePaise: number; quantity: number; lineTotalPaise: number };
 type OrderDoc = {
   _id: unknown; orderId: string; items: Line[]; status: string; stockDeducted: boolean; paymentStatus: string;
   subtotalPaise: number; deliveryChargePaise: number; totalPaise: number; refundCommittedPaise?: number;
@@ -25,20 +26,28 @@ type OrderDoc = {
 export const formatOrderId = (year: number, seq: number) => `SRO-${year}-${String(seq).padStart(4, "0")}`;
 const historyEntry = (status: string, actor: Actor, note = "") => ({ status, at: new Date(), byId: actor.id, byEmail: actor.email, note });
 
-async function movementsFor(ctx: AtomicCtx, lines: { suitId: unknown; sku: string; quantity: number }[], dir: 1 | -1, reason: "order_confirmed" | "order_cancelled", orderId: string, actor: Actor) {
+async function movementsFor(ctx: AtomicCtx, lines: { suitId: unknown; variantId?: unknown; sku: string; quantity: number }[], dir: 1 | -1, reason: "order_confirmed" | "order_cancelled", orderId: string, actor: Actor) {
   const rows: Record<string, unknown>[] = [];
   for (const l of lines) {
-    const after = await UnstitchedSuit.findOneAndUpdate(
-      dir === -1 ? { _id: l.suitId, stock: { $gte: l.quantity } } : { _id: l.suitId },
-      { $inc: { stock: dir * l.quantity } },
-      { session: ctx.session ?? undefined, returnDocument: "after" },
-    ).lean();
-    if (!after) {
-      const current = await UnstitchedSuit.findById(l.suitId).select("stock sku").session(ctx.session ?? null).lean();
-      throw new OrderError(409, current ? `Not enough stock for ${l.sku}: ${current.stock} available, ${l.quantity} requested.` : `Suit ${l.sku} no longer exists.`);
+    // Deductions use exactly the ordered variant. Restorations go back to it, or (if the suit's variants changed since
+    // the order) to restoreTarget(), so cancelling always works and the suit's total stays the sum of its variants.
+    let variantId: unknown = l.variantId ?? null;
+    if (dir === 1) {
+      const suit = await UnstitchedSuit.findById(l.suitId).select("sku stock variants").session(ctx.session ?? null).lean();
+      if (!suit) throw new OrderError(409, `Suit ${l.sku} no longer exists.`);
+      variantId = restoreTarget(suit, variantId);
     }
-    ctx.onUndo(async () => { await UnstitchedSuit.updateOne({ _id: l.suitId }, { $inc: { stock: -dir * l.quantity } }); });
-    rows.push({ suitId: l.suitId, sku: l.sku, previousQty: after.stock - dir * l.quantity, change: dir * l.quantity, resultingQty: after.stock, reason, note: "", refType: "order", refId: orderId, actorId: actor.id, actorEmail: actor.email });
+    const op = stockIncOp(l.suitId, variantId, dir * l.quantity);
+    const after = await UnstitchedSuit.findOneAndUpdate(op.filter, op.update, { ...op.options, session: ctx.session ?? undefined, returnDocument: "after" }).lean();
+    if (!after) {
+      const current = await UnstitchedSuit.findById(l.suitId).select("stock sku variants").session(ctx.session ?? null).lean();
+      if (current && hasVariants(current) && !findVariant(current, variantId)) throw new OrderError(409, `Choose which variant of ${current.sku} was ordered.`);
+      throw new OrderError(409, current ? `Not enough stock for ${l.sku}: ${trackedQty(current, variantId)} available, ${l.quantity} requested.` : `Suit ${l.sku} no longer exists.`);
+    }
+    const undo = stockIncOp(l.suitId, variantId, -dir * l.quantity);
+    ctx.onUndo(async () => { await UnstitchedSuit.updateOne({ _id: l.suitId }, undo.update, undo.options); });
+    const resultingQty = trackedQty(after, variantId);
+    rows.push({ suitId: l.suitId, sku: trackedSku(after, variantId), ...(variantId ? { variantId } : {}), previousQty: resultingQty - dir * l.quantity, change: dir * l.quantity, resultingQty, reason, note: "", refType: "order", refId: orderId, actorId: actor.id, actorEmail: actor.email });
   }
   await StockMovement.insertMany(rows, { session: ctx.session ?? undefined });
   ctx.onUndo(async () => { await StockMovement.deleteMany({ refType: "order", refId: orderId, reason }); });
@@ -66,7 +75,11 @@ export async function createOrder(input: ParsedOrder, actor: Actor): Promise<{ o
       const lines: Line[] = input.items.map((i) => {
         const s = byId.get(i.suitId);
         if (!s) throw new OrderError(400, "One of the suits in this order no longer exists.");
-        return { suitId: s._id, sku: s.sku, name: s.name, unitPricePaise: s.salePricePaise, quantity: i.quantity, lineTotalPaise: s.salePricePaise * i.quantity };
+        // A suit with image variants is ordered per variant (each has its own stock); the price is the suit's.
+        const v = findVariant(s, i.variantId);
+        if (hasVariants(s) && !v) throw new OrderError(400, i.variantId ? `The chosen variant of ${s.sku} no longer exists.` : `Choose which variant of ${s.sku} (${s.name}) was ordered.`);
+        if (!hasVariants(s) && i.variantId) throw new OrderError(400, `${s.sku} has no variants.`);
+        return { suitId: s._id, ...(v ? { variantId: v._id } : {}), sku: v ? v.code : s.sku, name: s.name, unitPricePaise: s.salePricePaise, quantity: i.quantity, lineTotalPaise: s.salePricePaise * i.quantity };
       });
       const subtotalPaise = lines.reduce((sum, l) => sum + l.lineTotalPaise, 0);
       await movementsFor(ctx, lines, -1, "order_confirmed", orderId, actor);
@@ -171,7 +184,7 @@ export function serializeOrder(o: OrderDoc & Record<string, unknown>) {
     id: String(o._id),
     orderId: o.orderId,
     customer: o.customer,
-    items: o.items.map((i) => ({ suitId: String(i.suitId), sku: i.sku, name: i.name, unitPricePaise: i.unitPricePaise, quantity: i.quantity, lineTotalPaise: i.lineTotalPaise, returnedQuantity: (i as unknown as { returnedQuantity?: number }).returnedQuantity ?? 0 })),
+    items: o.items.map((i) => ({ suitId: String(i.suitId), variantId: i.variantId ? String(i.variantId) : null, sku: i.sku, name: i.name, unitPricePaise: i.unitPricePaise, quantity: i.quantity, lineTotalPaise: i.lineTotalPaise, returnedQuantity: (i as unknown as { returnedQuantity?: number }).returnedQuantity ?? 0 })),
     subtotalPaise: o.subtotalPaise,
     deliveryChargePaise: o.deliveryChargePaise,
     totalPaise: o.totalPaise,

@@ -1,7 +1,7 @@
 import { rupeesToPaise } from "./money";
 import { cleanText, isIdempotencyKey, isObjectId, isPincode, isSafeTrackingUrl, normalizeCustomerPhone } from "./validation";
 
-export type OrderItemInput = { suitId: string; quantity: number };
+export type OrderItemInput = { suitId: string; variantId?: string; quantity: number };
 export type ParsedOrder = {
   customer: { name: string; phone: string; address: string; pincode: string };
   items: OrderItemInput[];
@@ -30,12 +30,15 @@ export function parseOrderInput(body: Record<string, unknown>): Res<ParsedOrder>
   const seen = new Set<string>();
   const items: OrderItemInput[] = [];
   for (const r of rawItems) {
-    const row = (r ?? {}) as { suitId?: unknown; quantity?: unknown };
+    const row = (r ?? {}) as { suitId?: unknown; variantId?: unknown; quantity?: unknown };
     if (!isObjectId(row.suitId)) return fail("An order item has an invalid suit.");
-    if (seen.has(row.suitId)) return fail("The same suit appears twice. Combine the quantities.");
+    const variantId = row.variantId === undefined || row.variantId === null || row.variantId === "" ? undefined : row.variantId;
+    if (variantId !== undefined && !isObjectId(variantId)) return fail("An order item has an invalid variant.");
+    const key = `${row.suitId}:${variantId ?? ""}`;
+    if (seen.has(key)) return fail("The same suit appears twice. Combine the quantities.");
     if (typeof row.quantity !== "number" || !Number.isInteger(row.quantity) || row.quantity < 1 || row.quantity > 999) return fail("Quantities must be whole numbers from 1 to 999.");
-    seen.add(row.suitId);
-    items.push({ suitId: row.suitId, quantity: row.quantity });
+    seen.add(key);
+    items.push({ suitId: row.suitId, ...(variantId ? { variantId } : {}), quantity: row.quantity });
   }
 
   let deliveryChargePaise = 0;

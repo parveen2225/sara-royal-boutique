@@ -6,7 +6,8 @@ export const STOCK_REASONS = ["initial", "order_confirmed", "order_cancelled", "
 const movementSchema = new Schema(
   {
     suitId: { type: Schema.Types.ObjectId, ref: "UnstitchedSuit", required: true },
-    sku: { type: String, required: true },
+    sku: { type: String, required: true }, // the variant code (SR-0005-V2) when the change is for one variant
+    variantId: { type: Schema.Types.ObjectId }, // set for variant stock; previous/resulting quantities are then the variant's
     previousQty: { type: Number, required: true },
     change: { type: Number, required: true },
     resultingQty: { type: Number, required: true },

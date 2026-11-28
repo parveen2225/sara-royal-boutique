@@ -50,8 +50,9 @@ export const cartStore = {
     if (result.items !== read()) write(result.items);
     return result;
   },
-  setQuantity: (id: string, qty: number) => write(setQuantity(read(), id, qty)),
-  remove: (id: string) => write(removeFromCart(read(), id)),
+  // `key` = lineKey(item): the suit id, or "suitId:variantId" for a variant line
+  setQuantity: (key: string, qty: number) => write(setQuantity(read(), key, qty)),
+  remove: (key: string) => write(removeFromCart(read(), key)),
   replaceAll: (items: CartItem[]) => write(items),
   clear: () => write(EMPTY), // only ever called from an explicit "Clear cart" action
 };

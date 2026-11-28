@@ -6,10 +6,11 @@ import Link from "next/link";
 import { Col, Container, Row } from "react-bootstrap";
 import SuitCard, { SuitPrice } from "@/components/shop/SuitCard";
 import QuantityStepper from "@/components/shop/QuantityStepper";
-import { fetchSuit, type PublicSuitDetail } from "@/lib/shopApi";
+import { fetchSuit, type PublicSuitDetail, type PublicSuitVariant } from "@/lib/shopApi";
+import { lineKey } from "@/lib/cartCore";
 import { cartStore } from "@/lib/cartStore";
 import { useCart, useShopSettings } from "@/lib/useShop";
-import { buildOrderMessage, buildWhatsAppUrl } from "@/lib/suitWhatsapp";
+import { buildOrderMessage, buildWhatsAppUrl, variantPageUrl } from "@/lib/suitWhatsapp";
 import { suitPublicUrl } from "@/lib/siteUrl";
 import SuitImageLightbox from "@/components/shop/SuitImageLightbox";
 import ShareProductButton from "@/components/shop/ShareProductButton";
@@ -54,7 +55,18 @@ export default function SuitDetailPage({ id }: { id: string }) {
   return <SuitDetail key={current.suit.id} suit={current.suit} />;
 }
 
+/** Variant to show first: the one in the link (?v=…, e.g. from a WhatsApp order), else the first in stock, else the first. */
+function initialVariant(variants: PublicSuitVariant[]): string | null {
+  if (variants.length === 0) return null;
+  let fromLink: string | null = null;
+  try { fromLink = new URLSearchParams(window.location.search).get("v"); } catch { /* not in a browser */ }
+  return (variants.find((v) => v.id === fromLink) ?? variants.find((v) => v.inStock) ?? variants[0]).id;
+}
+
 function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
+  const variants = suit.variants ?? [];
+  // Only rendered after the client-side fetch, so reading the URL here never differs from a server render.
+  const [variantId, setVariantId] = useState<string | null>(() => initialVariant(variants));
   const [active, setActive] = useState(0);
   const [preview, setPreview] = useState<number | null>(null); // open reference photo (index), null = closed
   const previewOpener = useRef<HTMLElement | null>(null); // the thumbnail that opened it: focus goes back there on close (Safari does not focus buttons on click)
@@ -69,26 +81,41 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
     fetchTryOnConfig().then((c) => { if (!cancelled && c.enabled) setTryOn(c); }).catch(() => undefined); // feature simply stays hidden
     return () => { cancelled = true; };
   }, []);
-  const images = suit.fabricImages;
-  const inCart = cart.items.find((i) => i.id === suit.id)?.quantity ?? 0;
-  const safeQty = Math.max(1, Math.min(qty, suit.maxQuantity || 1));
+  // With variants, photos / availability / stock are the selected variant's; everything else is the suit's.
+  const variant = variants.find((v) => v.id === variantId) ?? null;
+  const variantNo = variant ? variants.indexOf(variant) + 1 : 0;
+  const images = variant ? variant.images : suit.fabricImages;
+  const inStock = variant ? variant.inStock : suit.inStock;
+  const maxQuantity = variant ? variant.maxQuantity : suit.maxQuantity;
+  const inCart = cart.items.find((i) => lineKey(i) === lineKey({ id: suit.id, variantId: variant?.id }))?.quantity ?? 0;
+  const safeQty = Math.max(1, Math.min(qty, maxQuantity || 1));
+
+  const chooseVariant = (v: PublicSuitVariant) => {
+    if (v.id === variantId) return;
+    setVariantId(v.id);
+    setActive(0);
+    setMessage("");
+    // keep the address shareable (?v=…) without navigating or reloading
+    try { const url = new URL(window.location.href); url.searchParams.set("v", v.id); window.history.replaceState(window.history.state, "", url); } catch { /* ignore */ }
+  };
 
   const addToCart = () => {
-    const r = cartStore.add({ id: suit.id, sku: suit.sku, name: suit.name, image: suit.cover, unitPricePaise: suit.salePricePaise, maxQuantity: suit.maxQuantity }, safeQty);
-    if (r.error === "out_of_stock") setMessage("This suit is out of stock.");
+    const r = cartStore.add({ id: suit.id, sku: suit.sku, name: suit.name, image: variant?.cover || suit.cover, unitPricePaise: suit.salePricePaise, maxQuantity, ...(variant ? { variantId: variant.id, variantCode: variant.code } : {}) }, safeQty);
+    if (r.error === "out_of_stock") setMessage(variant ? "This design is out of stock." : "This suit is out of stock.");
     else if (r.error === "cart_full") setMessage("Your cart is full. Please remove an item first.");
-    else if (r.added === 0) setMessage(`You already have all ${suit.maxQuantity} available in your cart.`);
-    else setMessage(r.capped ? `Added ${r.added}. Only ${suit.maxQuantity} are available in total.` : `Added ${r.added} to your cart.`);
+    else if (r.added === 0) setMessage(`You already have all ${maxQuantity} available in your cart.`);
+    else setMessage(r.capped ? `Added ${r.added}. Only ${maxQuantity} are available in total.` : `Added ${r.added} to your cart.`);
   };
 
   const buyOnWhatsApp = () => {
-    const text = buildOrderMessage([{ name: suit.name, sku: suit.sku, quantity: safeQty, unitPricePaise: suit.salePricePaise, url: suitPublicUrl(suit.id) }], settings.boutiqueName || undefined);
+    const line = { name: suit.name, sku: suit.sku, quantity: safeQty, unitPricePaise: suit.salePricePaise, url: variantPageUrl(suitPublicUrl(suit.id), variant?.id), ...(variant ? { variant: variant.code, image: variant.cover } : {}) };
+    const text = buildOrderMessage([line], settings.boutiqueName || undefined);
     const url = settings.whatsappNumber ? buildWhatsAppUrl(settings.whatsappNumber, text) : null;
     if (!url) return setMessage("WhatsApp ordering is not available right now.");
     window.open(url, "_blank", "noopener,noreferrer"); // opens a prefilled chat only: no order, no stock change, cart untouched
   };
 
-  const waDisabled = !suit.inStock || (settings.ready && !settings.whatsappNumber);
+  const waDisabled = !inStock || (settings.ready && !settings.whatsappNumber);
 
   return (
     <div className="boutique_page shop_page shop_detail_page">
@@ -97,13 +124,27 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
         <Row className="g-4 g-lg-5">
           <Col xs={12} md={6}>
             <div className="shop_gallery_main">
-              {images[active] ? <Image src={images[active]} alt={`${suit.name} fabric photo ${active + 1}`} fill priority sizes="(max-width: 767px) 100vw, 50vw" style={{ objectFit: "cover" }} /> : <span className="shop_card_noimg">No photo</span>}
-              {!suit.inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
+              {images[active] ? <Image key={images[active]} src={images[active]} alt={`${suit.name}${variant ? ` design ${variantNo}` : ""} fabric photo ${active + 1}`} fill priority sizes="(max-width: 767px) 100vw, 50vw" style={{ objectFit: "cover" }} /> : <span className="shop_card_noimg">No photo</span>}
+              {!inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
             </div>
+            {variants.length > 0 && (
+              <div className="shop_variants">
+                <p className="shop_variants_label" id="shop-variants-label">Choose design <span>{variantNo} of {variants.length}</span></p>
+                <div className="shop_variant_list" role="group" aria-labelledby="shop-variants-label">
+                  {variants.map((v, i) => (
+                    <button key={v.id} type="button" className={`shop_variant ${v.id === variantId ? "is_on" : ""} ${v.inStock ? "" : "is_out"}`} onClick={() => chooseVariant(v)}
+                      aria-pressed={v.id === variantId} aria-label={`Design ${i + 1} of ${variants.length}${v.inStock ? "" : ", out of stock"}`}>
+                      {v.cover ? <Image src={v.cover} alt="" fill sizes="72px" style={{ objectFit: "cover" }} /> : <span className="shop_card_noimg">{i + 1}</span>}
+                      {!v.inStock && <span className="shop_variant_out" aria-hidden="true">Sold out</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {images.length > 1 && (
               <div className="shop_thumbs" aria-label="Fabric photos">
                 {images.map((src, i) => (
-                  <button key={src} type="button" className={`shop_thumb ${i === active ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1}`} aria-current={i === active}>
+                  <button key={`${variantId ?? ""}:${src}`} type="button" className={`shop_thumb ${i === active ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1}`} aria-current={i === active}>
                     <Image src={src} alt="" fill sizes="72px" style={{ objectFit: "cover" }} />
                   </button>
                 ))}
@@ -135,21 +176,22 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
             <ul className="shop_specs">
               {suit.fabric && <li><strong>Fabric</strong>{suit.fabric}</li>}
               {suit.color && <li><strong>Color</strong>{suit.color}</li>}
-              <li><strong>Availability</strong>{suit.inStock ? <span className="shop_stock_ok">In stock</span> : <span className="shop_stock_out">Out of Stock</span>}</li>
+              {variant && <li><strong>Design</strong><span data-testid="variant-code">{variant.code}</span></li>}
+              <li><strong>Availability</strong>{inStock ? <span className="shop_stock_ok">In stock</span> : <span className="shop_stock_out">Out of Stock</span>}</li>
               <li><strong>Type</strong>Unstitched fabric</li>
             </ul>
             {suit.description && <p className="shop_desc">{suit.description}</p>}
             {suit.details && <p className="shop_desc">{suit.details}</p>}
 
-            {suit.inStock && (
+            {inStock && (
               <div className="d-flex align-items-center gap-3 flex-wrap mt-3">
-                <QuantityStepper value={safeQty} max={suit.maxQuantity} onChange={setQty} />
-                <span className="text-muted small">{suit.maxQuantity} available{inCart > 0 ? ` · ${inCart} in your cart` : ""}</span>
+                <QuantityStepper value={safeQty} max={maxQuantity} onChange={setQty} />
+                <span className="text-muted small" data-testid="available-qty">{maxQuantity} available{inCart > 0 ? ` · ${inCart} in your cart` : ""}</span>
               </div>
             )}
             {message && <div className="shop_notice mt-3" role="status">{message} <Link href="/cart" className="shop_link_btn" style={{ color: "var(--boutique-gold)" }}>View cart</Link></div>}
             <div className="shop_actions">
-              <button type="button" className="shop_btn shop_btn_solid" onClick={addToCart} disabled={!suit.inStock}>Add to Cart</button>
+              <button type="button" className="shop_btn shop_btn_solid" onClick={addToCart} disabled={!inStock}>Add to Cart</button>
               <button type="button" className="shop_btn shop_btn_wa" onClick={buyOnWhatsApp} disabled={waDisabled}>Buy on WhatsApp</button>
             </div>
             {tryOn && (
@@ -157,11 +199,11 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
                 <button type="button" className="tryon_open_btn" onClick={() => setTryOnOpen(true)} aria-haspopup="dialog">
                   <SparkleIcon /> AI Try On Me
                 </button>
-                <p className="tryon_open_note">{suit.inStock ? "See this fabric stitched on you: an AI styling preview from your photo." : "Preview only: this suit is out of stock right now."}</p>
+                <p className="tryon_open_note">{inStock ? "See this fabric stitched on you: an AI styling preview from your photo." : "Preview only: this suit is out of stock right now."}</p>
               </>
             )}
             <ShareProductButton id={suit.id} name={suit.name} sku={suit.sku} image={suit.cover} />
-            {!suit.inStock && <p className="text-muted small mt-2">This suit is currently out of stock.</p>}
+            {!inStock && <p className="text-muted small mt-2">{variant ? "This design is currently out of stock. Please choose another design." : "This suit is currently out of stock."}</p>}
             {settings.ready && !settings.whatsappNumber && <p className="text-muted small mt-2">WhatsApp ordering is not available right now.</p>}
             <p className="text-muted small mt-3">Shipping charges are confirmed on WhatsApp for your PIN code. Payment: Cash on Delivery or Prepaid UPI.</p>
           </Col>
@@ -180,7 +222,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
           onClose={() => setTryOnOpen(false)}
           config={tryOn}
           suit={{ id: suit.id, name: suit.name, sku: suit.sku, cover: suit.cover, fabric: suit.fabric, color: suit.color }}
-          shopping={{ onAddToCart: addToCart, onBuyWhatsApp: buyOnWhatsApp, addDisabled: !suit.inStock, waDisabled, note: message }}
+          shopping={{ onAddToCart: addToCart, onBuyWhatsApp: buyOnWhatsApp, addDisabled: !inStock, waDisabled, note: message }}
         />
       )}
     </div>

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Col, Form, Row } from "react-bootstrap";
 import CommonButton from "@/components/common/ui/commonButton/CommonButton";
 import { errorMessage } from "@/lib/api/suitsApi";
-import { ordersApi, type OrderSuit } from "@/lib/api/ordersApi";
+import { orderSuitKey, ordersApi, type OrderSuit } from "@/lib/api/ordersApi";
 import { formatInrPaise } from "@/lib/money";
 import "@/components/admin/suits/suits.scss";
 import PageHeader from "@/components/admin/ui/PageHeader";
@@ -39,9 +40,10 @@ export default function NewOrderPage() {
 
   const add = (s: OrderSuit) => {
     setQ(""); setHits([]);
-    setLines((cur) => (cur.some((l) => l.id === s.id) ? cur : [...cur, { ...s, quantity: 1 }]));
+    setLines((cur) => (cur.some((l) => orderSuitKey(l) === orderSuitKey(s)) ? cur : [...cur, { ...s, quantity: 1 }]));
   };
-  const setQty = (id: string, n: number) => setLines((cur) => cur.map((l) => (l.id === id ? { ...l, quantity: Math.max(1, Math.min(n || 1, 999)) } : l)));
+  // a line is a suit, or one variant of a suit (each variant has its own stock)
+  const setQty = (key: string, n: number) => setLines((cur) => cur.map((l) => (orderSuitKey(l) === key ? { ...l, quantity: Math.max(1, Math.min(n || 1, 999)) } : l)));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +57,7 @@ export default function NewOrderPage() {
       const order = await ordersApi.create({
         idempotencyKey: key,
         customer: c,
-        items: lines.map((l) => ({ suitId: l.id, quantity: l.quantity })),
+        items: lines.map((l) => ({ suitId: l.id, ...(l.variantId ? { variantId: l.variantId } : {}), quantity: l.quantity })),
         deliveryCharge: delivery.trim() || 0,
         paymentMethod: method,
         paymentStatus: paid ? "paid" : "pending",
@@ -81,8 +83,8 @@ export default function NewOrderPage() {
               {hits.length > 0 && q && (
                 <ul className="list-group mt-2" role="listbox" aria-label="Suit results">
                   {hits.map((s) => (
-                    <li key={s.id} className="list-group-item d-flex justify-content-between align-items-center gap-2" role="option" aria-selected="false">
-                      <span><strong>{s.name}</strong> <small className="text-muted">{s.sku} · {formatInrPaise(s.salePricePaise)} · {s.stock} in stock{s.status !== "published" ? ` · ${s.status}` : ""}</small></span>
+                    <li key={orderSuitKey(s)} className="list-group-item d-flex justify-content-between align-items-center gap-2" role="option" aria-selected="false">
+                      <span className="d-flex align-items-center gap-2">{s.variantId && s.cover && <Image src={s.cover} alt="" width={36} height={36} unoptimized className="admin_variant_pick_thumb" />}<span><strong>{s.name}</strong> <small className="text-muted">{s.sku} · {formatInrPaise(s.salePricePaise)} · {s.stock} in stock{s.status !== "published" ? ` · ${s.status}` : ""}</small></span></span>
                       <CommonButton className="admin_outline_btn admin_sm_btn" onClick={() => add(s)} disabled={s.stock <= 0}>{s.stock <= 0 ? "Out of stock" : "Add"}</CommonButton>
                     </li>
                   ))}
@@ -93,12 +95,12 @@ export default function NewOrderPage() {
                   <thead><tr><th>Suit</th><th>Price</th><th style={{ width: 90 }}>Qty</th><th>Total</th><th /></tr></thead>
                   <tbody>
                     {lines.map((l) => (
-                      <tr key={l.id}>
+                      <tr key={orderSuitKey(l)}>
                         <td><strong>{l.name}</strong><small className="d-block text-muted">{l.sku} · {l.stock} in stock</small></td>
                         <td>{formatInrPaise(l.salePricePaise)}</td>
-                        <td><Form.Control aria-label={`Quantity of ${l.name}`} type="number" min={1} max={l.stock} value={l.quantity} onChange={(e) => setQty(l.id, Number(e.target.value))} /></td>
+                        <td><Form.Control aria-label={`Quantity of ${l.name}`} type="number" min={1} max={l.stock} value={l.quantity} onChange={(e) => setQty(orderSuitKey(l), Number(e.target.value))} /></td>
                         <td>{formatInrPaise(l.salePricePaise * l.quantity)}</td>
-                        <td><button type="button" className="admin_danger_btn admin_sm_btn" onClick={() => setLines((cur) => cur.filter((x) => x.id !== l.id))} aria-label={`Remove ${l.name}`}>✕</button></td>
+                        <td><button type="button" className="admin_danger_btn admin_sm_btn" onClick={() => setLines((cur) => cur.filter((x) => orderSuitKey(x) !== orderSuitKey(l)))} aria-label={`Remove ${l.name}`}>✕</button></td>
                       </tr>
                     ))}
                   </tbody>

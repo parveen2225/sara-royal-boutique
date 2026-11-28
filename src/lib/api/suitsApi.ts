@@ -6,6 +6,9 @@ export type SuitImage = { url: string; publicId: string };
 export type SuitStatus = "draft" | "published" | "archived";
 export type StockState = "in_stock" | "low_stock" | "out_of_stock";
 
+/** Image variant: same design and price, its own photos and stock. `code` (SR-0005-V2) never changes. */
+export type AdminVariant = { id: string; code: string; stock: number; stockState: StockState; images: SuitImage[] };
+
 export type AdminSuit = {
   id: string;
   sku: string;
@@ -23,6 +26,7 @@ export type AdminSuit = {
   categories: { id: string; name: string; slug: string; active: boolean }[];
   fabricImages: SuitImage[];
   referenceImages: SuitImage[];
+  variants: AdminVariant[]; // empty for suits without variants; otherwise `stock` is their total
   featured: boolean;
   status: SuitStatus;
   createdAt: string;
@@ -30,8 +34,9 @@ export type AdminSuit = {
 };
 
 export type SuitCategory = { id: string; name: string; slug: string; description: string; active: boolean; displayOrder: number; suitCount: number };
-export type StockChangeResult = { id: string; previousQty: number; change: number; stock: number; stockState: StockState };
-export type StockMovementRow = { id: string; previousQty: number; change: number; resultingQty: number; reason: string; note: string; actorEmail: string; createdAt: string };
+/** `stock` is the changed quantity (the variant's, for a variant suit); `totalStock` is the suit's total afterwards. */
+export type StockChangeResult = { id: string; variantId?: string | null; previousQty: number; change: number; stock: number; stockState: StockState; totalStock?: number; totalStockState?: StockState };
+export type StockMovementRow = { id: string; sku?: string; variantId?: string | null; previousQty: number; change: number; resultingQty: number; reason: string; note: string; actorEmail: string; createdAt: string };
 export type SuitListResult = { items: AdminSuit[]; total: number; page: number; limit: number; pages: number };
 export type SuitListQuery = { q?: string; status?: string; category?: string; stock?: string; sort?: string; page?: number; limit?: number };
 
@@ -51,7 +56,7 @@ export const suitsApi = {
   create: async (body: Record<string, unknown>) => (await apiJson<AdminSuit>(BASE, { method: "POST", body: json(body) })).data,
   update: async (id: string, body: Record<string, unknown>) => (await apiJson<AdminSuit>(`${BASE}/${id}`, { method: "PUT", body: json(body) })).data,
   setStatus: async (id: string, status: SuitStatus) => (await apiJson(`${BASE}/${id}/status`, { method: "POST", body: json({ status }) })).data,
-  setStock: async (id: string, body: { mode: "set" | "adjust"; quantity: number; reason: string; note?: string }) =>
+  setStock: async (id: string, body: { mode: "set" | "adjust"; quantity: number; reason: string; note?: string; variantId?: string }) =>
     (await apiJson<StockChangeResult>(`${BASE}/${id}/stock`, { method: "POST", body: json(body) })).data,
   /** Live stock for one suit (no page loader): the stock dialog reads it on open. */
   stockLevel: async (id: string) => (await apiJson<AdminSuit>(`${BASE}/${id}`, { skipLoader: true })).data,

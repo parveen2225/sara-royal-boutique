@@ -45,16 +45,24 @@ test("Collections cards: thumbnails are buttons beside the photo link (never ins
   assert.match(css, /&_visual \{[\s\S]*?\.shop_badge_out \{ bottom: auto; left: auto; top: 0\.6rem; right: 0\.6rem; \}/, "Out of Stock badge moves clear of the thumbnails");
 });
 
-test("product details gallery: whole photo visible (contain), capped height, vertical thumbnails on desktop, zoom kept", () => {
+test("product details gallery: whole photo visible (contain), 550-600px desktop / 340-480px phone, vertical thumbnails on desktop, zoom kept", () => {
   const page = read("src/pages/SuitDetailPage/SuitDetailPage.tsx");
   assert.match(page, /className="shop_pd_thumbs" role="group"/);
   // gallery thumbnails only change the photo; designs have their own picker
-  assert.match(page, /className=\{`shop_pd_thumb \$\{i === active \? "is_on" : ""\}`\} onClick=\{\(\) => setActive\(i\)\}/);
+  assert.match(page, /className=\{`shop_pd_thumb \$\{i === shown \? "is_on" : ""\}`\} onClick=\{\(\) => setActive\(i\)\}/);
+  assert.match(page, /\{images\.length > 1 && \(\s*<div className="shop_pd_thumbs"/, "no thumbnail rail for a single photo");
+  assert.match(page, /const shown = /, "the shown index is clamped (never past the photo list)");
+  assert.match(page, /onError=\{\(\) => setBroken/, "failed photos are handled, not left blank");
   assert.match(page, /<SuitImageLightbox images=\{images\} index=\{zoom\}/, "main photo opens the zoom lightbox");
   assert.match(page, /<SuitImageLightbox images=\{suit\.referenceImages\}/, "reference lightbox kept");
   const scss = read("src/pages/SuitDetailPage/suitDetail.scss");
   assert.match(scss, /\.shop_pd_main_img \{ object-fit: contain; \}/);
-  assert.match(scss, /@media \(min-width: 992px\) \{ aspect-ratio: auto; height: clamp\(380px, 36vw, 480px\); max-height: none; \}/);
-  assert.match(scss, /grid-template-areas: "thumbs main"/);
-  assert.match(scss, /max-height: min\(72vh, 520px\)/, "phones: never taller than the screen allows");
+  assert.match(scss, /--pd-h: min\(600px, max\(440px, calc\(100vh - 13rem\)\)/, "desktop: up to 600px, by window height");
+  assert.match(scss, /--pd-h: min\(clamp\(340px, 62vh, 480px\)/, "phones: 340-480px");
+  // regression (blank gallery): the named grid area may only be used where it is defined, i.e. with a thumbnail rail
+  const gallery = scss.slice(scss.indexOf(".shop_pd_gallery {"), scss.indexOf(".shop_pd_stage { display")).replace(/\/\/.*$/gm, ""); // without comments
+  const rail = gallery.slice(gallery.indexOf("&.has_thumbs {"));
+  assert.match(rail, /grid-template-areas: "thumbs main"/);
+  assert.match(rail, /\.shop_pd_stage \{ grid-area: main;/);
+  assert.equal((gallery.match(/grid-area: main/g) || []).length, 1, "grid-area: main appears only inside &.has_thumbs");
 });

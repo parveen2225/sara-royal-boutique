@@ -68,6 +68,8 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   // Only rendered after the client-side fetch, so reading the URL here never differs from a server render.
   const [variantId, setVariantId] = useState<string | null>(() => initialVariant(variants));
   const [active, setActive] = useState(0);
+  const [ratios, setRatios] = useState<Record<string, number>>({}); // photo URL -> width / height, once loaded
+  const [broken, setBroken] = useState<Record<string, true>>({}); // photo URLs that failed to load
   const [preview, setPreview] = useState<number | null>(null); // open reference photo (index), null = closed
   const [zoom, setZoom] = useState<number | null>(null); // main photo enlarged in the lightbox (index), null = closed
   const zoomOpener = useRef<HTMLElement | null>(null);
@@ -87,7 +89,15 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   // With variants, photos / availability / stock are the selected variant's; everything else is the suit's.
   const variant = variants.find((v) => v.id === variantId) ?? null;
   const variantNo = variant ? variants.indexOf(variant) + 1 : 0;
-  const images = variant ? variant.images : suit.fabricImages;
+  // Photos of the selected design (else the suit). Empty URLs are dropped; a design without usable photos shows the suit's
+  // own fabric photos rather than an empty gallery.
+  const variantPhotos = (variant?.images ?? []).filter(Boolean);
+  const images = variantPhotos.length ? variantPhotos : suit.fabricImages.filter(Boolean);
+  // Never points past the list (e.g. right after switching design); if that photo failed to load, show the first one that works.
+  const picked = Math.min(active, Math.max(0, images.length - 1));
+  const firstWorking = images.findIndex((u) => !broken[u]);
+  const shown = broken[images[picked]] && firstWorking >= 0 ? firstWorking : picked;
+  const mainSrc = images[shown] ?? "";
   const inStock = variant ? variant.inStock : suit.inStock;
   const maxQuantity = variant ? variant.maxQuantity : suit.maxQuantity;
   const inCart = cart.items.find((i) => lineKey(i) === lineKey({ id: suit.id, variantId: variant?.id }))?.quantity ?? 0;
@@ -137,22 +147,30 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
         <Row className="g-4 g-lg-5">
           {/* Gallery: photo thumbnails change ONLY the photo (never the design, SKU, price or stock). Main photo first in the
               DOM (phones: photo, then a scrollable thumbnail row); from 992px the thumbnails stand in a column on its left. */}
-          <Col xs={12} md={6} lg={5}>
+          <Col xs={12} md={6}>
             <div className={`shop_pd_gallery ${images.length > 1 ? "has_thumbs" : ""}`}>
-              <div className="shop_gallery_main shop_pd_main" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}>
-                {images[active] ? (
-                  <button type="button" className="shop_pd_zoom" onClick={(e) => { zoomOpener.current = e.currentTarget; setZoom(active); }} aria-haspopup="dialog" aria-label={`Enlarge photo ${active + 1} of ${images.length}`}>
-                    <Image key={images[active]} src={images[active]} alt={`${suit.name}${variant ? ` design ${variantNo}` : ""} fabric photo ${active + 1}`} fill priority sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 40vw" className="shop_pd_main_img" />
-                    <span className="shop_pd_zoom_hint" aria-hidden="true"><ZoomIcon /></span>
-                  </button>
-                ) : <span className="shop_card_noimg">No photo</span>}
-                {!inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
+              {/* The stage keeps one height for every design; the frame inside shrinks to the photo's own proportions once it
+                  has loaded (no empty bands, no cropping, no stretching). A photo that fails shows a neutral notice. */}
+              <div className="shop_pd_stage">
+                <div className={`shop_gallery_main shop_pd_main ${ratios[mainSrc] && !broken[mainSrc] ? "is_fitted" : ""}`} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}
+                  style={ratios[mainSrc] && !broken[mainSrc] ? ({ "--pd-ratio": ratios[mainSrc] } as React.CSSProperties) : undefined}>
+                  {mainSrc && !broken[mainSrc] ? (
+                    <button type="button" className="shop_pd_zoom" onClick={(e) => { zoomOpener.current = e.currentTarget; setZoom(shown); }} aria-haspopup="dialog" aria-label={`Enlarge photo ${shown + 1} of ${images.length}`}>
+                      <Image key={mainSrc} src={mainSrc} alt={`${suit.name}${variant ? ` design ${variantNo}` : ""} fabric photo ${shown + 1}`} fill priority sizes="(max-width: 767px) 100vw, 50vw" className="shop_pd_main_img"
+                        onLoad={(e) => { const img = e.currentTarget; if (img.naturalWidth && img.naturalHeight) setRatios((r) => ({ ...r, [mainSrc]: img.naturalWidth / img.naturalHeight })); }}
+                        onError={() => setBroken((b) => ({ ...b, [mainSrc]: true }))} />
+                      <span className="shop_pd_zoom_hint" aria-hidden="true"><ZoomIcon /></span>
+                    </button>
+                  ) : <span className="shop_card_noimg" role="img" aria-label="Photo unavailable">{mainSrc ? "Photo unavailable" : "No photo"}</span>}
+                  {!inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
+                </div>
               </div>
               {images.length > 1 && (
                 <div className="shop_pd_thumbs" role="group" aria-label="Fabric photos" key={variantId ?? "main"}>
                   {images.map((src, i) => (
-                    <button key={src} type="button" className={`shop_pd_thumb ${i === active ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1} of ${images.length}`} aria-pressed={i === active}>
-                      <Image src={src} alt="" fill sizes="72px" style={{ objectFit: "cover" }} />
+                    <button key={src} type="button" className={`shop_pd_thumb ${i === shown ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1} of ${images.length}`} aria-pressed={i === shown}>
+                      {broken[src] ? <span className="shop_pd_thumb_missing" aria-hidden="true">!</span>
+                        : <Image src={src} alt="" fill sizes="72px" style={{ objectFit: "cover" }} onError={() => setBroken((b) => ({ ...b, [src]: true }))} />}
                     </button>
                   ))}
                 </div>
@@ -161,7 +179,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
             <SuitImageLightbox images={images} index={zoom} label={`${suit.name} fabric`} onIndexChange={(i) => { setZoom(i); setActive(i); }} onClose={() => { setZoom(null); requestAnimationFrame(() => zoomOpener.current?.focus({ preventScroll: true })); }} />
           </Col>
 
-          <Col xs={12} md={6} lg={7}>
+          <Col xs={12} md={6}>
             {suit.categories.length > 0 && <div className="shop_cats">{suit.categories.map((c) => <Link key={c.id} href={`/collections?category=${c.slug}`}>{c.name}</Link>)}</div>}
             <h1 className="shop_title">{suit.name}</h1>
             {/* a design has its own SKU (variant code); the suit's SKU otherwise */}
@@ -175,7 +193,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
                   {variants.map((v, i) => (
                     <button key={v.id} type="button" className={`shop_variant ${v.id === variantId ? "is_on" : ""} ${v.inStock ? "" : "is_out"}`} onClick={() => chooseVariant(v)}
                       aria-pressed={v.id === variantId} aria-label={`Design ${i + 1} of ${variants.length}${v.inStock ? "" : ", out of stock"}`}>
-                      {v.cover ? <Image src={v.cover} alt="" fill sizes="72px" style={{ objectFit: "cover" }} /> : <span className="shop_card_noimg">{i + 1}</span>}
+                      {v.cover && !broken[v.cover] ? <Image src={v.cover} alt="" fill sizes="72px" style={{ objectFit: "cover" }} onError={() => setBroken((b) => ({ ...b, [v.cover]: true }))} /> : <span className="shop_card_noimg">{i + 1}</span>}
                       {!v.inStock && <span className="shop_variant_out" aria-hidden="true">Sold out</span>}
                     </button>
                   ))}
@@ -216,7 +234,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
             <p className="text-muted small mt-3">Shipping charges are confirmed on WhatsApp for your PIN code. Payment: Cash on Delivery or Prepaid UPI.</p>
           </Col>
           {suit.referenceImages.length > 0 && (
-            <Col xs={12} md={6} lg={5}>
+            <Col xs={12} md={6}>
               <section className="shop_ref" aria-label="Stitched reference">
                 <h3>Stitched / styling reference</h3>
                 <p>Examples of how this fabric can look once stitched. These photos show styling only, not the unstitched fabric you will receive.</p>

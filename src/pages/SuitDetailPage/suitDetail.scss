@@ -43,24 +43,36 @@
   }
 }
 
-// Product gallery. Phones / tablets: main photo, then a horizontally scrollable thumbnail row. From 992px: thumbnails in a
-// column on the left, a medium main photo beside them (max 480px tall, sticky while the details scroll). The whole photo is
-// always visible (`contain`, never stretched or cropped) on a neutral panel.
+// Product gallery. Phones / tablets: main photo, then a horizontally scrollable thumbnail row (only with 2+ photos). From
+// 992px: thumbnails in a column on the left (only with 2+ photos), the main photo beside them, sticky while the details
+// scroll. The stage keeps one height for every design; the photo frame inside takes the photo's own proportions once it has
+// loaded, so the whole photo shows (`contain`) without cropping, stretching or empty side bands.
 .shop_detail_page {
   .shop_pd_gallery {
+    // Photo height. Phones: 340-480px by screen height. Desktop: ~550-600px by window height. Both are capped so a portrait
+    // (3:4) photo still fits the column width (100cqi = gallery width; on desktop minus the thumbnail column, reserved even
+    // for single-photo designs so the gallery keeps the same height when switching designs).
+    --pd-h: min(clamp(340px, 62vh, 480px), calc(100cqi * 1.34));
+    container-type: inline-size;
     display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem;
     @media (min-width: 992px) {
+      --pd-h: min(600px, max(440px, calc(100vh - 13rem)), calc((100cqi - 84px) * 1.34)); // 84px = 72px thumbnails + gap
       position: sticky; top: 6.5rem;
-      &.has_thumbs { grid-template-columns: 72px minmax(0, 1fr); grid-template-areas: "thumbs main"; }
-      .shop_pd_main { grid-area: main; }
-      // as tall as the main photo: 6 thumbnails fit without scrolling at full size (6 x 72px + gaps < 480px)
-      .shop_pd_thumbs { grid-area: thumbs; flex-direction: column; max-height: clamp(380px, 36vw, 480px); overflow-x: hidden; overflow-y: auto; padding: 2px; }
+      // Named areas ONLY when there is a thumbnail column. (Root cause of the blank gallery: `grid-area: main` was set on the
+      // photo for every gallery, so with a single photo, where no such area exists, it landed in an implicit 0px column.)
+      &.has_thumbs {
+        grid-template-columns: 72px minmax(0, 1fr); grid-template-areas: "thumbs main";
+        .shop_pd_stage { grid-area: main; justify-content: flex-start; } // photo right next to its thumbnails (single photos stay centred)
+        .shop_pd_thumbs { grid-area: thumbs; flex-direction: column; max-height: var(--pd-h); overflow-x: hidden; overflow-y: auto; padding: 2px; }
+      }
     }
   }
+  .shop_pd_stage { display: flex; align-items: center; justify-content: center; min-width: 0; height: var(--pd-h); }
   .shop_pd_main {
-    aspect-ratio: 4 / 5; max-height: min(72vh, 520px); width: 100%;
+    width: 100%; height: 100%; aspect-ratio: auto; // (shop.scss gives .shop_gallery_main a fixed 3:4)
     background: var(--boutique-surface-hover);
-    @media (min-width: 992px) { aspect-ratio: auto; height: clamp(380px, 36vw, 480px); max-height: none; }
+    // photo loaded: the frame takes its proportions, as large as the stage allows (landscape photos: full width, centred)
+    &.is_fitted { width: min(100%, calc(var(--pd-h) * var(--pd-ratio))); height: auto; max-height: 100%; aspect-ratio: var(--pd-ratio); }
     .shop_pd_main_img { object-fit: contain; }
   }
   .shop_pd_zoom {
@@ -85,7 +97,8 @@
     &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 2px; }
     &.is_on { opacity: 1; border-color: var(--boutique-gold); box-shadow: 0 0 0 1px var(--boutique-gold); }
     @media (min-width: 992px) { flex: 0 0 auto; width: 100%; height: 72px; }
+    &_missing { position: absolute; inset: 0; display: grid; place-items: center; color: var(--boutique-muted); font-weight: 700; }
   }
-  // the design picker now sits in the details column, between the price and the specs
+  // the design picker sits in the details column, between the price and the specs
   .shop_variants { margin: 1rem 0 0.25rem; }
 }

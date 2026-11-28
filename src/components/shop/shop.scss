@@ -7,7 +7,7 @@
 // Where a class is used together with another on the same element (e.g. `.shop_btn.shop_btn_solid`) the second class is written out
 // in full, and descendant selectors (e.g. `.shop_cart_line .shop_cart_img`) keep their full class names.
 .shop {
-  &_page { background: var(--boutique-bg); color: var(--boutique-text); min-height: 70vh; padding-top: 6.5rem; padding-bottom: 4rem; }
+  &_page { background: var(--boutique-bg); color: var(--boutique-text); min-height: 70vh; padding-top: 8rem; padding-bottom: 4rem; }
 
   &_eyebrow { color: var(--boutique-gold); font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; }
   &_hero { text-align: center; padding: 1.5rem 0 2rem; h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin: 0.4rem 0; } p { color: var(--boutique-muted); max-width: 40rem; margin: 0 auto; } }

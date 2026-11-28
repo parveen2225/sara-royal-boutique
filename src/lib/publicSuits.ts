@@ -28,8 +28,18 @@ function cardGallery(s: SuitDoc): string[] {
 }
 
 /** Card/list shape. Never includes admin-only data (status, exact low-stock bands, publicIds, timestamps of edits). */
+/** For each card photo of a variant suit: the design whose cover it is (null for a general suit photo). */
+function cardImageVariants(s: SuitDoc, images: string[]) {
+  const byCover = new Map((s.variants ?? []).filter((v) => v.images?.[0]?.url).map((v) => [v.images![0].url, v]));
+  return images.map((url) => {
+    const v = byCover.get(url);
+    return v ? { id: String(v._id), code: v.code, inStock: v.stock > 0 } : null;
+  });
+}
+
 export function toPublicListItem(s: SuitDoc) {
   const gallery = cardGallery(s);
+  const images = gallery.slice(0, CARD_GALLERY_MAX);
   return {
     id: String(s._id),
     sku: s.sku,
@@ -44,8 +54,9 @@ export function toPublicListItem(s: SuitDoc) {
     inStock: s.stock > 0,
     maxQuantity: Math.max(0, s.stock), // used to cap the quantity selector
     cover: s.fabricImages?.[0]?.url ?? "",
-    images: gallery.slice(0, CARD_GALLERY_MAX), // card thumbnails (Collections)
+    images, // card thumbnails (first = cover)
     imageCount: gallery.length,
+    ...(s.variants?.length ? { imageVariants: cardImageVariants(s, images) } : {}), // which design each thumbnail shows
     categories: activeCategories(s),
     featured: Boolean(s.featured),
     variantCount: s.variants?.length ?? 0, // > 0: the customer picks a variant on the suit page (each has its own stock)

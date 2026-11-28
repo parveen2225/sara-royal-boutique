@@ -34,7 +34,8 @@ export default function SuitsRail({ label, title, subtitle, query, id }: Props) 
         </div>
         <Row className="g-3 g-xl-4">
           {items.map((s) => (
-            <Col key={s.id} xs={6} md={4} lg={3}><SuitCard suit={s} /></Col>
+            // same photo / design thumbnails as Collections; on Home the chosen design also carries into Choose Design / View Details
+            <Col key={s.id} xs={6} md={4} lg={3}><SuitCard suit={s} gallery designLinks /></Col>
           ))}
         </Row>
         <div className="text-center mt-4"><Link href="/collections" className="shop_btn shop_btn_outline">Shop all suits</Link></div>

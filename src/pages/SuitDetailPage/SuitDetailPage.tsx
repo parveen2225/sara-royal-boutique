@@ -98,6 +98,18 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   const firstWorking = images.findIndex((u) => !broken[u]);
   const shown = broken[images[picked]] && firstWorking >= 0 ? firstWorking : picked;
   const mainSrc = images[shown] ?? "";
+  // Gallery box, sized ONCE per suit so it never changes width between designs (the design picker sits beside it and
+  // must not move under the cursor): the widest photo proportions seen among the suit's photos, and room for the thumbnail
+  // rail if any design has 2+ photos. Proportions come from photos that load right away (each design's cover in the picker,
+  // or a plain suit's own photos), so the box is settled before anyone clicks; other photos are shown whole inside it.
+  const galleryPhotos = variants.length ? variants.map((v) => v.cover) : suit.fabricImages;
+  const knownRatios = galleryPhotos.map((u) => ratios[u]).filter((r): r is number => r > 0);
+  const boxRatio = knownRatios.length ? Math.min(1.4, Math.max(0.5, ...knownRatios)) : 0.75;
+  const reserveRail = variants.length ? variants.some((v) => v.images.filter(Boolean).length > 1) : suit.fabricImages.filter(Boolean).length > 1;
+  const noteRatio = (src: string) => (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth && img.naturalHeight) setRatios((r) => (r[src] ? r : { ...r, [src]: img.naturalWidth / img.naturalHeight }));
+  };
   const inStock = variant ? variant.inStock : suit.inStock;
   const maxQuantity = variant ? variant.maxQuantity : suit.maxQuantity;
   const inCart = cart.items.find((i) => lineKey(i) === lineKey({ id: suit.id, variantId: variant?.id }))?.quantity ?? 0;
@@ -147,17 +159,17 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
         <Row className="g-4 g-lg-5">
           {/* Gallery: photo thumbnails change ONLY the photo (never the design, SKU, price or stock). Main photo first in the
               DOM (phones: photo, then a scrollable thumbnail row); from 992px the thumbnails stand in a column on its left. */}
-          <Col xs={12} md={6}>
-            <div className={`shop_pd_gallery ${images.length > 1 ? "has_thumbs" : ""}`}>
-              {/* The stage keeps one height for every design; the frame inside shrinks to the photo's own proportions once it
-                  has loaded (no empty bands, no cropping, no stretching). A photo that fails shows a neutral notice. */}
+          {/* desktop: the gallery column is as wide as its content (rail + photo box, below 45% of the row); details get the rest */}
+          <Col xs={12} md={6} lg="auto" className="shop_pd_col">
+            <div className={`shop_pd_gallery ${images.length > 1 ? "has_thumbs" : ""} ${reserveRail ? "reserve_rail" : ""}`} style={{ "--pd-ratio": boxRatio } as React.CSSProperties}>
+              {/* One box per suit (see boxRatio): same size for every design; the photo is shown whole inside it. A photo that
+                  fails to load shows a neutral notice instead of an empty gallery. */}
               <div className="shop_pd_stage">
-                <div className={`shop_gallery_main shop_pd_main ${ratios[mainSrc] && !broken[mainSrc] ? "is_fitted" : ""}`} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}
-                  style={ratios[mainSrc] && !broken[mainSrc] ? ({ "--pd-ratio": ratios[mainSrc] } as React.CSSProperties) : undefined}>
+                <div className="shop_gallery_main shop_pd_main" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}>
                   {mainSrc && !broken[mainSrc] ? (
                     <button type="button" className="shop_pd_zoom" onClick={(e) => { zoomOpener.current = e.currentTarget; setZoom(shown); }} aria-haspopup="dialog" aria-label={`Enlarge photo ${shown + 1} of ${images.length}`}>
                       <Image key={mainSrc} src={mainSrc} alt={`${suit.name}${variant ? ` design ${variantNo}` : ""} fabric photo ${shown + 1}`} fill priority sizes="(max-width: 767px) 100vw, 50vw" className="shop_pd_main_img"
-                        onLoad={(e) => { const img = e.currentTarget; if (img.naturalWidth && img.naturalHeight) setRatios((r) => ({ ...r, [mainSrc]: img.naturalWidth / img.naturalHeight })); }}
+                        onLoad={noteRatio(mainSrc)}
                         onError={() => setBroken((b) => ({ ...b, [mainSrc]: true }))} />
                       <span className="shop_pd_zoom_hint" aria-hidden="true"><ZoomIcon /></span>
                     </button>
@@ -170,7 +182,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
                   {images.map((src, i) => (
                     <button key={src} type="button" className={`shop_pd_thumb ${i === shown ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1} of ${images.length}`} aria-pressed={i === shown}>
                       {broken[src] ? <span className="shop_pd_thumb_missing" aria-hidden="true">!</span>
-                        : <Image src={src} alt="" fill sizes="72px" style={{ objectFit: "cover" }} onError={() => setBroken((b) => ({ ...b, [src]: true }))} />}
+                        : <Image src={src} alt="" fill sizes="72px" loading="eager" style={{ objectFit: "cover" }} onLoad={noteRatio(src)} onError={() => setBroken((b) => ({ ...b, [src]: true }))} />}
                     </button>
                   ))}
                 </div>
@@ -179,7 +191,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
             <SuitImageLightbox images={images} index={zoom} label={`${suit.name} fabric`} onIndexChange={(i) => { setZoom(i); setActive(i); }} onClose={() => { setZoom(null); requestAnimationFrame(() => zoomOpener.current?.focus({ preventScroll: true })); }} />
           </Col>
 
-          <Col xs={12} md={6}>
+          <Col xs={12} md={6} lg>
             {suit.categories.length > 0 && <div className="shop_cats">{suit.categories.map((c) => <Link key={c.id} href={`/collections?category=${c.slug}`}>{c.name}</Link>)}</div>}
             <h1 className="shop_title">{suit.name}</h1>
             {/* a design has its own SKU (variant code); the suit's SKU otherwise */}
@@ -193,7 +205,7 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
                   {variants.map((v, i) => (
                     <button key={v.id} type="button" className={`shop_variant ${v.id === variantId ? "is_on" : ""} ${v.inStock ? "" : "is_out"}`} onClick={() => chooseVariant(v)}
                       aria-pressed={v.id === variantId} aria-label={`Design ${i + 1} of ${variants.length}${v.inStock ? "" : ", out of stock"}`}>
-                      {v.cover && !broken[v.cover] ? <Image src={v.cover} alt="" fill sizes="72px" style={{ objectFit: "cover" }} onError={() => setBroken((b) => ({ ...b, [v.cover]: true }))} /> : <span className="shop_card_noimg">{i + 1}</span>}
+                      {v.cover && !broken[v.cover] ? <Image src={v.cover} alt="" fill sizes="72px" loading="eager" style={{ objectFit: "cover" }} onLoad={noteRatio(v.cover)} onError={() => setBroken((b) => ({ ...b, [v.cover]: true }))} /> : <span className="shop_card_noimg">{i + 1}</span>}
                       {!v.inStock && <span className="shop_variant_out" aria-hidden="true">Sold out</span>}
                     </button>
                   ))}

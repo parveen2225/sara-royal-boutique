@@ -8,9 +8,11 @@ export type PublicSuitListItem = {
   originalPricePaise: number; salePricePaise: number; discountPercent: number;
   inStock: boolean; maxQuantity: number; cover: string;
   images?: string[]; imageCount?: number; // up to 4 card photos (first = cover) and how many the suit has in total
+  imageVariants?: (CardDesign | null)[]; // variant suits: the design each card photo shows (null = a general suit photo)
   categories: { id: string; name: string; slug: string }[]; featured: boolean;
   variantCount?: number; // > 0: chosen on the suit page (each variant has its own stock)
 };
+export type CardDesign = { id: string; code: string; inStock: boolean };
 /** Image variant: same design and price, its own photos and stock. */
 export type PublicSuitVariant = { id: string; code: string; images: string[]; cover: string; inStock: boolean; maxQuantity: number };
 export type PublicSuitDetail = PublicSuitListItem & {

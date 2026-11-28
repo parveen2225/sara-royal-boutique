@@ -125,7 +125,9 @@ test("product card links: Add to Cart and View Details are always rendered, View
   const fs = await import("node:fs");
   const src = fs.readFileSync(new URL("../src/components/shop/SuitCard.tsx", import.meta.url), "utf8");
   assert.match(src, /const href = `\/suits\/\$\{suit\.id\}`/);
-  assert.match(src, /<Link href=\{href\} className="shop_btn shop_card_btn"[^>]*>View Details<\/Link>/);
+  // linkHref = the suit page, or (Home cards, after a design thumbnail was clicked) that design on the suit page
+  assert.match(src, /const linkHref = design \? `\$\{href\}\?v=\$\{encodeURIComponent\(design\.id\)\}` : href;/);
+  assert.match(src, /<Link href=\{linkHref\} className="shop_btn shop_card_btn"[^>]*>View Details<\/Link>/);
   assert.match(src, /disabled=\{!suit\.inStock\}/);
   assert.doesNotMatch(src, /Try On/i, "AI Try-On stays on the Suit Details page only");
   const css = fs.readFileSync(new URL("../src/components/shop/shop.scss", import.meta.url), "utf8");

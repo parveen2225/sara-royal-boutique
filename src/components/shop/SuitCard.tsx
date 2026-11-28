@@ -30,8 +30,17 @@ type Feedback = CartFeedback | null;
 const addOne = (suit: PublicSuitListItem): Feedback =>
   cartAddFeedback(cartStore.add({ id: suit.id, sku: suit.sku, name: suit.name, image: suit.cover, unitPricePaise: suit.salePricePaise, maxQuantity: suit.maxQuantity }, 1), suit.maxQuantity);
 
-export default function SuitCard({ suit }: { suit: PublicSuitListItem }) {
+/**
+ * `gallery` (Collections only): up to 4 photo thumbnails over the bottom of the card photo; clicking one swaps the photo in
+ * place. They are buttons NEXT TO the photo link (not inside it), so they never navigate. Without it the card is unchanged.
+ */
+export default function SuitCard({ suit, gallery = false }: { suit: PublicSuitListItem; gallery?: boolean }) {
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const photos = gallery ? (suit.images ?? []).filter(Boolean) : [];
+  const withThumbs = photos.length > 1;
+  const [shown, setShown] = useState(0);
+  const mainPhoto = withThumbs ? photos[shown] ?? suit.cover : suit.cover;
+  const morePhotos = Math.max(0, (suit.imageCount ?? photos.length) - photos.length);
   useEffect(() => {
     if (!feedback) return;
     const t = setTimeout(() => setFeedback(null), 3500);
@@ -39,17 +48,33 @@ export default function SuitCard({ suit }: { suit: PublicSuitListItem }) {
   }, [feedback]);
   const href = `/suits/${suit.id}`;
   const variantCount = suit.variantCount ?? 0;
+  const media = (
+    <Link href={href} className="shop_card_media" aria-label={suit.name}>
+      {mainPhoto ? (
+        <Image src={mainPhoto} alt={withThumbs ? `${suit.name}, photo ${shown + 1}` : suit.name} fill sizes="(max-width: 575px) 50vw, (max-width: 991px) 33vw, 25vw" className="shop_card_img" />
+      ) : (
+        <span className="shop_card_noimg">No photo</span>
+      )}
+      {suit.discountPercent > 0 && <span className="shop_badge shop_badge_corner">{suit.discountPercent}% off</span>}
+      {!suit.inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
+    </Link>
+  );
   return (
     <article className={`shop_card ${suit.inStock ? "" : "is_out"}`}>
-      <Link href={href} className="shop_card_media" aria-label={suit.name}>
-        {suit.cover ? (
-          <Image src={suit.cover} alt={suit.name} fill sizes="(max-width: 575px) 50vw, (max-width: 991px) 33vw, 25vw" className="shop_card_img" />
-        ) : (
-          <span className="shop_card_noimg">No photo</span>
-        )}
-        {suit.discountPercent > 0 && <span className="shop_badge shop_badge_corner">{suit.discountPercent}% off</span>}
-        {!suit.inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
-      </Link>
+      {withThumbs ? (
+        <div className="shop_card_visual">
+          {media}
+          <div className="shop_card_thumbs" role="group" aria-label={`Photos of ${suit.name}`}>
+            {photos.map((src, i) => (
+              <button key={src} type="button" className={`shop_card_thumb ${i === shown ? "is_on" : ""}`} aria-pressed={i === shown}
+                aria-label={`Show photo ${i + 1} of ${suit.imageCount ?? photos.length}`} onClick={() => setShown(i)}>
+                <Image src={src} alt="" fill sizes="44px" className="shop_card_thumb_img" />
+                {i === photos.length - 1 && morePhotos > 0 && <span className="shop_card_thumb_more" aria-hidden="true">+{morePhotos}</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : media}
       <div className="shop_card_body">
         <h3 className="shop_card_title"><Link href={href}>{suit.name}</Link></h3>
         <p className="shop_card_meta">{suit.sku}{suit.fabric ? ` · ${suit.fabric}` : ""}{variantCount > 0 ? ` · ${variantCount} designs` : ""}</p>

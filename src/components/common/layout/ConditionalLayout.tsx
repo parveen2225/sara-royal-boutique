@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/common/header/Header";
 import Footer from "@/components/common/footer/Footer";
 import { AuthLauncherProvider } from "@/components/account/AuthLauncher";
-import { headerToneFor } from "@/lib/headerTone";
+import { footerClipsX } from "@/lib/headerTone";
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ const ConditionalLayout: React.FC<ConditionalLayoutProps> = ({ children }) => {
     <AuthLauncherProvider>
       {!isAdmin && <Header />}
       {children}
-      {!isAdmin && <Footer clipX={headerToneFor(pathname) !== undefined} />}
+      {!isAdmin && <Footer clipX={footerClipsX(pathname)} />}
     </AuthLauncherProvider>
   );
 };

@@ -14,8 +14,22 @@ const activeCategories = (s: SuitDoc) =>
     .filter((c): c is CatLike => !!c && typeof c === "object" && "name" in (c as object) && (c as CatLike).active !== false)
     .map((c) => ({ id: String(c._id), name: c.name, slug: c.slug }));
 
+export const CARD_GALLERY_MAX = 4;
+
+/**
+ * Photos a product card can flip through (first = cover). Plain suits: their uploaded fabric photos. Variant suits: the
+ * cover, then each variant's first photo (so the card previews the available colours), then the other fabric photos.
+ */
+function cardGallery(s: SuitDoc): string[] {
+  const fabric = (s.fabricImages ?? []).map((i) => i.url);
+  const variantCovers = (s.variants ?? []).map((v) => v.images?.[0]?.url ?? "");
+  const ordered = s.variants?.length ? [fabric[0] ?? "", ...variantCovers, ...fabric.slice(1)] : fabric;
+  return [...new Set(ordered.filter(Boolean))];
+}
+
 /** Card/list shape. Never includes admin-only data (status, exact low-stock bands, publicIds, timestamps of edits). */
 export function toPublicListItem(s: SuitDoc) {
+  const gallery = cardGallery(s);
   return {
     id: String(s._id),
     sku: s.sku,
@@ -30,6 +44,8 @@ export function toPublicListItem(s: SuitDoc) {
     inStock: s.stock > 0,
     maxQuantity: Math.max(0, s.stock), // used to cap the quantity selector
     cover: s.fabricImages?.[0]?.url ?? "",
+    images: gallery.slice(0, CARD_GALLERY_MAX), // card thumbnails (Collections)
+    imageCount: gallery.length,
     categories: activeCategories(s),
     featured: Boolean(s.featured),
     variantCount: s.variants?.length ?? 0, // > 0: the customer picks a variant on the suit page (each has its own stock)

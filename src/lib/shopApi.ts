@@ -7,6 +7,7 @@ export type PublicSuitListItem = {
   id: string; sku: string; name: string; fabric: string; color: string;
   originalPricePaise: number; salePricePaise: number; discountPercent: number;
   inStock: boolean; maxQuantity: number; cover: string;
+  images?: string[]; imageCount?: number; // up to 4 card photos (first = cover) and how many the suit has in total
   categories: { id: string; name: string; slug: string }[]; featured: boolean;
   variantCount?: number; // > 0: chosen on the suit page (each variant has its own stock)
 };

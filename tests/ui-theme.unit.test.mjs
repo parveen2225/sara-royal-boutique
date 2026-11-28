@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 
-const { headerToneFor } = await import("../src/lib/headerTone.ts");
+const { headerToneFor, footerClipsX } = await import("../src/lib/headerTone.ts");
 const root = path.resolve(import.meta.dirname, "..");
 const read = (p) => fs.readFileSync(path.join(root, p), "utf8");
 const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
@@ -84,6 +84,8 @@ test("scope: restricted pages and shared files are byte-for-byte unchanged (git)
     "src/app/api/admin/suits/route.ts", "src/app/api/admin/suits/[id]/route.ts", "src/app/api/admin/order-suits/route.ts", "src/app/api/suit-cart/validate/route.ts",
     "src/app/admin/orders/new/page.tsx", "src/app/admin/orders/[id]/page.tsx", "src/app/admin/returns/new/page.tsx", "src/app/admin/returns/[id]/page.tsx",
     "src/components/shop/SuitCard.tsx", "src/lib/cartCore.ts", "src/lib/cartStore.ts", "src/lib/shopApi.ts", "src/lib/suitWhatsapp.ts",
+    // Collections gallery (requested; Collections changes allowed for it): the page passes `gallery` to its cards
+    "src/pages/SuitCollectionsPage/SuitCollectionsPage.tsx",
   ];
   const changed = execFileSync("git", ["status", "--porcelain", "--", ...protectedPaths, ...allowed.map((f) => `:(exclude,literal)${f}`)], { cwd: root, encoding: "utf8" }).trim();
   assert.equal(changed, "", `protected files changed:\n${changed}`);
@@ -154,10 +156,11 @@ test("homepage layout fixes: tablet hero centred, rails 2x2 on tablet and centre
   assert.match(ord, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/); assert.match(ord, /nth-child\(4\) \{ grid-column: 2 \/ span 2; \}/); assert.match(ord, /nth-child\(5\) \{ grid-column: 4 \/ span 2; \}/);
 });
 
-test("footer overflow fix is opt-in: every page except Collections and About gets it; their footer is exactly as before", () => {
-  assert.equal(headerToneFor("/collections"), undefined); assert.equal(headerToneFor("/about"), undefined);
-  for (const p of ["/", "/cart", "/services", "/stitching"]) assert.notEqual(headerToneFor(p), undefined, p);
-  assert.match(read("src/components/common/layout/ConditionalLayout.tsx"), /<Footer clipX=\{headerToneFor\(pathname\) !== undefined\} \/>/);
+test("footer overflow fix is opt-in: every page except About gets it (Collections opted in with its gallery update); About's footer is exactly as before", () => {
+  assert.equal(headerToneFor("/collections"), undefined); assert.equal(headerToneFor("/about"), undefined); // header unchanged on both
+  for (const p of ["/", "/cart", "/services", "/stitching", "/collections", "/collections?page=2", "/Collections/x"]) assert.equal(footerClipsX(p), true, p);
+  for (const p of ["/about", "/About", "/about/"]) assert.equal(footerClipsX(p), false, p);
+  assert.match(read("src/components/common/layout/ConditionalLayout.tsx"), /<Footer clipX=\{footerClipsX\(pathname\)\} \/>/);
   const footer = read("src/components/common/footer/Footer.tsx");
   assert.match(footer, /\{ clipX = false \}/); assert.match(footer, /\$\{clipX \? " is_clip_x" : ""\}/);
   // content check (the change is committed now, so a git diff is empty): the opt-in class is the only footer-level clip

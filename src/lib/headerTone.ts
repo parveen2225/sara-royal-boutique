@@ -12,6 +12,13 @@ const HERO_PREFIXES = [
   "/boutique-classes-punjab", "/designer-suits-kharar", "/ladies-tailor-kharar", "/suit-stitching-kharar",
 ];
 
+/**
+ * Should the footer clip its row's ~8px horizontal overflow (992-1599px)? Every page except About (left exactly as it was);
+ * Collections opted in with its gallery update.
+ */
+export const footerClipsX = (pathname: string | null | undefined) =>
+  headerToneFor(pathname) !== undefined || /^\/collections(\/|$)/i.test((pathname ?? "/").split(/[?#]/)[0]);
+
 export function headerToneFor(pathname: string | null | undefined): HeaderTone | undefined {
   const p = (pathname ?? "/").split(/[?#]/)[0] || "/";
   if (UNCHANGED.test(p)) return undefined;

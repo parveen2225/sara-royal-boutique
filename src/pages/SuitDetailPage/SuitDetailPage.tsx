@@ -69,6 +69,9 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   const [variantId, setVariantId] = useState<string | null>(() => initialVariant(variants));
   const [active, setActive] = useState(0);
   const [preview, setPreview] = useState<number | null>(null); // open reference photo (index), null = closed
+  const [zoom, setZoom] = useState<number | null>(null); // main photo enlarged in the lightbox (index), null = closed
+  const zoomOpener = useRef<HTMLElement | null>(null);
+  const swipeX = useRef<number | null>(null);
   const previewOpener = useRef<HTMLElement | null>(null); // the thumbnail that opened it: focus goes back there on close (Safari does not focus buttons on click)
   const [qty, setQty] = useState(1);
   const [message, setMessage] = useState("");
@@ -89,6 +92,16 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
   const maxQuantity = variant ? variant.maxQuantity : suit.maxQuantity;
   const inCart = cart.items.find((i) => lineKey(i) === lineKey({ id: suit.id, variantId: variant?.id }))?.quantity ?? 0;
   const safeQty = Math.max(1, Math.min(qty, maxQuantity || 1));
+
+  // phones: swipe the main photo to the next / previous photo (same as tapping a thumbnail)
+  const onSwipeStart = (e: React.TouchEvent) => { swipeX.current = e.touches[0]?.clientX ?? null; };
+  const onSwipeEnd = (e: React.TouchEvent) => {
+    const start = swipeX.current;
+    swipeX.current = null;
+    const dx = start === null ? 0 : (e.changedTouches[0]?.clientX ?? start) - start;
+    if (Math.abs(dx) < 50 || images.length < 2) return;
+    setActive((i) => (i + (dx < 0 ? 1 : -1) + images.length) % images.length);
+  };
 
   const chooseVariant = (v: PublicSuitVariant) => {
     if (v.id === variantId) return;
@@ -122,12 +135,40 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
       <Container>
         <nav className="shop_crumbs" aria-label="Breadcrumb"><Link href="/">Home</Link><span>›</span><Link href="/collections">Collections</Link><span>›</span>{suit.name}</nav>
         <Row className="g-4 g-lg-5">
-          <Col xs={12} md={6}>
-            <div className="shop_gallery_main">
-              {images[active] ? <Image key={images[active]} src={images[active]} alt={`${suit.name}${variant ? ` design ${variantNo}` : ""} fabric photo ${active + 1}`} fill priority sizes="(max-width: 767px) 100vw, 50vw" style={{ objectFit: "cover" }} /> : <span className="shop_card_noimg">No photo</span>}
-              {!inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
+          {/* Gallery: photo thumbnails change ONLY the photo (never the design, SKU, price or stock). Main photo first in the
+              DOM (phones: photo, then a scrollable thumbnail row); from 992px the thumbnails stand in a column on its left. */}
+          <Col xs={12} md={6} lg={5}>
+            <div className={`shop_pd_gallery ${images.length > 1 ? "has_thumbs" : ""}`}>
+              <div className="shop_gallery_main shop_pd_main" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd}>
+                {images[active] ? (
+                  <button type="button" className="shop_pd_zoom" onClick={(e) => { zoomOpener.current = e.currentTarget; setZoom(active); }} aria-haspopup="dialog" aria-label={`Enlarge photo ${active + 1} of ${images.length}`}>
+                    <Image key={images[active]} src={images[active]} alt={`${suit.name}${variant ? ` design ${variantNo}` : ""} fabric photo ${active + 1}`} fill priority sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 40vw" className="shop_pd_main_img" />
+                    <span className="shop_pd_zoom_hint" aria-hidden="true"><ZoomIcon /></span>
+                  </button>
+                ) : <span className="shop_card_noimg">No photo</span>}
+                {!inStock && <span className="shop_badge shop_badge_out">Out of Stock</span>}
+              </div>
+              {images.length > 1 && (
+                <div className="shop_pd_thumbs" role="group" aria-label="Fabric photos" key={variantId ?? "main"}>
+                  {images.map((src, i) => (
+                    <button key={src} type="button" className={`shop_pd_thumb ${i === active ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1} of ${images.length}`} aria-pressed={i === active}>
+                      <Image src={src} alt="" fill sizes="72px" style={{ objectFit: "cover" }} />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+            <SuitImageLightbox images={images} index={zoom} label={`${suit.name} fabric`} onIndexChange={(i) => { setZoom(i); setActive(i); }} onClose={() => { setZoom(null); requestAnimationFrame(() => zoomOpener.current?.focus({ preventScroll: true })); }} />
+          </Col>
+
+          <Col xs={12} md={6} lg={7}>
+            {suit.categories.length > 0 && <div className="shop_cats">{suit.categories.map((c) => <Link key={c.id} href={`/collections?category=${c.slug}`}>{c.name}</Link>)}</div>}
+            <h1 className="shop_title">{suit.name}</h1>
+            {/* a design has its own SKU (variant code); the suit's SKU otherwise */}
+            <p className="shop_sku">SKU: <span data-testid="variant-code">{variant ? variant.code : suit.sku}</span></p>
+            <SuitPrice {...suit} />
             {variants.length > 0 && (
+              // Designs (same design, other colours): picking one switches its photos, SKU, availability and stock.
               <div className="shop_variants">
                 <p className="shop_variants_label" id="shop-variants-label">Choose design <span>{variantNo} of {variants.length}</span></p>
                 <div className="shop_variant_list" role="group" aria-labelledby="shop-variants-label">
@@ -141,42 +182,9 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
                 </div>
               </div>
             )}
-            {images.length > 1 && (
-              <div className="shop_thumbs" aria-label="Fabric photos">
-                {images.map((src, i) => (
-                  <button key={`${variantId ?? ""}:${src}`} type="button" className={`shop_thumb ${i === active ? "is_on" : ""}`} onClick={() => setActive(i)} aria-label={`Show fabric photo ${i + 1}`} aria-current={i === active}>
-                    <Image src={src} alt="" fill sizes="72px" style={{ objectFit: "cover" }} />
-                  </button>
-                ))}
-              </div>
-            )}
-            {suit.referenceImages.length > 0 && (
-              <section className="shop_ref" aria-label="Stitched reference">
-                <h3>Stitched / styling reference</h3>
-                <p>Examples of how this fabric can look once stitched. These photos show styling only, not the unstitched fabric you will receive.</p>
-                <div className="shop_thumbs">
-                  {suit.referenceImages.map((src, i) => (
-                    // a button, not a link: the photo previews on this page (SuitImageLightbox) instead of navigating away
-                    <button key={src} type="button" className="shop_thumb shop_ref_thumb" onClick={(e) => { previewOpener.current = e.currentTarget; setPreview(i); }} aria-haspopup="dialog" aria-label={`Preview stitched reference ${i + 1} of ${suit.referenceImages.length}`}>
-                      <Image src={src} alt={`Stitched reference ${i + 1}`} fill sizes="72px" style={{ objectFit: "cover" }} />
-                      <span className="shop_ref_zoom" aria-hidden="true"><ZoomIcon /></span>
-                    </button>
-                  ))}
-                </div>
-                <SuitImageLightbox images={suit.referenceImages} index={preview} label={`${suit.name} stitched reference`} onIndexChange={setPreview} onClose={() => { setPreview(null); requestAnimationFrame(() => previewOpener.current?.focus({ preventScroll: true })); }} />
-              </section>
-            )}
-          </Col>
-
-          <Col xs={12} md={6}>
-            {suit.categories.length > 0 && <div className="shop_cats">{suit.categories.map((c) => <Link key={c.id} href={`/collections?category=${c.slug}`}>{c.name}</Link>)}</div>}
-            <h1 className="shop_title">{suit.name}</h1>
-            <p className="shop_sku">SKU: {suit.sku}</p>
-            <SuitPrice {...suit} />
             <ul className="shop_specs">
               {suit.fabric && <li><strong>Fabric</strong>{suit.fabric}</li>}
               {suit.color && <li><strong>Color</strong>{suit.color}</li>}
-              {variant && <li><strong>Design</strong><span data-testid="variant-code">{variant.code}</span></li>}
               <li><strong>Availability</strong>{inStock ? <span className="shop_stock_ok">In stock</span> : <span className="shop_stock_out">Out of Stock</span>}</li>
               <li><strong>Type</strong>Unstitched fabric</li>
             </ul>
@@ -207,6 +215,24 @@ function SuitDetail({ suit }: { suit: PublicSuitDetail }) {
             {settings.ready && !settings.whatsappNumber && <p className="text-muted small mt-2">WhatsApp ordering is not available right now.</p>}
             <p className="text-muted small mt-3">Shipping charges are confirmed on WhatsApp for your PIN code. Payment: Cash on Delivery or Prepaid UPI.</p>
           </Col>
+          {suit.referenceImages.length > 0 && (
+            <Col xs={12} md={6} lg={5}>
+              <section className="shop_ref" aria-label="Stitched reference">
+                <h3>Stitched / styling reference</h3>
+                <p>Examples of how this fabric can look once stitched. These photos show styling only, not the unstitched fabric you will receive.</p>
+                <div className="shop_thumbs">
+                  {suit.referenceImages.map((src, i) => (
+                    // a button, not a link: the photo previews on this page (SuitImageLightbox) instead of navigating away
+                    <button key={src} type="button" className="shop_thumb shop_ref_thumb" onClick={(e) => { previewOpener.current = e.currentTarget; setPreview(i); }} aria-haspopup="dialog" aria-label={`Preview stitched reference ${i + 1} of ${suit.referenceImages.length}`}>
+                      <Image src={src} alt={`Stitched reference ${i + 1}`} fill sizes="72px" style={{ objectFit: "cover" }} />
+                      <span className="shop_ref_zoom" aria-hidden="true"><ZoomIcon /></span>
+                    </button>
+                  ))}
+                </div>
+                <SuitImageLightbox images={suit.referenceImages} index={preview} label={`${suit.name} stitched reference`} onIndexChange={setPreview} onClose={() => { setPreview(null); requestAnimationFrame(() => previewOpener.current?.focus({ preventScroll: true })); }} />
+              </section>
+            </Col>
+          )}
         </Row>
 
         {suit.related.length > 0 && (

@@ -202,5 +202,5 @@
 }
 
 // The footer's Bootstrap row stuck ~8px out of the viewport at 992-1599px, adding horizontal page scroll. `clip` creates no scroll
-// container. Applied only when <Footer clipX> is set (every page except Collections and About, whose behaviour is left as it was).
+// container. Applied only when <Footer clipX> is set (every page except About, whose behaviour is left as it was).
 .boutique_footer.is_clip_x { overflow-x: clip; }

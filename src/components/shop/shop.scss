@@ -203,4 +203,35 @@
     &_status { min-height: 1.1rem; margin: 0.35rem 0 0; font-size: 0.8rem; color: var(--boutique-muted); word-break: break-all;
       &.is_ok { color: var(--boutique-gold); } }
   }
+
+  // Collections cards: photo thumbnails over the bottom of the card photo (SuitCard `gallery`). Only the image area is
+  // covered; name, SKU, price and buttons sit below it, untouched. Thumbnails shrink with the card, so 4 always fit.
+  &_card {
+    &_visual {
+      position: relative;
+      // the overlay sits where "Out of Stock" used to be: move that badge to the free top-right corner
+      .shop_badge_out { bottom: auto; left: auto; top: 0.6rem; right: 0.6rem; }
+    }
+    &_thumbs {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+      display: flex; justify-content: center; gap: 0.35rem; padding: 1.4rem 0.5rem 0.5rem;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+      pointer-events: none; // only the buttons take clicks; the rest of the photo still opens the suit
+    }
+    &_thumb {
+      position: relative; flex: 0 1 44px; min-width: 0; aspect-ratio: 1; padding: 0; overflow: hidden; cursor: pointer; pointer-events: auto;
+      border-radius: 0.45rem; border: 2px solid rgba(255, 255, 255, 0.75); background: rgba(0, 0, 0, 0.35);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); transition: border-color 0.15s ease, transform 0.15s ease;
+      &:hover { transform: translateY(-1px); border-color: #fff; }
+      &:focus-visible { outline: 2px solid var(--boutique-gold); outline-offset: 2px; }
+      &.is_on { border-color: var(--boutique-gold); box-shadow: 0 0 0 2px var(--boutique-gold), 0 2px 6px rgba(0, 0, 0, 0.35); }
+      &_img { object-fit: cover; }
+      &_more {
+        position: absolute; inset: 0; display: grid; place-items: center;
+        background: rgba(0, 0, 0, 0.55); color: #fff; font-size: 0.72rem; font-weight: 700;
+      }
+    }
+    // icon + "Choose Design" is wider than the button on small cards: the icon must not be squeezed to a dot
+    &_btn svg { flex-shrink: 0; }
+  }
 }

@@ -113,7 +113,7 @@ export default function SuitCollectionsPage() {
           <>
             <p className="shop_count">Showing {data.items.length} of {data.total} {data.total === 1 ? "suit" : "suits"}</p>
             <Row className="g-3 g-xl-4">
-              {data.items.map((s) => <Col key={s.id} xs={6} md={4} lg={3}><SuitCard suit={s} /></Col>)}
+              {data.items.map((s) => <Col key={s.id} xs={6} md={4} lg={3}><SuitCard suit={s} gallery /></Col>)}
             </Row>
             {data.pages > 1 && (
               <nav className="shop_pager" aria-label="Pagination">
